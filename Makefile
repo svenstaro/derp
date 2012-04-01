@@ -32,4 +32,4 @@ HerpDerp:
 	$(COMPILER) herpderp/*.d $(DFLAGS) $(INCLUDES) -L-Llib -L-lderp $(LFLAGS) -ofbin/herpderp
 
 GoDerper: Derper
-	bin/derper
+	bin/derper test/derp.lua
