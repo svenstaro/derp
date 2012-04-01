@@ -1,33 +1,11 @@
+module derper.main;
+
 import std.stdio;
 import std.conv;
 import std.getopt;
-
 import luad.all;
-
 import derp.all;
-
-
-
-float total_time = 0;
-Derp app;
-
-LuaFunction luaLoad, luaDraw, luaUpdate;
-
-void load() {
-    writeln("Loading...");
-}
-
-void draw() {
-    writeln("Drawing...");
-}
-
-void update(float dt) {
-    total_time += dt;
-    writeln("Updating... " ~ to!string(dt));
-    if(total_time > 4) {
-        app.quit();
-    }
-}
+import derper.loader;
 
 int main(string[] args) {
     // parse arguments
@@ -37,50 +15,25 @@ int main(string[] args) {
         std.getopt.config.bundling,
         "help|h", &help);
 
-    if(help) {
-        writeln("Helping you...");
-        return 0;
-    }
+
 
     if(args.length > 2) {
         writeln("Too many input files.");
-        return 1;
+        help = true;
     } else if(args.length == 1) {
         writeln("No input file.");
-        return 1;
+        help = true;
     }
 
-    string input = args[1];
-    writeln("input file: " ~ input);
+    if(help) {
+        writeln("Display help...");
+        return 0;
+    }
 
-    app = new Derp();
-
-    auto lua = new LuaState;
-    lua.openLibs();
-    lua.setPanicHandler((LuaState lua, in char[] error) {
-        writeln("Lua Error:", error);
-    });
-
-
-    LuaTable luaDerp = lua.newTable;
-    lua["derp"] =  luaDerp;
-    lua["derp", "app"] = app;
-
-    lua["derp", "draw"] = () {};
-    lua["derp", "load"] = () {};
-    lua["derp", "update"] = (float dt) {};
-
-    lua.doFile(input);
-
-    luaDraw = luaDerp.get!LuaFunction("draw");
-    luaUpdate = luaDerp.get!LuaFunction("update");
-    luaLoad = luaDerp.get!LuaFunction("load");
-
-    app.drawCallback = function void() { luaDraw(); };
-    app.updateCallback = function void(float dt) { luaUpdate(dt); };
-    app.loadCallback = function void() { luaLoad(); };
-
-    // draw, load, update
+    Derp app = new Derp();
+    Loader loader = new Loader(app, args[1]);
+    loader.prepareState();
+    loader.doFile();
     app.run();
 
     return 0;
