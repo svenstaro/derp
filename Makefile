@@ -17,3 +17,6 @@ Derper:
 
 HerpDerp:
 	$(COMPILER) herpderp/*.d -I$(BIN) -L-L$(BIN) -L-lderp -ofbin/herpderp
+
+GoDerper: Derper
+	bin/derper
