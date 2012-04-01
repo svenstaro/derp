@@ -1,7 +1,7 @@
 COMPILER=dmd 
-INCLUDES=-I. -Iexternals/LuaD/
-LFLAGS=-L-Lexternals/LuaD/lib/ -L-lluad -L-lluajit-5.1
-DFLAGS=-w -odlib/ -debug -gc -op
+INCLUDES=-I. -Iexternals/LuaD/ -Iexternals/orange/ -Iexternals/Derelict3/import/
+LFLAGS=-L-Lexternals/LuaD/lib/ -L-lluad -L-lluajit-5.1 -L-Lexternals/orange/lib/64/ -L-Lexternals/orange/lib/32/ -L-lorange -L-Lexternals/Derelict3/lib/ -L-lDerelictAL -L-lDerelictFT -L-lDerelictGL3 -L-lDerelictGLFW3 -L-lDerelictIL -L-lDerelictUtil -L-ldl
+DFLAGS=-odlib/ -debug -gc -op
 
 # Aliases
 default: bake
@@ -14,7 +14,15 @@ editor: HerpDerp
 luad:
 	cd externals/LuaD; make
 
-Derp: luad
+orange:
+	cd externals/orange; make
+
+derelict:
+	cd externals/Derelict3/build; rdmd derelict.d
+
+deps: luad orange derelict
+
+Derp: 
 	$(COMPILER) derp/*.d $(DFLAGS) $(INCLUDES) $(LFLAGS) -oflibderp.a -lib
 
 Derper:
