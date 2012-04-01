@@ -4,6 +4,8 @@ import std.stdio;
 
 import luad.all;
 
+static string Version = "0.1";
+
 class Derp {
     LuaState lua;
 
