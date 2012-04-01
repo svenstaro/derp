@@ -83,19 +83,7 @@ class Derp {
             }
 
             // Flip here automatically ?
-
-            auto lua = new LuaState;
-            lua.openLibs();
-            lua.setPanicHandler((LuaState lua, in char[] error) {
-                writeln("Lua Error:", error);
-            });
-
-            // lua.registerType!Derp;
-            lua["derp"] = lua.newTable;
-            lua["derp", "app"] = this;
-
-            lua.doString(`print("Quitting from Lua"); derp.app:quit()`);
-
+            /*
             auto foo = new Foo;
             foo.wut = 3;
 
@@ -105,7 +93,7 @@ class Derp {
             serializer.serialize(foo);
             writeln(cast(string)archive.untypedData());
             auto foo2 = serializer.deserialize!(Foo)(archive.untypedData);
-            assert(foo.wut == foo2.wut);
+            assert(foo.wut == foo2.wut); */
         }
     }
 }
