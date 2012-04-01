@@ -1,9 +1,8 @@
 module derp.resources;
 
 import std.stdio;
-import std.file;
-import std.conv;
 import std.regex;
+import std.file;
 import std.net.curl;
 
 static string Autodetect = "";
@@ -31,7 +30,7 @@ class FilesystemResourceLoader : ResourceLoader {
         source = replace(source, regex("^file://", "i"), "");
 
         Resource r = new Resource(name);
-        r.data = cast(char[]) read(source);
+        r.data = cast(char[]) std.file.read(source);
         return r;
     }
 
@@ -45,7 +44,7 @@ class HttpResourceLoader : ResourceLoader {
         source = replace(source, regex("^https?://", "i"), "");
 
         Resource r = new Resource(name);
-        r.data = cast(char[]) get(source);
+        r.data = cast(char[]) std.net.curl.get(source);
         return r;
     }
 

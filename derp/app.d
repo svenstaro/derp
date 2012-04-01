@@ -1,6 +1,7 @@
 module derp.app;
 
 import std.stdio;
+import std.datetime;
 
 import luad.all;
 
@@ -19,7 +20,7 @@ class Derp {
     void delegate() runCallback;
 
     /// Called in the main loop when updating.
-    void delegate(float) updateCallback;
+    void delegate(double) updateCallback;
 
     /// Called in the main loop for drawing.
     void delegate() drawCallback;
@@ -71,9 +72,13 @@ class Derp {
 
     void mainLoop() {
         running = true;
+        StopWatch clock;
+        clock.start();
         while(running) {
             // Time keeping here
-            float delta_time = 0.5;
+            TickDuration t = clock.peek();
+            clock.reset();
+            double delta_time = 1.0 * t.length / t.ticksPerSec;
 
             // Update everything
             if(updateCallback) {

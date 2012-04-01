@@ -1,6 +1,5 @@
 module derper.loader;
 
-import core.vararg;
 import std.stdio;
 import luad.all;
 import derp.all;
@@ -18,7 +17,7 @@ class Loader {
     void prepareState() {
         this.derp.lua["derp", "load"] = () {};
         this.derp.lua["derp", "draw"] = () {};
-        this.derp.lua["derp", "update"] = (float dt) {};
+        this.derp.lua["derp", "update"] = (double dt) {};
         this.derp.lua["derp", "quit"] = () {};
 
         derp.loadCallback = &luaLoad;
@@ -43,7 +42,7 @@ class Loader {
         lf();
     }
 
-    void luaUpdate(float dt) {
+    void luaUpdate(double dt) {
         auto lt = derp.lua.get!LuaTable("derp");
         auto lf = lt.get!LuaFunction("update");
         lf(dt);
