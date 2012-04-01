@@ -1,7 +1,8 @@
 BIN=bin/
 COMPILER=dmd -od$(BIN)
-INCLUDES=-Iderp/ -Iexternals/LuaD/ 
-DFLAGS=
+INCLUDES=-I. -Iexternals/LuaD/
+LFLAGS=-L-Lexternals/LuaD/lib/ -L-lluad -L-lluajit-5.1
+DFLAGS=-w
 
 # Aliases
 default: bake
@@ -15,13 +16,13 @@ luad:
 	cd externals/LuaD; make
 
 Derp: luad
-	$(COMPILER) derp/*.d $(INCLUDES) -L-Lexternals/LuaD/lib/ -L-lluad -L-llua -oflibderp.a -lib
+	$(COMPILER) derp/*.d $(DFLAGS) $(INCLUDES) $(LFLAGS) -oflibderp.a -lib
 
 Derper:
-	$(COMPILER) derper/*.d $(INCLUDES) -L-L$(BIN) -L-lderp -ofbin/derper
+	$(COMPILER) derper/*.d $(DFLAGS) $(INCLUDES) -L-L$(BIN) -L-lderp $(LFLAGS) -ofbin/derper
 
 HerpDerp:
-	$(COMPILER) herpderp/*.d $(INCLUDES) -L-L$(BIN) -L-lderp -ofbin/herpderp
+	$(COMPILER) herpderp/*.d $(DFLAGS) $(INCLUDES) -L-L$(BIN) -L-lderp $(LFLAGS) -ofbin/herpderp
 
 GoDerper: Derper
 	bin/derper
