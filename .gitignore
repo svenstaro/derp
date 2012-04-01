@@ -1,0 +1,6 @@
+*.sln
+*.pidb
+*.dproj
+*.userprefs
+*.user
+bin/
