@@ -2,6 +2,8 @@ module derp.app;
 
 import std.stdio;
 
+import luad.all;
+
 class Derp {
     /// Is being set to false when the main loop should end.
     bool running = false;
@@ -68,6 +70,10 @@ private:
             }
 
             // Flip here automatically ?
+            auto lua = new LuaState;
+            lua.openLibs();
+
+            lua.doString(`print("derplua")`);
         }
     }
 }

@@ -1,5 +1,7 @@
 BIN=bin/
 COMPILER=dmd -od$(BIN)
+INCLUDES=-Iderp/ -Iexternals/LuaD/ 
+DFLAGS=
 
 # Aliases
 default: bake
@@ -9,14 +11,17 @@ bin: Derper
 editor: HerpDerp
 
 # Compiler Instructions
-Derp:
-	$(COMPILER) derp/*.d -oflibderp.a -lib
+luad:
+	cd externals/LuaD; make
+
+Derp: luad
+	$(COMPILER) derp/*.d $(INCLUDES) -L-Lexternals/LuaD/lib/ -L-lluad -L-llua -oflibderp.a -lib
 
 Derper:
-	$(COMPILER) derper/*.d -I$(BIN) -L-L$(BIN) -L-lderp -ofbin/derper
+	$(COMPILER) derper/*.d $(INCLUDES) -L-L$(BIN) -L-lderp -ofbin/derper
 
 HerpDerp:
-	$(COMPILER) herpderp/*.d -I$(BIN) -L-L$(BIN) -L-lderp -ofbin/herpderp
+	$(COMPILER) herpderp/*.d $(INCLUDES) -L-L$(BIN) -L-lderp -ofbin/herpderp
 
 GoDerper: Derper
 	bin/derper
