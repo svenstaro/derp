@@ -95,6 +95,7 @@ private:
             auto serializer = new Serializer(archive);
 
             serializer.serialize(foo);
+            writeln(cast(string)archive.untypedData());
             auto foo2 = serializer.deserialize!(Foo)(archive.untypedData);
             assert(foo.wut == foo2.wut);
         }
