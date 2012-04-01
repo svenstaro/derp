@@ -1,0 +1,9 @@
+[submodule "externals/LuaD"]
+	path = externals/LuaD
+	url = git://github.com/JakobOvrum/LuaD.git
+[submodule "externals/Derelict3"]
+	path = externals/Derelict3
+	url = git://github.com/aldacron/Derelict3.git
+[submodule "externals/orange"]
+	path = externals/orange
+	url = git://github.com/jacob-carlborg/orange.git
