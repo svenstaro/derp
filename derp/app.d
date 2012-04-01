@@ -4,6 +4,17 @@ import std.stdio;
 
 import luad.all;
 
+import orange.core._;
+import orange.serialization._;
+import orange.serialization.archives._;
+
+import derelict.opengl3.gl3;
+import derelict.glfw3.glfw3;
+
+class Foo {
+    int wut;
+}
+
 class Derp {
     /// Is being set to false when the main loop should end.
     bool running = false;
@@ -26,6 +37,8 @@ class Derp {
     /// Constructor
     this() {
         writeln("Derpy is coming!");
+
+        DerelictGL3.load();
     }
 
     /// Starts the game.
@@ -74,6 +87,16 @@ private:
             lua.openLibs();
 
             lua.doString(`print("derplua")`);
+
+            auto foo = new Foo;
+            foo.wut = 3;
+
+            auto archive = new XmlArchive!(char);
+            auto serializer = new Serializer(archive);
+
+            serializer.serialize(foo);
+            auto foo2 = serializer.deserialize!(Foo)(archive.untypedData);
+            assert(foo.wut == foo2.wut);
         }
     }
 }
