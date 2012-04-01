@@ -6,16 +6,27 @@ class Derp {
     /// Is being set to false when the main loop should end.
     bool running = false;
 
+    /// Called when the game is being started.
     void function() loadCallback;
+
+    /// Called instead of the default main loop, if provided.
     void function() runCallback;
-    void function() drawCallback;
+
+    /// Called in the main loop when updating.
     void function(float) updateCallback;
+
+    /// Called in the main loop for drawing.
+    void function() drawCallback;
+
+    /// Called when the main loop ends.
     void function() quitCallback;
 
+    /// Constructor
     this() {
         writeln("Derpy is coming!");
     }
 
+    /// Starts the game.
     void run() {
         if(loadCallback) {
             loadCallback();
@@ -32,6 +43,7 @@ class Derp {
         }
     }
 
+    /// Cancels the main loop and quits the game.
     void quit() {
         running = false;
     }
