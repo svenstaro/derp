@@ -1,8 +1,7 @@
-BIN=bin/
-COMPILER=dmd -od$(BIN)
+COMPILER=dmd 
 INCLUDES=-I. -Iexternals/LuaD/
 LFLAGS=-L-Lexternals/LuaD/lib/ -L-lluad -L-lluajit-5.1
-DFLAGS=-w
+DFLAGS=-w -odlib/ -debug -gc -op
 
 # Aliases
 default: bake
@@ -19,10 +18,10 @@ Derp: luad
 	$(COMPILER) derp/*.d $(DFLAGS) $(INCLUDES) $(LFLAGS) -oflibderp.a -lib
 
 Derper:
-	$(COMPILER) derper/*.d $(DFLAGS) $(INCLUDES) -L-L$(BIN) -L-lderp $(LFLAGS) -ofbin/derper
+	$(COMPILER) derper/*.d $(DFLAGS) $(INCLUDES) -L-Llib/ -L-lderp $(LFLAGS) -ofbin/derper
 
 HerpDerp:
-	$(COMPILER) herpderp/*.d $(DFLAGS) $(INCLUDES) -L-L$(BIN) -L-lderp $(LFLAGS) -ofbin/herpderp
+	$(COMPILER) herpderp/*.d $(DFLAGS) $(INCLUDES) -L-Llib -L-lderp $(LFLAGS) -ofbin/herpderp
 
 GoDerper: Derper
 	bin/derper
