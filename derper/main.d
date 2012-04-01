@@ -1,7 +1,7 @@
 import std.stdio;
 import std.conv;
 
-import derp.app;
+import derp.all;
 
 float total_time = 0;
 Derp app;
