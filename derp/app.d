@@ -63,7 +63,7 @@ class Derp {
         running = false;
     }
 
-private:
+
     void mainLoop() {
         running = true;
         while(running) {
@@ -83,10 +83,18 @@ private:
             }
 
             // Flip here automatically ?
+
             auto lua = new LuaState;
             lua.openLibs();
+            lua.setPanicHandler((LuaState lua, in char[] error) {
+                writeln("Lua Error:", error);
+            });
 
-            lua.doString(`print("derplua")`);
+            // lua.registerType!Derp;
+            lua["derp"] = lua.newTable;
+            lua["derp", "app"] = this;
+
+            lua.doString(`print("Quitting from Lua"); derp.app:quit()`);
 
             auto foo = new Foo;
             foo.wut = 3;
@@ -101,3 +109,4 @@ private:
         }
     }
 }
+

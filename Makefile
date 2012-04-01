@@ -1,8 +1,7 @@
-BIN=bin/
-COMPILER=dmd -od$(BIN)
+COMPILER=dmd 
 INCLUDES=-I. -Iexternals/LuaD/ -Iexternals/orange/ -Iexternals/Derelict3/import/
 LFLAGS=-L-Lexternals/LuaD/lib/ -L-lluad -L-lluajit-5.1 -L-Lexternals/orange/lib/64/ -L-Lexternals/orange/lib/32/ -L-lorange -L-Lexternals/Derelict3/lib/ -L-lDerelictAL -L-lDerelictFT -L-lDerelictGL3 -L-lDerelictGLFW3 -L-lDerelictIL -L-lDerelictUtil -L-ldl
-#DFLAGS=-w
+DFLAGS=-odlib/ -debug -gc -op
 
 # Aliases
 default: bake
@@ -21,14 +20,16 @@ orange:
 derelict:
 	cd externals/Derelict3/build; rdmd derelict.d
 
-Derp: luad orange derelict
+deps: luad orange derelict
+
+Derp: 
 	$(COMPILER) derp/*.d $(DFLAGS) $(INCLUDES) $(LFLAGS) -oflibderp.a -lib
 
 Derper:
-	$(COMPILER) derper/*.d $(DFLAGS) $(INCLUDES) -L-L$(BIN) -L-lderp $(LFLAGS) -ofbin/derper
+	$(COMPILER) derper/*.d $(DFLAGS) $(INCLUDES) -L-Llib/ -L-lderp $(LFLAGS) -ofbin/derper
 
 HerpDerp:
-	$(COMPILER) herpderp/*.d $(DFLAGS) $(INCLUDES) -L-L$(BIN) -L-lderp $(LFLAGS) -ofbin/herpderp
+	$(COMPILER) herpderp/*.d $(DFLAGS) $(INCLUDES) -L-Llib -L-lderp $(LFLAGS) -ofbin/herpderp
 
 GoDerper: Derper
 	bin/derper
