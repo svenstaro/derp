@@ -1,0 +1,57 @@
+# Configuration file for DBS (D Build System)
+
+compiler: DMD
+libraryPath: lib/
+binaryPath: bin/
+
+Dependency {
+    name: luajit-5.1
+}
+
+Dependency {
+    name: dl
+}
+
+Dependency {
+    name: curl
+}
+
+External {
+    name: luad
+    command: cd externals/LuaD; make
+    # libraries: luad # automatically generated from `name`
+    libraryPaths: externals/LuaD/lib/
+    includePaths: externals/LuaD/
+}
+
+External {
+    name: orange
+    command: cd externals/orange; make
+    # libraries: orange
+    libraryPaths: externals/orange/lib/64/ externals/orange/lib/32/
+    includePaths: externals/orange/
+}
+
+External {
+    name: delerict
+    command: cd externals/Derelict3/build; rdmd derelict.d
+    libraries: DerelictAL DerelictFT DerelictGL3 DerelictGLFW3 DerelictIL DerelictUtil
+    libraryPaths: externals/Derelict3/lib/
+    includePaths: externals/Derelict3/import/
+}
+
+Target {
+    name: derp
+    files: derp/
+    # documentRoot: derp/ # automatically generated from `files`
+    type: StaticLibrary # |SharedLibrary|Executable
+    depends: luajit-5.1 dl curl luad orange delerict
+}
+
+Target {
+    name: derper
+    files: derper/
+    # documentRoot: derper/ # automatically generated from `files`
+    type: Executable
+    depends: derp luad
+}
