@@ -10,7 +10,7 @@
 <a name="derp">
 # Derp - Engine
 
-Derp is a very simple and yet to be powerful game engine for 2D and 3D games written in D. It is supposed to be a *hybrid engine*, providing both a D and a Lua interface. Thus it will be possible to write application code both in D (compiled) or Luad (scripted, dynamically loaded and executed).
+Derp is a very simple and yet to be powerful game engine for 2D and 3D games written in D. It is supposed to be a *hybrid engine*, providing both a D and a Lua interface. Thus it will be possible to write application code both in D (compiled) or Lua (scripted, dynamically loaded and executed with [LuaD](https://github.com/jakobovrum/LuaD/)).
 
 ## Goals
 
