@@ -3,6 +3,7 @@
 compiler: DMD
 libraryPath: lib/
 binaryPath: bin/
+default: derp derper
 
 Dependency {
     name: luajit-5.1
