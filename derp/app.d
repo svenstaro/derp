@@ -5,6 +5,8 @@ import std.datetime;
 
 import luad.all;
 
+import derp.scene;
+
 static string Version = "0.1";
 
 class Derp {
@@ -43,6 +45,8 @@ class Derp {
 
         lua["derp"] = lua.newTable;
         lua["derp", "app"] = this;
+
+        lua.registerType!Node;
 
         // Initialize OpenGL
         // DerelictGL3.load();
