@@ -3,7 +3,7 @@
 compiler: DMD
 libraryPath: lib/
 binaryPath: bin/
-default: derp derper
+default: derp derper herpderp
 
 Dependency {
     name: luajit-5.1
@@ -53,6 +53,13 @@ Target {
     name: derper
     files: derper/
     # documentRoot: derper/ # automatically generated from `files`
+    type: Executable
+    depends: derp luad
+}
+
+Target {
+    name: herpderp
+    files: herpderp/
     type: Executable
     depends: derp luad
 }
