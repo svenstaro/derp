@@ -5,6 +5,8 @@ import std.regex;
 import std.file;
 import std.net.curl;
 
+import derp.fs;
+
 static string Autodetect = "";
 
 class Resource {
@@ -26,11 +28,18 @@ abstract class ResourceLoader {
 }
 
 class FilesystemResourceLoader : ResourceLoader {
+    MergedFileSystem fileSystem;
+
+    this() {
+        this.fileSystem = new MergedFileSystem();
+        this.fileSystem.fileSystems ~= new FileSystem(""); // find files in current directory
+    }
+
     Resource opCall(string source, string name) {
         source = replace(source, regex("^file://", "i"), "");
 
         Resource r = new Resource(name);
-        r.data = cast(char[]) std.file.read(source);
+        r.data = cast(char[]) this.fileSystem.read(source);
         return r;
     }
 

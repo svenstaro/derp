@@ -1,0 +1,2 @@
+This is a simple text file.
+It has just two (2) lines, and some special characters (öäüß).

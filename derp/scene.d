@@ -7,6 +7,8 @@ class Node {
     Node parent = null;
     string name;
 
+    Component[] components;
+
     this(string name, Node parent = null) {
         this.name = name;
         setParent(parent);
@@ -45,4 +47,8 @@ class Node {
         while(n.parent) n = n.parent;
         return n;
     }
+}
+
+class Component {
+
 }
