@@ -4,6 +4,7 @@ compiler: DMD
 libraryPath: lib/
 binaryPath: bin/
 default: derp derper herpderp
+compilerFlags: -fPIC -g -gc -gs -unittest
 
 Dependency {
     name: luajit-5.1
@@ -47,6 +48,7 @@ Target {
     # documentRoot: derp/ # automatically generated from `files`
     type: StaticLibrary # |SharedLibrary|Executable
     depends: luajit-5.1 dl curl luad orange delerict
+    compilerFlags: -D -Dddocs/derp/
 }
 
 Target {
@@ -55,6 +57,7 @@ Target {
     # documentRoot: derper/ # automatically generated from `files`
     type: Executable
     depends: derp luad
+    compilerFlags: -D -Dddocs/derper/
 }
 
 Target {
@@ -62,4 +65,5 @@ Target {
     files: herpderp/
     type: Executable
     depends: derp luad
+    compilerFlags: -D -Dddocs/herpderp/
 }
