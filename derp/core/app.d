@@ -1,13 +1,13 @@
-module derp.app;
+module derp.core.app;
 
 import std.stdio;
 import std.datetime;
 
 import luad.all;
 
-import derp.fs;
-import derp.resources;
-import derp.scene;
+import derp.core.fs;
+import derp.core.resources;
+import derp.core.scene;
 
 static string Version = "0.1";
 
@@ -89,9 +89,6 @@ class Derp {
             end)");
 
         lua.registerType!Node;
-
-        // Initialize OpenGL
-        // DerelictGL3.load();
     }
 
     /**

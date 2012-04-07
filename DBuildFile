@@ -56,7 +56,7 @@ Target {
     files: derper/
     # documentRoot: derper/ # automatically generated from `files`
     type: Executable
-    depends: derp luad
+    depends: derp luad delerict
     compilerFlags: -D -Dddocs/derper/
 }
 
@@ -64,6 +64,6 @@ Target {
     name: herpderp
     files: herpderp/
     type: Executable
-    depends: derp luad
+    depends: derp luad delerict
     compilerFlags: -D -Dddocs/herpderp/
 }

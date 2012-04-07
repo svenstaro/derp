@@ -28,7 +28,7 @@ int main(string[] args) {
 
     if(display_version) {
         writeln("Derp Engine Loader - Derper");
-        writeln("Version " ~ derp.app.Version);
+        writeln("Version " ~ derp.core.app.Version);
         return 0;
     }
     if(!resource_compiled && args.length > 2) {

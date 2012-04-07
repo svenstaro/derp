@@ -4,7 +4,7 @@
  * Todo: Merge with derp.fs and Resource class.
  */
 
-module derp.resources;
+module derp.core.resources;
 
 import std.stdio;
 import std.regex;
@@ -12,7 +12,7 @@ import std.file;
 import std.conv;
 import std.net.curl;
 
-import derp.fs;
+import derp.core.fs;
 
 static string Autodetect = "";
 
