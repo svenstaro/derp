@@ -25,9 +25,6 @@ int main(string[] args) {
     if(args.length > 2) {
         writeln("Too many input files.");
         display_help = true;
-    } else if(args.length == 1) {
-        writeln("No input file.");
-        display_help = true;
     }
 
     if(display_help) {
@@ -36,9 +33,29 @@ int main(string[] args) {
     }
 
     Derp app = new Derp();
-    Loader loader = new Loader(app, args[1]);
+
+    ubyte[] data;
+    if(args.length >= 2) {
+        // Load the zipfile
+        Resource zipFile = app.resourceManager.load(args[1]);
+        data = zipFile.bytes;
+    }
+    Loader loader = new Loader(app, data);
+
     loader.prepareState();
-    loader.doFile();
+    try {
+        loader.doFile();
+    } catch(FileNotFoundException e) {
+        if(e.file == "main.lua") {
+            writeln("Cannot find `main.lua`.");
+            if(args.length == 1) {
+                writeln("Please create main.lua in this directory or add it to a zip archive and call derper with this archive.");
+            } else {
+                writeln("The archive you supplied did not contain a file main.lua.");
+            }
+            return 1;
+        }
+    }
     app.run();
 
     return 0;

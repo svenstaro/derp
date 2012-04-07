@@ -1,12 +1,18 @@
 module derp.app;
 
 import std.stdio;
+import std.datetime;
 
 import luad.all;
+
+import derp.fs;
+import derp.resources;
+import derp.scene;
 
 static string Version = "0.1";
 
 class Derp {
+    ResourceManager resourceManager;
     LuaState lua;
 
     /// Is being set to false when the main loop should end.
@@ -19,7 +25,7 @@ class Derp {
     void delegate() runCallback;
 
     /// Called in the main loop when updating.
-    void delegate(float) updateCallback;
+    void delegate(double) updateCallback;
 
     /// Called in the main loop for drawing.
     void delegate() drawCallback;
@@ -30,6 +36,8 @@ class Derp {
     /// Constructor
     this() {
         writeln("Derpy is coming!");
+
+        this.resourceManager = new ResourceManager();
 
         // Create Lua State
         lua = new LuaState;
@@ -43,8 +51,31 @@ class Derp {
         lua["derp"] = lua.newTable;
         lua["derp", "app"] = this;
 
+        lua.doString("loadfile = function(src)
+                return derp.app:luaLoad(src, \"\")
+            end");
+        lua.doString("function dofile(src)
+                loadfile(src)()
+            end");
+        lua.doString("table.insert(
+            package.loaders, 2, function(src)
+                f = derp.app:luaLoad(src .. \".lua\", src)
+                return f
+            end)");
+
+        lua.registerType!Node;
+
         // Initialize OpenGL
         // DerelictGL3.load();
+    }
+
+    LuaFunction luaRequire(string source) {
+        return this.luaLoad(source ~ ".lua", source);
+    }
+
+    LuaFunction luaLoad(string source, string name = "") {
+        Resource r = this.resourceManager.load(source, name == "" ? Autodetect : name);
+        return lua.loadString(r.text);
     }
 
     /// Starts the game.
@@ -71,9 +102,13 @@ class Derp {
 
     void mainLoop() {
         running = true;
+        StopWatch clock;
+        clock.start();
         while(running) {
             // Time keeping here
-            float delta_time = 0.5;
+            TickDuration t = clock.peek();
+            clock.reset();
+            double delta_time = 1.0 * t.length / t.ticksPerSec;
 
             // Update everything
             if(updateCallback) {

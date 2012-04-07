@@ -2,4 +2,4 @@
 
 module derp.all;
 
-public import derp.app, derp.resources;
+public import derp.app, derp.resources, derp.scene, derp.fs;

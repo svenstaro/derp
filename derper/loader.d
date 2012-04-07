@@ -1,6 +1,5 @@
 module derper.loader;
 
-import core.vararg;
 import std.stdio;
 import luad.all;
 import derp.all;
@@ -10,15 +9,20 @@ class Loader {
     Derp derp;
     string filename;
 
-    this(Derp derp, string filename) {
+    this(Derp derp, ubyte[] data = []) {
         this.derp = derp;
-        this.filename = filename;
+
+        if(data) {
+            // Load the Zip File
+            FilesystemResourceLoader fsr = cast(FilesystemResourceLoader) this.derp.resourceManager.loaders["filesystem"];
+            fsr.fileSystem.fileSystems ~= new ZipFileSystem(data);
+        }
     }
 
     void prepareState() {
         this.derp.lua["derp", "load"] = () {};
         this.derp.lua["derp", "draw"] = () {};
-        this.derp.lua["derp", "update"] = (float dt) {};
+        this.derp.lua["derp", "update"] = (double dt) {};
         this.derp.lua["derp", "quit"] = () {};
 
         derp.loadCallback = &luaLoad;
@@ -28,7 +32,8 @@ class Loader {
     }
 
     void doFile() {
-        derp.lua.doFile(filename);
+        Resource main = this.derp.resourceManager.load("main.lua");
+        derp.lua.doString(main.text);
     }
 
     void luaLoad() {
@@ -43,7 +48,7 @@ class Loader {
         lf();
     }
 
-    void luaUpdate(float dt) {
+    void luaUpdate(double dt) {
         auto lt = derp.lua.get!LuaTable("derp");
         auto lf = lt.get!LuaFunction("update");
         lf(dt);

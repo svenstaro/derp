@@ -1,20 +1,30 @@
 module derp.resources;
 
 import std.stdio;
+import std.regex;
 import std.file;
 import std.conv;
-import std.regex;
 import std.net.curl;
+
+import derp.fs;
 
 static string Autodetect = "";
 
 class Resource {
     string sourceType;
     string name;
-    char[] data;
+    void[] data;
 
     this(string name) {
         this.name = name;
+    }
+
+    @property ubyte[] bytes() {
+        return cast(ubyte[]) this.data;
+    }
+
+    @property string text() {
+        return to!string(this.data);
     }
 }
 
@@ -27,11 +37,18 @@ abstract class ResourceLoader {
 }
 
 class FilesystemResourceLoader : ResourceLoader {
+    MergedFileSystem fileSystem;
+
+    this() {
+        this.fileSystem = new MergedFileSystem();
+        this.fileSystem.fileSystems ~= new FileSystem(""); // find files in current directory
+    }
+
     Resource opCall(string source, string name) {
         source = replace(source, regex("^file://", "i"), "");
 
         Resource r = new Resource(name);
-        r.data = cast(char[]) read(source);
+        r.data = this.fileSystem.read(source);
         return r;
     }
 
@@ -45,7 +62,7 @@ class HttpResourceLoader : ResourceLoader {
         source = replace(source, regex("^https?://", "i"), "");
 
         Resource r = new Resource(name);
-        r.data = cast(char[]) get(source);
+        r.data = std.net.curl.get(source);
         return r;
     }
 
@@ -93,12 +110,12 @@ class ResourceManager {
                 }
             }
             if(sourceType == Autodetect) {
-                writeln("Could not Auto-Detect SourceType for " ~ source);
-                writeln("  using default SourceType " ~ defaultSourceType);
+                // writeln("Could not Auto-Detect SourceType for " ~ source);
+                // writeln("  using default SourceType " ~ defaultSourceType);
                 sourceType = defaultSourceType;
             } else {
-                writeln("Auto-Detect SourceType: " ~ sourceType);
-                writeln("  for " ~ source);
+                // writeln("Auto-Detect SourceType: " ~ sourceType);
+                // writeln("  for " ~ source);
             }
         }
 
