@@ -1,18 +1,43 @@
-module derp.app;
+module derp.core.app;
 
 import std.stdio;
 import std.datetime;
 
 import luad.all;
 
-import derp.fs;
-import derp.resources;
-import derp.scene;
+import derp.core.fs;
+import derp.core.resources;
+import derp.core.scene;
 
 static string Version = "0.1";
 
+/**
+ * This is the main engine object. It connects all submodules and contains
+ * the main loop.
+ *
+ * Examples:
+ * ---
+ * // This is all you need to run the main loop.
+ * import std.stdio;
+ * import std.functional;
+ * import derp.all;
+ *
+ * Derp derp = new Derp();
+ * derp.updateCallback = std.functional.toDelegate((double dt) {
+ *     std.stdio.writefln("Updating... ", dt);
+ * });
+ * derp.run();
+ * ---
+ */
 class Derp {
+    /// The global resource manager
     ResourceManager resourceManager;
+
+    /**
+     * The main LuaState.
+     *
+     * This is filled with global properties (e.g. "derp.app") on initialization.
+     */
     LuaState lua;
 
     /// Is being set to false when the main loop should end.
@@ -64,21 +89,29 @@ class Derp {
             end)");
 
         lua.registerType!Node;
-
-        // Initialize OpenGL
-        // DerelictGL3.load();
     }
 
-    LuaFunction luaRequire(string source) {
-        return this.luaLoad(source ~ ".lua", source);
-    }
-
+    /**
+     * Replacement function for Lua's loadfile() and require()
+     *
+     * Parses the contents of the source into a lua function.
+     *
+     * Parameters:
+     *      source = The filename of the LUA file (including extension)
+     *               to load.
+     *      name   = The resource name. Leave empty for Autodetect. Default: ""
+     */
     LuaFunction luaLoad(string source, string name = "") {
         Resource r = this.resourceManager.load(source, name == "" ? Autodetect : name);
         return lua.loadString(r.text);
     }
 
-    /// Starts the game.
+    /**
+     * Starts the game.
+     *
+     * This will eventually start either the default mainLoop, or call
+     * the runCallback, if one was specified.
+     */
     void run() {
         if(loadCallback) {
             loadCallback();
@@ -95,11 +128,18 @@ class Derp {
         }
     }
 
-    /// Cancels the main loop and quits the game.
+    /**
+     * Cancels the mainLoop and quits the game.
+     *
+     * For custom main loop implementations with runCallback, make sure
+     * to check the running variable each frame and manually terminate
+     * the loop.
+     */
     void quit() {
         running = false;
     }
 
+    /// The default main loop of the engine.
     void mainLoop() {
         running = true;
         StopWatch clock;

@@ -1,4 +1,4 @@
-module derp.scene;
+module derp.core.scene;
 
 import std.algorithm;
 

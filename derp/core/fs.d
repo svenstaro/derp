@@ -1,4 +1,4 @@
-module derp.fs;
+module derp.core.fs;
 
 import core.exception;
 

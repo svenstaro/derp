@@ -2,38 +2,39 @@ import derp.all;
 
 import std.stdio;
 
+import derelict.opengl3.gl3;
+import derelict.glfw3.glfw3;
+
 int main(string[] args) {
+    Window w = new Window("Hello World", 300, 200, 32, Window.Mode.Windowed);
 
-    FileSystem root = new FileSystem("test");
-    ZipFileSystem zip = new ZipFileSystem(root.readBytes("test_zip.zip"));
+    for(int i = 0; i < 100; ++i) {
+        w.update();
+        w.clear(new Color(1, 0, 0));
+        w.display();
+    }
+    w.close();
 
-    assert(zip.exists("testDir/") == true);
-    assert(zip.exists("invalidDir/") == false);
-    assert(zip.exists("testDir/file") == true);
-    assert(zip.getSize("testDir/file") == 8);
-    assert(zip.readText("testDir/file") == "CONTENT\n");
+    /*DerelictGL3.load();
+    DerelictGLFW3.load();
 
-    try {
-        root.getSize("invalidFile");
-        assert(0);
-    } catch(FileNotFoundException e) {
-        assert(e.file == "invalidFile");
-        assert(e.fileSystem == root);
+    if(!glfwInit()) {
+        writeln("Cannot make init");
+        return 1;
     }
 
-    // MergedFileSystem both = new MergedFileSystem();
-    // the higher in the array, the higher the priority
-    // both.fileSystems ~= zip;
-    // both.fileSystems ~= root;
+    //glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 2);
+    //glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 1);
+    //glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    Derp app = new Derp();
+    GLFWwindow w = glfwOpenWindow(100, 100, GLFW_WINDOWED, "omg", null);
+    if(w) {
+        writeln("Made a window.");
+    } else {
+        writeln("Failed making a window.");
+    }
+    DerelictGL3.reload();
 
-    FilesystemResourceLoader frl = cast(FilesystemResourceLoader) app.resourceManager.loaders["filesystem"];
-    frl.fileSystem.fileSystems ~= root;
-    frl.fileSystem.fileSystems ~= zip;
-
-    Resource double_file = app.resourceManager.load("double_file");
-    writeln(double_file.text);
-
+    glfwTerminate();*/
     return 0;
 }
