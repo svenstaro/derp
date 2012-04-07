@@ -9,9 +9,14 @@ class Loader {
     Derp derp;
     string filename;
 
-    this(Derp derp, string filename) {
+    this(Derp derp, ubyte[] data = []) {
         this.derp = derp;
-        this.filename = filename;
+
+        if(data) {
+            // Load the Zip File
+            FilesystemResourceLoader fsr = cast(FilesystemResourceLoader) this.derp.resourceManager.loaders["filesystem"];
+            fsr.fileSystem.fileSystems ~= new ZipFileSystem(data);
+        }
     }
 
     void prepareState() {
@@ -27,7 +32,8 @@ class Loader {
     }
 
     void doFile() {
-        derp.lua.doFile(filename);
+        Resource main = this.derp.resourceManager.load("main.lua");
+        derp.lua.doString(main.text);
     }
 
     void luaLoad() {

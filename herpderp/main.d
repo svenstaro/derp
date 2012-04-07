@@ -26,13 +26,14 @@ int main(string[] args) {
     // both.fileSystems ~= zip;
     // both.fileSystems ~= root;
 
-    ResourceManager r = new ResourceManager();
-    FilesystemResourceLoader fsr = cast(FilesystemResourceLoader) r.loaders["filesystem"];
-    fsr.fileSystem.fileSystems ~= root;
-    fsr.fileSystem.fileSystems ~= zip;
+    Derp app = new Derp();
 
-    Resource double_file = r.load("double_file");
-    writeln(double_file.data);
+    FilesystemResourceLoader frl = cast(FilesystemResourceLoader) app.resourceManager.loaders["filesystem"];
+    frl.fileSystem.fileSystems ~= root;
+    frl.fileSystem.fileSystems ~= zip;
+
+    Resource double_file = app.resourceManager.load("double_file");
+    writeln(double_file.text);
 
     return 0;
 }
