@@ -9,4 +9,4 @@
 	url = git://github.com/jacob-carlborg/orange.git
 [submodule "externals/gl3n"]
 	path = externals/gl3n
-	url = git@github.com:svenstaro/gl3n.git
+	url = git://github.com/svenstaro/gl3n.git
