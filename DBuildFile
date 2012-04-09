@@ -19,6 +19,14 @@ Dependency {
 }
 
 External {
+    name: gl3n
+    command: cd externals/gl3n; make
+    libraries: gl3n-dmd # automatically generated from `name`
+    libraryPaths: externals/gl3n/lib/
+    includePaths: externals/gl3n/import/
+}
+
+External {
     name: luad
     command: cd externals/LuaD; make
     # libraries: luad # automatically generated from `name`
@@ -47,7 +55,7 @@ Target {
     files: derp/
     # documentRoot: derp/ # automatically generated from `files`
     type: StaticLibrary # |SharedLibrary|Executable
-    depends: luajit-5.1 dl curl luad orange delerict
+    depends: luajit-5.1 dl curl luad orange delerict gl3n
     compilerFlags: -D -Dddocs/derp/
 }
 
@@ -56,7 +64,7 @@ Target {
     files: derper/
     # documentRoot: derper/ # automatically generated from `files`
     type: Executable
-    depends: derp luad delerict
+    depends: derp luad delerict gl3n
     compilerFlags: -D -Dddocs/derper/
 }
 
@@ -64,6 +72,6 @@ Target {
     name: herpderp
     files: herpderp/
     type: Executable
-    depends: derp luad delerict
+    depends: derp luad delerict gl3n
     compilerFlags: -D -Dddocs/herpderp/
 }
