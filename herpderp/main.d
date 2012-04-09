@@ -6,6 +6,9 @@ import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
 
 int main(string[] args) {
+    audioTest();
+    return 0;
+
     Window w = new Window("Hello World", 300, 200, 32, Window.Mode.Windowed);
 
     for(int i = 0; i < 100; ++i) {
