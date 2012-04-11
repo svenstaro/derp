@@ -7,6 +7,7 @@ import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
 import gl3n.linalg;
 
+import derp.graphics.util;
 import derp.graphics.draw;
 import derp.graphics.view;
 

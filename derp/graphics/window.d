@@ -7,53 +7,12 @@ module derp.graphics.window;
 import std.stdio;
 import std.string;
 
+import derp.graphics.util;
 import derp.graphics.draw;
 import derp.graphics.view;
 
 import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
-
-static bool graphicsInitialized = false;
-
-void initializeGraphics(Context context = null) {
-    if(graphicsInitialized) return;
-
-    DerelictGL3.load();
-    DerelictGLFW3.load();
-
-    if(!glfwInit())
-        throw new GraphicsException("Failed to initialize GLFW.", context);
-
-    // reloadGraphics(context);
-
-    graphicsInitialized = true;
-}
-
-void reloadGraphics(Context context) {
-    // make sure the graphics system is initialized
-    initializeGraphics(context);
-
-    GLVersion glVersion = DerelictGL3.reload();
-    writefln("Loaded OpenGL Version %s", glVersion);
-}
-
-void deinitializeGraphics() {
-    if(!graphicsInitialized) return;
-    glfwTerminate();
-}
-
-
-class GraphicsException : Exception {
-    Context context;
-
-    this(string text, Context context) {
-        super("Error in graphics context: " ~ text);
-    }
-}
-
-interface Context {
-    void activate();
-}
 
 class Window : Context {
     enum Mode {

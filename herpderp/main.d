@@ -9,9 +9,7 @@ import derelict.glfw3.glfw3;
 import gl3n.linalg;
 
 static string fragmentSolid = "#version 120
-
 varying vec4 fColor;
-
 
 void main() {
     gl_FragColor = fColor;
