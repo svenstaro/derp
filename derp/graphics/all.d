@@ -5,6 +5,7 @@ module derp.graphics.all;
 public import
     derp.graphics.draw,
     derp.graphics.shader,
+    derp.graphics.sprite,
     derp.graphics.texture,
     derp.graphics.util,
     derp.graphics.vertexbuffer,

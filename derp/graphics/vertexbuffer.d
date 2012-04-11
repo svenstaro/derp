@@ -37,7 +37,12 @@ class VertexBufferObject {
     ulong vertexCount;
 
     this(ShaderProgram shaderProgram = null) {
-        this.shaderProgram = shaderProgram;
+        if(shaderProgram) {
+            this.shaderProgram = shaderProgram;
+        } else {
+            ShaderProgram.createDefaultShaders(); // will not re-create the default shaders
+            this.shaderProgram = ShaderProgram.defaultPipeline;
+        }
         create();
     }
 

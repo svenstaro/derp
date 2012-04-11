@@ -7,12 +7,13 @@ module derp.graphics.window;
 import std.stdio;
 import std.string;
 
+import derelict.opengl3.gl3;
+import derelict.glfw3.glfw3;
+
+import derp.core.geo;
 import derp.graphics.util;
 import derp.graphics.draw;
 import derp.graphics.view;
-
-import derelict.opengl3.gl3;
-import derelict.glfw3.glfw3;
 
 class Window : Context {
     enum Mode {

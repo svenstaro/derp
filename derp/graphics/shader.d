@@ -7,6 +7,7 @@ import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
 import gl3n.linalg;
 
+import derp.core.geo;
 import derp.graphics.util;
 import derp.graphics.draw;
 import derp.graphics.view;
@@ -210,4 +211,56 @@ class ShaderProgram {
         glUniform1i(pos, location);
         detach();
     }
+
+    // ========== STATIC STUFF ==========
+
+    static ShaderProgram defaultPipeline = null;
+
+    static void createDefaultShaders() {
+        if(defaultPipeline) return; // do not recreate
+
+        Shader[] shaders;
+        shaders ~= new Shader(defaultVertexShader, Shader.Type.vertex);
+        shaders ~= new Shader(defaultFragmentShader, Shader.Type.fragment);
+        defaultPipeline = new ShaderProgram(shaders);
+    }
+
+    static void createDefaultShaders(string vertex, string fragment) {
+        defaultPipeline = null;
+        defaultFragmentShader = fragment;
+        defaultVertexShader = vertex;
+        ShaderProgram.createDefaultShaders();
+    }
 }
+
+static string defaultFragmentShader  = "#version 120
+varying vec4 fColor;
+varying vec2 fTexCoord;
+uniform sampler2D uTexture0;
+
+void main() {
+    gl_FragColor = texture2D(uTexture0, fTexCoord);
+    //gl_FragColor = fColor;
+    //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+";
+
+static string defaultVertexShader = "#version 120
+uniform mat4 uModelViewProjectionMatrix;
+attribute vec3 vVertex;
+attribute vec2 vTexCoord;
+attribute vec4 vColor;
+
+varying vec4 fColor;
+varying vec2 fTexCoord;
+
+void main() {
+    gl_Position = uModelViewProjectionMatrix * vec4(vVertex, 1.0);
+    // gl_Position = vec4(vVertex.x, vVertex.y, 0.0, 1.0);
+    // gl_TexCoord[0].st = vTexCoord;
+
+    // fColor = vColor;
+    fColor = vColor; // vec4(1.0, 0.0, 0.0, 1.0);
+    fTexCoord = vTexCoord;
+}
+";

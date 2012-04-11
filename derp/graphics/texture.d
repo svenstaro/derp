@@ -11,6 +11,7 @@ import derelict.devil.il;
 import derelict.devil.ilu;
 import derelict.devil.ilut;
 
+import derp.core.geo;
 import derp.graphics.util;
 import derp.graphics.view;
 

@@ -4,10 +4,9 @@ import std.algorithm;
 
 class Node {
     Node[] children;
+    Component[] components;
     Node parent = null;
     string name;
-
-    Component[] components;
 
     this(string name, Node parent = null) {
         this.name = name;
@@ -20,16 +19,11 @@ class Node {
 
     void setParent(Node parent) {
         if(this.parent) {
-            // This node is already the child of another node,
-            // remove it from its children list.
             remove(this.parent.children, indexOf(this.parent.children, this));
-            // this.parent.children.remove(this);
         }
-
         if(parent) {
             parent.children ~= this;
         }
-
         this.parent = parent;
     }
 
@@ -47,8 +41,32 @@ class Node {
         while(n.parent) n = n.parent;
         return n;
     }
+
+    void addComponent(Component c) {
+        c.setNode(this);
+    }
 }
 
 class Component {
+    Node node;
+    string name;
 
+    this(string name) {
+        this.name = name;
+    }
+
+    @property string path() {
+        if(node) return node.path ~ "/" ~ name;
+        else return "<unattached>/" ~ name;
+    }
+
+    void setNode(Node node) {
+        if(this.node) {
+            remove(this.node.components, indexOf(this.node.components, this));
+        }
+        if(node) {
+            node.components ~= this;
+        }
+        this.node = node;
+    }
 }
