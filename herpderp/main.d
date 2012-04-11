@@ -1,6 +1,7 @@
 import derp.all;
 
 import std.stdio;
+import std.math;
 import std.random;
 
 import derelict.opengl3.gl3;
@@ -19,7 +20,7 @@ void main() {
 ";
 
 static string standardVertex = "#version 120
-// uniform mat4 uModelViewProjectionMatrix;
+uniform mat4 uModelViewProjectionMatrix;
 attribute vec3 vVertex;
 attribute vec2 vTexCoord;
 attribute vec4 vColor;
@@ -28,8 +29,8 @@ varying vec4 fColor;
 varying vec2 fTexCoord;
 
 void main() {
-    //gl_Position = uModelViewProjectionMatrix * vec4(vVertex, 1.0);
-    gl_Position = vec4(vVertex.x, vVertex.y, 0.0, 1.0);
+    gl_Position = uModelViewProjectionMatrix * vec4(vVertex, 1.0);
+    // gl_Position = vec4(vVertex.x, vVertex.y, 0.0, 1.0);
     // gl_TexCoord[0].st = vTexCoord;
 
     // fColor = vColor;
@@ -65,33 +66,28 @@ int main(string[] args) {
     data ~= VertexData(-0.8, -0.8, 0, 0, 0, 1);
     vbo.setVertices(data);
 
-    // Create model-view-matrix
-    Matrix4 modelView = Matrix4(
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, -10,
-            0, 0, 0, 1
+    w.backgroundColor = Color.Background;
+    float x = 0;
+    while(w.isOpen()) {
+        x += 0.03;
+
+        Vector3 camPos = Vector3(
+            sin(x) * 2,
+            cos(x) * 2,
+            - 4
             );
 
-    /* Matrix4 projection = Matrix4(
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 1
-    ); */
-    Matrix4 projection = orthographicProjection(-1, 1, -1, 1);
+        Matrix4 projection = orthographicProjection(-1, 1, -1, 1);
+        Matrix4 modelView = Matrix4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            - camPos.x, - camPos.y, - camPos.z, 1
+            );
 
 
-    w.backgroundColor = Color.Background;
-    while(w.isOpen()) {
-
-        /* Vector3 camPos = Vector3(
-            uniform(-10.0, 10.0),
-            uniform(-10.0, 10.0),
-            uniform(-10.0, 10.0)
-            ); */
         // ProjectionMatrix mat = ProjectionMatrix.look_at(camPos, Vector3(0, 0, 0), Vector3(0, 1, 0));
-        // defaultShaderProgram.setMvpMatrix(modelView * projection);
+        defaultShaderProgram.setMvpMatrix(modelView * projection);
 
         w.update();
         w.clear();
