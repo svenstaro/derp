@@ -31,7 +31,7 @@ struct VertexData {
 class VertexBufferObject {
     ShaderProgram shaderProgram;
 
-    uint vbo; // vertex buffer object, keeps track of vertex attributes etc.
+    uint array; // vertex buffer object, keeps track of vertex attributes etc.
     uint buffer;
     ulong vertexCount;
 
@@ -45,9 +45,9 @@ class VertexBufferObject {
         this.shaderProgram.attach();
 
         // Create VBO
-        glGenVertexArrays(1, &vbo);
+        glGenVertexArrays(1, &array);
         glCheck();
-        glBindVertexArray(vbo);
+        glBindVertexArray(array);
         glCheck();
 
         // Create the buffer
@@ -62,11 +62,10 @@ class VertexBufferObject {
         glEnableVertexAttribArray(2);
         glCheck();
 
-        //glBindAttribLocation(this.shaderProgram.handle, 0, "_vertex");
-        //glBindAttribLocation(this.shaderProgram.handle, 1, "_color");
-        //glBindAttribLocation(this.shaderProgram.handle, 2, "_texCoord");
-        // glBindFragDataLocation(this.shaderProgram.handle, 0, "outColor");
-        glCheck();
+        // glBindAttribLocation(this.shaderProgram.handle, 0, "_vertex");
+        // glBindAttribLocation(this.shaderProgram.handle, 1, "_color");
+        // glBindAttribLocation(this.shaderProgram.handle, 2, "_texCoord");
+        // glCheck();
 
         // Define Attribute Sets
         // DOC: glVertexAttribPointer(index, size, type, normalized, stride (offset between 2 attributes), offset);
@@ -79,9 +78,9 @@ class VertexBufferObject {
         // this.setVertexArray([]);
 
         // Disable Attribute Sets
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
+        // glDisableVertexAttribArray(0);
+        // glDisableVertexAttribArray(1);
+        // glDisableVertexAttribArray(2);
         glCheck();
 
         // Clean up context
@@ -100,12 +99,12 @@ class VertexBufferObject {
     void setVertices(VertexData[] vertices) {
         this.shaderProgram.attach();
 
-        glBindVertexArray(vbo);
+        glBindVertexArray(array);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glCheck();
 
         this.vertexCount = vertices.length;
-        glBufferData(GL_ARRAY_BUFFER, vertices.length * VertexData.sizeof, &vertices, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.length * VertexData.sizeof, vertices.ptr, GL_STATIC_DRAW);
         glCheck();
 
         glBindVertexArray(0);
@@ -121,7 +120,8 @@ class VertexBufferObject {
         // attach texture
         this.shaderProgram.attach();
 
-        glBindVertexArray(vbo); // is the buffer connected to the vbo?
+        glBindVertexArray(array); // is the vertex buffer object connected to the vertex array obkect?
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glCheck();
 
         // Enable Attribute Sets
@@ -131,7 +131,7 @@ class VertexBufferObject {
         glCheck();
 
         // glDisable(GL_LIGHTING);
-        // glDisable(GL_DEPTH_TEST);
+        glDisable(GL_DEPTH_TEST);
         // glDisable(GL_ALPHA_TEST);
         // glEnable(GL_TEXTURE_2D);
         // glEnable(GL_BLEND);
@@ -142,13 +142,14 @@ class VertexBufferObject {
         glCheck();
 
         // Disable Attribute Sets
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
+        //glDisableVertexAttribArray(0);
+        //glDisableVertexAttribArray(1);
+        //glDisableVertexAttribArray(2);
         glCheck();
 
         // Unbind
         glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glCheck();
 
         this.shaderProgram.detach();

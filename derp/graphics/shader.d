@@ -103,9 +103,9 @@ class ShaderProgram {
         }
 
         // link
-        glBindAttribLocation(handle, 0, "_vertex");
-        glBindAttribLocation(handle, 1, "_color");
-        glBindAttribLocation(handle, 2, "_texCoord");
+        glBindAttribLocation(handle, 0, "vVertex");
+        glBindAttribLocation(handle, 1, "vColor");
+        glBindAttribLocation(handle, 2, "vTexCoord");
         glCheck();
 
 
@@ -185,9 +185,11 @@ class ShaderProgram {
         glCheck();
     }
 
-    void setProjectionMatrix(ProjectionMatrix matrix) {
-        int pos = getUniformLocation("projectionMatrix");
-        assert(pos != -1, "Cannot find active uniform `projectionMatrix` in shader.");
+    /// Sets the model-view-projection matrix as "uModelViewProjectionMatrix"
+    /// or `name`
+    void setMvpMatrix(ProjectionMatrix matrix, string name = "uModelViewProjectionMatrix") {
+        int pos = getUniformLocation(name);
+        assert(pos != -1, "Cannot find active uniform `" ~ name ~ "` in shader.");
 
         attach();
         sendUniformMat4(pos, matrix);

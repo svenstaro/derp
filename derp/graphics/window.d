@@ -34,7 +34,7 @@ void reloadGraphics(Context context) {
     initializeGraphics(context);
 
     GLVersion glVersion = DerelictGL3.reload();
-    // writefln("Loaded OpenGL Version %s", glVersion);
+    writefln("Loaded OpenGL Version %s", glVersion);
 }
 
 void deinitializeGraphics() {
