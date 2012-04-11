@@ -10,6 +10,7 @@ import gl3n.linalg;
 import derp.graphics.util;
 import derp.graphics.draw;
 import derp.graphics.view;
+import derp.graphics.texture;
 
 import std.array;
 
@@ -197,5 +198,16 @@ class ShaderProgram {
         detach();
 
         glCheck();
+    }
+
+    void setTexture(Texture texture, string name = "texture", int location = 0) {
+        uint pos = getUniformLocation(name);
+        assert(pos != -1, "Cannot find texture sampler `" ~ name ~ "` in shader.");
+
+        attach();
+        texture.bind();
+        glActiveTexture(GL_TEXTURE0 + location);
+        glUniform1i(pos, location);
+        detach();
     }
 }

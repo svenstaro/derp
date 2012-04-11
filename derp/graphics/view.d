@@ -8,7 +8,7 @@ import std.algorithm;
 import std.string;
 import std.conv;
 
-import gl3n.linalg; // let everyone access vec2 etc.
+public import gl3n.linalg; // let everyone access vec2 etc.
 
 alias vec2 Vector2;
 alias vec3 Vector3;

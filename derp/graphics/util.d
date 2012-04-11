@@ -9,6 +9,11 @@ import std.string;
 
 import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
+import derelict.devil.il;
+import derelict.devil.ilu;
+import derelict.devil.ilut;
+
+import derp.core.input;
 
 static bool graphicsInitialized = false;
 
@@ -22,6 +27,22 @@ void initializeGraphics(Context context = null) {
         throw new GraphicsException("Failed to initialize GLFW.", context);
 
     // reloadGraphics(context);
+
+    DerelictIL.load();
+
+    /*if (ilGetInteger(IL_VERSION_NUM) < IL_VERSION ||
+        iluGetInteger(ILU_VERSION_NUM) < ILU_VERSION ||
+        ilutGetInteger(ILUT_VERSION_NUM) < ILUT_VERSION) {
+        throw new GraphicsException("Outdated DevIL version.", context);
+    }*/
+
+    ilInit();
+    //iluInit();
+    //ilutInit();
+
+    // ilutRenderer(ILUT_OPENGL);
+
+    initializeInput();
 
     graphicsInitialized = true;
 }
@@ -80,6 +101,18 @@ bool glCheck(string file = __FILE__, int line = __LINE__) {
                 break;
         }
         error = glGetError();
+    }
+    return false;
+}
+
+bool ilCheck(string file = __FILE__, int line = __LINE__) {
+    int error = ilGetError();
+    if (error == IL_NO_ERROR) return true;
+
+    write(format("[[ %s:%s ]]", file, line));
+
+    while (error != IL_NO_ERROR) {
+        writefln("%s (%s)", iluErrorString(error), error);
     }
     return false;
 }

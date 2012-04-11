@@ -112,7 +112,7 @@ class VertexBufferObject {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glCheck();
 
-        writefln("Setting %s vertices.", this.vertexCount);
+        // writefln("Setting %s vertices.", this.vertexCount);
 
         this.shaderProgram.detach();
     }

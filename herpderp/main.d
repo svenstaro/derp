@@ -10,9 +10,12 @@ import gl3n.linalg;
 
 static string fragmentSolid = "#version 120
 varying vec4 fColor;
+varying vec2 fTexCoord;
+uniform sampler2D uTexture0;
 
 void main() {
-    gl_FragColor = fColor;
+    gl_FragColor = texture2D(uTexture0, fTexCoord);
+    //gl_FragColor = fColor;
     //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
 ";
@@ -59,10 +62,22 @@ int main(string[] args) {
 
     VertexBufferObject vbo = new VertexBufferObject(defaultShaderProgram);
     VertexData[] data;
-    data ~= VertexData( 0.0,  0.8, 0, 1, 0, 0);
-    data ~= VertexData( 0.8, -0.8, 0, 0, 1, 0);
-    data ~= VertexData(-0.8, -0.8, 0, 0, 0, 1);
+    data ~= VertexData(-1, -1, 0, 1, 0, 0, 0, 0, 0);
+    data ~= VertexData( 1, -1, 0, 1, 0, 0, 0, 1, 1);
+    data ~= VertexData( 1,  1, 0, 1, 0, 0, 0, 1, 1);
+
+    data ~= VertexData( 1,  1, 0, 0, 0, 1, 0, 1, 1);
+    data ~= VertexData(-1,  1, 0, 0, 0, 1, 0, 0, 1);
+    data ~= VertexData(-1, -1, 0, 0, 0, 1, 0, 0, 0);
+
     vbo.setVertices(data);
+
+    // Load texture
+    ResourceManager mgr = new ResourceManager();
+    Resource image = mgr.load("data/icon.png");
+    Texture tex = new Texture();
+    tex.loadFromMemory(cast(byte[])image.bytes);
+    defaultShaderProgram.setTexture(tex, "uTexture0", 0);
 
     w.backgroundColor = Color.Background;
     float x = 0;
