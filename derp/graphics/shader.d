@@ -190,7 +190,7 @@ class ShaderProgram {
 
     /// Sets the model-view-projection matrix as "uModelViewProjectionMatrix"
     /// or `name`
-    void setMvpMatrix(ProjectionMatrix matrix, string name = "uModelViewProjectionMatrix") {
+    void setMvpMatrix(Matrix4 matrix, string name = "uModelViewProjectionMatrix") {
         int pos = getUniformLocation(name);
         assert(pos != -1, "Cannot find active uniform `" ~ name ~ "` in shader.");
 
