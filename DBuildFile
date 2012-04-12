@@ -23,7 +23,7 @@ External {
     command: cd externals/gl3n; make
     libraries: gl3n-dmd # automatically generated from `name`
     libraryPaths: externals/gl3n/lib/
-    includePaths: externals/gl3n/import/
+    includePaths: externals/gl3n/
 }
 
 External {

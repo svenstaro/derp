@@ -1,5 +1,5 @@
 COMPILER=dmd 
-INCLUDES=-I. -Iexternals/LuaD/ -Iexternals/orange/ -Iexternals/Derelict3/import/
+INCLUDES=-I. -Iexternals/LuaD/ -Iexternals/orange/ -Iexternals/Derelict3/import/ -Iexternals/gl3n
 LFLAGS=-L-Lexternals/LuaD/lib/ -L-lluad -L-lluajit-5.1 -L-Lexternals/orange/lib/64/ -L-Lexternals/orange/lib/32/ -L-lorange -L-Lexternals/Derelict3/lib/ -L-lDerelictAL -L-lDerelictFT -L-lDerelictGL3 -L-lDerelictGLFW3 -L-lDerelictIL -L-lDerelictUtil -L-ldl -L-lcurl
 DFLAGS=-odlib/ -debug -gc -op
 
