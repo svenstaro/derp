@@ -33,7 +33,7 @@ class Node {
     }
 
     @property bool isRoot() {
-        return cast(bool)this.parent;
+        return !(cast(bool)this.parent);
     }
 
     @property Node rootNode() {
