@@ -1,5 +1,7 @@
 module derp.graphics.sprite;
 
+import derelict.opengl3.gl3;
+
 import derp.core.geo;
 import derp.graphics.vertexbuffer;
 import derp.graphics.draw;
@@ -12,6 +14,7 @@ class Sprite {
     Vector2 offset; /// Screen position of the origin
     Vector2 scale; /// Scale the texture along x and y axis.
     Texture texture;
+    bool smooth = true;
 
     VertexData[] vertices;
     VertexBufferObject vbo;
@@ -33,6 +36,11 @@ class Sprite {
     }
 
     void render() {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, smooth ? GL_LINEAR : GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, smooth ? GL_LINEAR : GL_NEAREST);
+        
         this.vbo.shaderProgram.setTexture(this.texture, "uTexture0", 0);
         // set model-view-projection stuff here?
         this.vbo.render();

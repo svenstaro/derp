@@ -49,16 +49,14 @@ class Texture {
         // Receive image information
         size.x = ilGetInteger(IL_IMAGE_WIDTH);
         size.y = ilGetInteger(IL_IMAGE_HEIGHT);
-        bitsPerPixel = ilGetInteger(IL_IMAGE_BPP);
+        bitsPerPixel = ilGetInteger(IL_IMAGE_BPP) * 8; // DevIL returns *bytes* per pixel
         format = ilGetInteger(IL_IMAGE_FORMAT);
 
-        writefln("Found image data: %s x %s  at  %s BPP", size.x, size.y, bitsPerPixel);
-        if(format == GL_RGBA) writeln("RGBA");
-        else writeln("Not rgba.");
+        // writefln("Found image data: %s x %s x %s", size.x, size.y, bitsPerPixel);
 
         // Push data to OpenGL
-        bind();
-        glTexImage2D(GL_TEXTURE_2D, 0, bitsPerPixel, size.x, size.y, 0, format, GL_UNSIGNED_BYTE, ilGetData());
+        bind(); 
+        glTexImage2D(GL_TEXTURE_2D, 0, bitsPerPixel / 8, size.x, size.y, 0, format, GL_UNSIGNED_BYTE, ilGetData());
         glCheck();
         unbind();
 
