@@ -209,16 +209,23 @@ public:
 
         Quaternion targetWorldOrientation;
         Quaternion rotQuat;
-        if ( (zAxis(this.orientation)+zAdjustVec).length_squared <  0.00005f) 
+    
+        Vector3 xAxis;
+        Vector3 yAxis;
+        Vector3 zAxis;
+        //TODO: UFCS
+        to_axis(this.orientation, xAxis, yAxis, zAxis);
+    
+        if (xAxis.length_squared <  0.00005f) 
         {
             // Oops, a 180 degree turn (infinite possible rotation axes)
             // Default to yaw i.e. use current UP
-            fromAngleAxis(rotQuat, degrees(180), yAxis(this.orientation));
+            fromAngleAxis(rotQuat, degrees(180), yAxis);
         }
         else
         {
             // Derive shortest arc to new direction
-            rotQuat = rotationTo(zAxis(this.orientation), zAdjustVec);
+            rotQuat = rotationTo(zAxis, zAdjustVec);
         }
         this.orientation = rotQuat * this.orientation;
         this._requestUpdate(Update.Orientation);
@@ -415,13 +422,7 @@ public:
     ///
     this(string name, float left, float right, float top, float bottom, float near, float far) @safe nothrow {		
         super(name);
-        float A = 2 * near / (right - left);
-        float B = 2 * near / (top - bottom);
-        float C = (right + left) / (right - left);
-        float D = (top + bottom) / (top - bottom);
-        float q = - (far + near) / (far - near);
-        float qn = - 2 * (far * near) / (far - near);
-        this._projectionMatrix = Matrix4(Vector4(A,0,0,0),Vector4(0,B,0,0),Vector4(C,D,q,-1),Vector4(0,0,qn,0));
+        this._projectionMatrix = Matrix4.perspective(left, right, bottom, top, near, far);
     }
     
 public:
