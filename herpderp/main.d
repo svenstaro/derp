@@ -22,7 +22,7 @@ int main(string[] args) {
 
     // Load texture
     ResourceManager mgr = new ResourceManager();
-    Resource image = mgr.load("test/test-texture.bmp");
+    Resource image = mgr.load("data/icon.png");
     Texture tex = new Texture(image);
 
     Sprite s = new Sprite(tex);
