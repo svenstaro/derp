@@ -12,6 +12,7 @@ import derelict.devil.ilu;
 import derelict.devil.ilut;
 
 import derp.core.geo;
+import derp.core.resources;
 import derp.graphics.util;
 import derp.graphics.view;
 
@@ -22,6 +23,21 @@ class Texture {
     vec2i size;
     uint bitsPerPixel;
     int format;
+    
+    this() {
+    }
+    
+    this(Resource r) {
+        loadFromResource(r);
+    }
+    
+    this(byte[] data) {
+        loadFromMemory(data);
+    }
+    
+    void loadFromResource(Resource r) {
+        this.loadFromMemory(cast(byte[])r.bytes);
+    }
 
     void loadFromMemory(byte[] data) {
         _create();
@@ -41,24 +57,10 @@ class Texture {
         else writeln("Not rgba.");
 
         // Push data to OpenGL
-        glBindTexture(GL_TEXTURE_2D, glHandle);
-        glCheck();
-
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        /*iluImageParameter(ILU_PLACEMENT, ILU_UPPER_LEFT);
-        int nextPow2(int x) {
-            int i = 1;
-            while(x > i) i *= 2;
-            return x == i ? i : i * 2;
-        }
-        iluEnlargeCanvas(nextPow2(size.x), nextPow2(size.y), bitsPerPixel);
-
-        int w = ilGetInteger(IL_IMAGE_WIDTH);
-        int h = ilGetInteger(IL_IMAGE_HEIGHT);*/
+        bind();
         glTexImage2D(GL_TEXTURE_2D, 0, bitsPerPixel, size.x, size.y, 0, format, GL_UNSIGNED_BYTE, ilGetData());
         glCheck();
+        unbind();
 
         // Cleanup
         //_ilUnbind();
@@ -68,10 +70,12 @@ class Texture {
 
     void bind() {
         glBindTexture(GL_TEXTURE_2D, glHandle);
+        glCheck();
     }
 
     void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
+        glCheck();
     }
 
 private:

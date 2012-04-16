@@ -235,30 +235,37 @@ public:
         assert(pos != -1, "Cannot find texture sampler `" ~ name ~ "` in shader.");
 
         attach();
+        glUniform1i(pos, location);
         texture.bind();
         glActiveTexture(GL_TEXTURE0 + location);
-        glUniform1i(pos, location);
         detach();
     }
 
-    // ========== STATIC STUFF ==========
+    /**
+     * Predefined default pipeline with simple vertex shader and 
+     * simple color/texture fragment shader.
+     */
+    static ShaderProgram _defaultPipeline = null;
 
-    static ShaderProgram defaultPipeline = null;
-
-    static void createDefaultShaders() {
-        if(defaultPipeline) return; // do not recreate
-
-        Shader[] shaders;
-        shaders ~= new Shader(defaultVertexShader, Shader.Type.vertex);
-        shaders ~= new Shader(defaultFragmentShader, Shader.Type.fragment);
-        defaultPipeline = new ShaderProgram(shaders);
+    /// ditto
+    static @property ShaderProgram defaultPipeline() {
+        if(!_defaultPipeline) {
+            Shader[] shaders;
+            shaders ~= new Shader(defaultVertexShader, Shader.Type.vertex);
+            shaders ~= new Shader(defaultFragmentShader, Shader.Type.fragment);
+            _defaultPipeline = new ShaderProgram(shaders);
+        }
+        return _defaultPipeline;
     }
 
-    static void createDefaultShaders(string vertex, string fragment) {
-        defaultPipeline = null;
+    /**
+     * Sets the vertex and fragment shader for the default pipeline. The shaders
+     * will be lazily compiled when defaultPipeline is accessed the next time.
+     */
+    static void setDefaultShaders(string vertex, string fragment) {
+        _defaultPipeline = null;
         defaultFragmentShader = fragment;
         defaultVertexShader = vertex;
-        ShaderProgram.createDefaultShaders();
     }
 }
 

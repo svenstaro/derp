@@ -22,9 +22,8 @@ int main(string[] args) {
 
     // Load texture
     ResourceManager mgr = new ResourceManager();
-    Resource image = mgr.load("data/icon.png");
-    Texture tex = new Texture();
-    tex.loadFromMemory(cast(byte[])image.bytes);
+    Resource image = mgr.load("test/test-texture.bmp");
+    Texture tex = new Texture(image);
 
     Sprite s = new Sprite(tex);
 
