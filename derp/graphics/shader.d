@@ -2,10 +2,12 @@ module derp.graphics.shader;
 
 import std.string;
 import std.conv;
+import std.traits;
 
 import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
 import gl3n.linalg;
+import gl3n.util : isVector = is_vector, isMatrix = is_matrix;
 
 import derp.core.geo;
 import derp.graphics.util;
@@ -16,19 +18,21 @@ import derp.graphics.texture;
 import std.array;
 
 class Shader {
+public:
     enum Type {
         vertex      = GL_VERTEX_SHADER,
         fragment    = GL_FRAGMENT_SHADER,
         geometry    = GL_GEOMETRY_SHADER
     }
-
-    string source;
-    Type type;
-    int handle;
+    
+private:    
+    string _source;
+    Type _type;
+    int _handle;
 
     this(string source, Type type) {
-        this.source = source;
-        this.type = type;
+        this._source = source;
+        this._type = type;
         create();
     }
 
@@ -37,12 +41,12 @@ class Shader {
     }
 
     void create() {
-        this.handle = glCreateShader(this.type);
+        this._handle = glCreateShader(this._type);
         // writefln("Created Shader %s", this.handle);
-        const char* source = this.source.toStringz();
-        glShaderSource(this.handle, 1, &source, null);
+        const char* source = this._source.toStringz();
+        glShaderSource(this._handle, 1, &source, null);
         glCheck();
-        glCompileShader(this.handle);
+        glCompileShader(this._handle);
         glCheck();
 
         string info = infoLog;
@@ -52,17 +56,17 @@ class Shader {
 
     @property string infoLog() {
         int len;
-        glGetShaderiv(handle, GL_INFO_LOG_LENGTH , &len);
+        glGetShaderiv(this._handle, GL_INFO_LOG_LENGTH , &len);
         if (len > 1) {
             char[] msg = new char[len];
-            glGetShaderInfoLog(handle, len, null, cast(char*) msg);
+            glGetShaderInfoLog(this._handle, len, null, cast(char*) msg);
             return cast(string)msg;
         }
         return "";
     }
 
     void destroy() {
-        glDeleteShader(this.handle);
+        glDeleteShader(this._handle);
         glCheck();
     }
 }
@@ -73,9 +77,12 @@ import std.stdio;
  *  This is a shading program, consisting of multiple shaders
  *  (usually a vertex and a fragment shader).
  */
-class ShaderProgram {
-    int handle;
-
+final class ShaderProgram {
+private:
+    int _handle;
+    int[string] _uniformLocationCache;
+    int[string] _attribLocationCache;
+public:
     this(Shader[] shaders) {
         this.create(shaders);
     }
@@ -86,37 +93,37 @@ class ShaderProgram {
 
     @property string infoLog() {
         int len;
-        glGetProgramiv(handle, GL_INFO_LOG_LENGTH , &len);
+        glGetProgramiv(this._handle, GL_INFO_LOG_LENGTH , &len);
         if (len > 1) {
             char[] msg = new char[len];
-            glGetProgramInfoLog(handle, len, null, cast(char*) msg);
+            glGetProgramInfoLog(this._handle, len, null, cast(char*) msg);
             return cast(string)msg;
         }
         return "";
     }
 
     void create(Shader[] shaders) {
-        this.handle = glCreateProgram();
-        assert(glIsProgram(this.handle), "Failed to create ShaderProgram.");
+        this._handle = glCreateProgram();
+        assert(glIsProgram(this._handle), "Failed to create ShaderProgram.");
 
         // attach
         foreach(s; shaders) {
-            glAttachShader(this.handle, s.handle);
+            glAttachShader(this._handle, s._handle);
             glCheck();
         }
 
         // link
-        glBindAttribLocation(handle, 0, "vVertex");
-        glBindAttribLocation(handle, 1, "vColor");
-        glBindAttribLocation(handle, 2, "vTexCoord");
+        glBindAttribLocation(this._handle, 0, "vVertex");
+        glBindAttribLocation(this._handle, 1, "vColor");
+        glBindAttribLocation(this._handle, 2, "vTexCoord");
         glCheck();
 
 
-        glLinkProgram(this.handle);
+        glLinkProgram(this._handle);
         glCheck();
 
         int linkSuccess;
-        glGetProgramiv(this.handle, GL_LINK_STATUS, &linkSuccess);
+        glGetProgramiv(this._handle, GL_LINK_STATUS, &linkSuccess);
         assert(linkSuccess == GL_TRUE, "Linker error.");
 
         // check here
@@ -125,26 +132,26 @@ class ShaderProgram {
         assert(info == "", "Failed to link program.");
 
         int validateSuccess;
-        glValidateProgram(handle);
-        glGetProgramiv(handle, GL_VALIDATE_STATUS, &validateSuccess);
+        glValidateProgram(this._handle);
+        glGetProgramiv(this._handle, GL_VALIDATE_STATUS, &validateSuccess);
         assert(validateSuccess == GL_TRUE, "Validation error.");
 
         glCheck();
 
         // detach
         foreach(s; shaders) {
-            glDetachShader(this.handle, s.handle);
+            glDetachShader(this._handle, s._handle);
             glCheck();
         }
     }
 
     void destroy() {
-        glDeleteProgram(this.handle);
+        glDeleteProgram(this._handle);
         glCheck();
     }
 
     void attach() {
-        glUseProgram(this.handle);
+        glUseProgram(this._handle);
         glCheck();
     }
 
@@ -153,52 +160,74 @@ class ShaderProgram {
         glCheck();
     }
 
-    void sendUniformMat4(int position, Matrix4 mat) {
-        attach();
-        glUniformMatrix4fv(position, 1, false, mat.value_ptr());
-        detach();
-        glCheck();
-    }
-
-    void sendUniformVec2(int position, Vector2 v) {
-        attach();
-        glUniform2fv(position, 1, v.value_ptr());
-        detach();
-        glCheck();
-    }
-
     int getUniformLocation(string name) {
+        int* px = (name in this._uniformLocationCache);
+        if(px !is null)
+            return *px;
         const char* n = name.toStringz();
-        int x = glGetUniformLocation(this.handle, &n[0]);
+        int x = glGetUniformLocation(this._handle, &n[0]);
         glCheck();
+        this._uniformLocationCache[name] = x;
         return x;
     }
 
     int getAttribLocation(string name) {
+        int* px = (name in this._attribLocationCache);
+        if(px !is null)
+            return *px;
         const char* n = name.toStringz();
-        int x = glGetAttribLocation(this.handle, &n[0]);
+        int x = glGetAttribLocation(this._handle, &n[0]);
         glCheck();
+        this._attribLocationCache[name] = x;
         return x;
     }
-
-    void sendUniformFloat(int position, float v) {
+    
+    /// send Uniform
+    void sendUniform(T)(int position, T t) {
         attach();
-        glUniform1f(position, v);
+        static if(isFloatingPoint!T) {
+            glUniform1f(position, t);
+        }
+        else static if(isIntegral!T) {
+            glUniform1i(position, t);
+        }
+        else static if(isVector!T && isFloatingPoint!(T.vt)) {
+            mixin("glUniform"~to!string(T.dimension)~"fv(position, 1, t.value_ptr);");
+        }
+        else static if(isVector!T && isIntegral!(T.vt)) {
+            mixin("glUniform"~to!string(T.dimension)~"iv(position, 1, t.value_ptr);");
+        }
+        else static if(isMatrix!T && isNumeric!(T.mt) && T.cols >= 2 && T.cols <= 4 && T.rows >= 2 && T.rows <= 4) {
+            static if(isFloatingPoint!(T.mt)) {
+                static if(T.cols != T.rows)
+                    mixin("glUniformMatrix"~to!string(T.cols)~"x"~to!string(T.rows)~"fv(position, 1, GL_FALSE, t.value_ptr);");
+                else
+                    mixin("glUniformMatrix"~to!string(T.cols)~"fv(position, 1, false, t.value_ptr);");
+            }
+            else static if(isIntegral!(T.mt)) {
+                static if(T.cols != T.rows)
+                    mixin("glUniformMatrix"~to!string(T.cols)~"x"~to!string(T.rows)~"fi(position, 1, GL_FALSE, t.value_ptr);");
+                else
+                    mixin("glUniformMatrix"~to!string(T.cols)~"fi(position, 1, false, t.value_ptr);");   
+            }
+        }
+        else
+        {
+            static assert(false, "Type "~T.stringof~" can not be sent via sendUniform");
+        }
         detach();
         glCheck();
+    }
+    
+    /// send Uniform
+    void sendUniform(T)(string name, T t){
+        sendUniform(getUniformLocation(name), t);
     }
 
     /// Sets the model-view-projection matrix as "uModelViewProjectionMatrix"
     /// or `name`
     void setMvpMatrix(Matrix4 matrix, string name = "uModelViewProjectionMatrix") {
-        int pos = getUniformLocation(name);
-        assert(pos != -1, "Cannot find active uniform `" ~ name ~ "` in shader.");
-
-        attach();
-        sendUniformMat4(pos, matrix);
-        detach();
-
-        glCheck();
+        sendUniform(name, matrix);
     }
 
     void setTexture(Texture texture, string name = "texture", int location = 0) {
