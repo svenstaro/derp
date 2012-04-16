@@ -10,16 +10,32 @@ import std.utf;
 import gl3n.linalg;
 import derelict.glfw3.glfw3;
 
+import derp.graphics.window;
+
+static Window _currentInputWindow = null;
+
 extern(C) void _keyCallback(void* window, int key, int action) {
-    writefln("%s key %s", (action == GLFW_PRESS ? "pressed": "released"), key);
+    // writefln("%s key %s", (action == GLFW_PRESS ? "pressed": "released"), key);
+    if(!_currentInputWindow) return;
+    if(action == GLFW_PRESS)
+        _currentInputWindow.keyPressed(key);
+    else
+        _currentInputWindow.keyReleased(key);
 }
 
 extern(C) void _characterCallback(void* window, int unicode) {
-    writefln("unicode key %s", cast(dchar)unicode);
+    // writefln("unicode key %s", cast(dchar)unicode);
+    if(!_currentInputWindow) return;
+    _currentInputWindow.unicodePressed(cast(dchar)unicode);
 }
 
 extern(C) void _mouseButtonCallback(void* window, int button, int action) {
-    writefln("%s button %s", (action == GLFW_PRESS ? "pressed": "released"), button);
+    // writefln("%s button %s", (action == GLFW_PRESS ? "pressed": "released"), button);
+    if(!_currentInputWindow) return;
+    if(action == GLFW_PRESS)
+        _currentInputWindow.mouseButtonPressed(button);
+    else
+        _currentInputWindow.mouseButtonReleased(button);
 }
 
 void initializeInput() {

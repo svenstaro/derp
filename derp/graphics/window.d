@@ -11,6 +11,7 @@ import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
 
 import derp.core.geo;
+import derp.core.input;
 import derp.graphics.util;
 import derp.graphics.draw;
 import derp.graphics.view;
@@ -88,12 +89,23 @@ class Window : Context {
     }
 
     void display() {
+        _currentInputWindow = this;
         glfwSwapBuffers();
         glfwPollEvents();
+        _currentInputWindow = null;
     }
 
     void setViewport(Rect bounds) {
         glViewport(cast(int)bounds.pos.x, cast(int)bounds.pos.y,
             cast(int)bounds.size.x, cast(int)bounds.size.y);
     }
+    
+    void keyPressed(int key) {
+        if(key == Input.Key.Escape)
+            close();
+    }
+    void keyReleased(int key) {}
+    void unicodePressed(dchar unicode) {}
+    void mouseButtonPressed(int button) {}
+    void mouseButtonReleased(int button) {}
 }
