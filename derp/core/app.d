@@ -88,7 +88,7 @@ class Derp {
                 return f
             end)");
 
-        lua.registerType!Node;
+        // lua.registerType!Node; // not compatible yet
     }
 
     /**

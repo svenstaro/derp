@@ -6,6 +6,7 @@ module derp.graphics.draw;
 
 import std.stdio;
 import std.string;
+import std.math;
 
 struct Color {
     static Color Black          = Color(0, 0, 0);
@@ -30,4 +31,34 @@ struct Color {
         this.b = b;
         this.a = a;
     }
+
+    @property float min() {
+        return fmin(fmin(this.r, this.g), this.b);
+    }
+
+    @property float max()  {
+        return fmax(fmax(this.r, this.g), this.b);
+    }
+
+    @property float hue() {
+        float d = this.max - this.min;
+
+        if (d == 0)
+            return 0;
+        else if (this.r == this.max && (this.g - this.b) > 0)
+            return 60 * (this.g - this.b) / d;
+        else if (this.r == this.max && (this.g - this.b) <= 0)
+            return (60 * (this.g - this.b) / d + 360) % 360;
+        else if (this.g == this.max)
+            return 60 * (this.b - this.r) / d + 120;
+        else if (this.b == this.max)
+            return 60 * (this.r - this.g) / d + 240;
+        return 0f;
+    }
+
+    @property float saturation() {
+        return max - min;
+    }
+
+    alias max value; // for Hue/Saturation/Value
 }
