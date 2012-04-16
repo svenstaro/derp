@@ -198,6 +198,36 @@ public:
         }
         this._requestUpdate(Update.Orientation);
     }
+    
+    ///
+    @property void direction(Vector3 vector) @safe nothrow {
+        if(vector == Vector3(0,0,0))
+            return;
+
+        Vector3 zAdjustVec = -vector;
+        zAdjustVec.normalize();
+
+        Quaternion targetWorldOrientation;
+        Quaternion rotQuat;
+        if ( (zAxis(this.orientation)+zAdjustVec).length_squared <  0.00005f) 
+        {
+            // Oops, a 180 degree turn (infinite possible rotation axes)
+            // Default to yaw i.e. use current UP
+            fromAngleAxis(rotQuat, degrees(180), yAxis(this.orientation));
+        }
+        else
+        {
+            // Derive shortest arc to new direction
+            rotQuat = rotationTo(zAxis(this.orientation), zAdjustVec);
+        }
+        this.orientation = rotQuat * this.orientation;
+        this._requestUpdate(Update.Orientation);
+    }
+
+    ///
+    void lookAt(Vector3 point) @safe nothrow {
+        this.direction = (point - this.position);
+    }	
 
 public:
     /// Creates a new Node with this Node as parent.
@@ -326,6 +356,9 @@ private:
 
         foreach(c; this._children)
             c._requestUpdate(update);
+        
+        foreach(c; this._components)
+            c._needUpdate = true;
     }
 }
 
@@ -337,6 +370,7 @@ class Component {
 private:    
     Node _node; //TODO: FIXME: this has to become a weak_reference!
     string _name;
+    bool _needUpdate = false;
 
 public:
     this(string name) @safe nothrow {
@@ -368,9 +402,6 @@ class CameraComponent : Component{
 private:	
     Matrix4 _projectionMatrix;
     Matrix4 _cachedViewMatrix;
-    Vector3 _position;
-    Quaternion	_orientation;
-    bool _needUpdate = true;
 public:
     ///
     this(string name, Angle fovY, float aspectRatio, float front, float back) @safe nothrow {
@@ -381,16 +412,7 @@ public:
         this(name, -width, width, -height, height, front, back);
     }	
 
-    /**
-        uniform perspective projection matrix,
-        // which depth range [-1,1], right-handed rules
-        //
-        // [ A   0   C   0  ]
-        // [ 0   B   D   0  ]
-        // [ 0   0   q   qn ]
-        // [ 0   0   -1  0  ]
-        //
-    */
+    ///
     this(string name, float left, float right, float top, float bottom, float near, float far) @safe nothrow {		
         super(name);
         float A = 2 * near / (right - left);
@@ -403,30 +425,6 @@ public:
     }
     
 public:
-    ///
-    @property Vector3 position() const @safe nothrow {
-        return this._position;
-    }
-
-    ///
-    @property Vector3 position(in Vector3 position) @safe nothrow {
-        this._needUpdate = true; 
-        this._position = position; 
-        return this._position;
-    }
-
-    ///
-    @property Quaternion orientation() const @safe nothrow {
-        return this._orientation;
-    } 
-
-    ///
-    @property Quaternion orientation(in Quaternion quaternion) @safe nothrow {
-        this._needUpdate = true; 
-        this._orientation = orientation; 
-        return this._orientation;
-    }
-
     ///return projection matrix
     @property Matrix4 projectionMatrix() const @safe nothrow {
         return _projectionMatrix;
@@ -436,86 +434,11 @@ public:
     @property Matrix4 viewMatrix() @safe nothrow {
         if(this._needUpdate)
         {
-            makeTransform(this._cachedViewMatrix, this._position, Vector3(1,1,1), this._orientation);
+            makeTransform(this._cachedViewMatrix, this._node.position, Vector3(1,1,1), this._node.orientation);
             this._needUpdate = false;
         }
         return this._cachedViewMatrix;
     }
-    
-public:
-    ///translate (TransformSpace.Parent == TransformSpace.World)
-    void translate(in Vector3 vector, TransformSpace ts) @safe nothrow {
-        this._needUpdate = true; 
-        final switch(ts)
-        {
-        case TransformSpace.Local:
-            this._position += this._orientation * vector;
-            break;
-        case TransformSpace.Parent:
-            this._position += vector;
-            break;
-        case TransformSpace.World:
-            this._position += vector;
-            break;
-        }
-    }
-
-    ///rotate (TransformSpace.Parent == TransformSpace.World)
-    void rotate(in Angle angle, in Vector3 axis, TransformSpace ts) @safe nothrow {
-        Quaternion q;
-        final switch(ts)
-        {
-            case TransformSpace.Local:
-                fromAngleAxis(q, angle, this._orientation * axis);
-                break;
-            case TransformSpace.Parent:
-                fromAngleAxis(q, angle, axis);
-                break;
-            case TransformSpace.World:
-                fromAngleAxis(q, angle, axis);
-                break;
-        }
-        rotate(q);
-    }
-
-    ///rotate
-    void rotate(Quaternion quaternion) @safe nothrow {
-        this._needUpdate = true;
-        // Normalise the quat to avoid cumulative problems with precision
-        quaternion.normalize();
-        this._orientation = quaternion * this._orientation;
-    }
-
-    ///
-    @property void direction(Vector3 vector) @safe nothrow {
-        this._needUpdate = true;
-        if(vector == Vector3(0,0,0))
-            return;
-
-        Vector3 zAdjustVec = -vector;
-        zAdjustVec.normalize();
-
-        Quaternion targetWorldOrientation;
-        Quaternion rotQuat;
-        if ( (zAxis(this.orientation)+zAdjustVec).length_squared <  0.00005f) 
-        {
-            // Oops, a 180 degree turn (infinite possible rotation axes)
-            // Default to yaw i.e. use current UP
-            fromAngleAxis(rotQuat, degrees(180), yAxis(this.orientation));
-        }
-        else
-        {
-            // Derive shortest arc to new direction
-            rotQuat = rotationTo(zAxis(this.orientation), zAdjustVec);
-        }
-        this.orientation = rotQuat * this.orientation;
-    }
-
-    ///
-    void lookAt(Vector3 point) @safe nothrow {
-        this.direction = (point - this.position);
-    }	
-    
 public:
     /// Returns a Ray From ScreenPoint into the Scene
     //~ Ray cameraToViewportRay(uint screenX, uint screenY) {
