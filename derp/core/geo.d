@@ -115,7 +115,7 @@ Quaternion rotationTo(in Vector3 src, in Vector3 dest, in Vector3 fallbackAxis =
 	// If dot == 1, vectors are the same
 	if (d >= 1.0f)
 	{
-		return Quaternion(0,0,0,1);
+		return Quaternion(1,0,0,0);
 	}
 	if (d < (1e-6f - 1.0f))
 	{
