@@ -40,12 +40,15 @@ private:
 
     Matrix4 _cachedMatrix;
     Matrix4 _cachedDerivedMatrix;
+    Node _cachedRootNode = null; //TODO: FIXME: this has to become a weak_reference!
 
     bool _needPositionUpdate = true;
     bool _needOrientationUpdate = true;
     bool _needScaleUpdate = true;
     bool _needMatrixUpdate = true;
     bool _needDerivedMatrixUpdate = true;
+    bool _needRootNodeUpdate = true;
+
 
 public:
     this(string name, Node parent = null) @safe nothrow {
@@ -254,6 +257,7 @@ public:
             parent._children ~= this;
         }
         this._parent = parent;
+        _requestUpdate(Update.RootNode);
     }
 
     /// Returns a path for user-friendly representation of the position
@@ -271,10 +275,13 @@ public:
     /// Returns the root node of this Node (the first Node in the scene
     /// graph).
     @property Node rootNode() @safe nothrow {
-        Node n = this;
-        while(!n.isRoot)
-            n = n._parent;
-        return n;
+        if(this._needRootNodeUpdate)
+        {
+            this._cachedRootNode = this;
+            while(!this._cachedRootNode.isRoot)
+                this._cachedRootNode = this._cachedRootNode._parent;
+        }
+        return this._cachedRootNode;
     }
     
     /// Returns true if node is a child of this Node.
@@ -345,7 +352,8 @@ private:
     enum Update {
         Position,
         Scale,
-        Orientation
+        Orientation,
+        RootNode
     }
 
     /// Informs the Node and all child nodes to update parts of their
@@ -357,6 +365,8 @@ private:
             this._needScaleUpdate = true;
         if(update == Update.Orientation)
             this._needOrientationUpdate = true;
+        if(update == Update.RootNode)
+            this._needRootNodeUpdate = true;
 
         this._needMatrixUpdate = true;
         this._needDerivedMatrixUpdate = true;
@@ -377,7 +387,7 @@ class Component {
 private:    
     Node _node; //TODO: FIXME: this has to become a weak_reference!
     string _name;
-    bool _needUpdate = false;
+    bool _needUpdate = true;
 
 public:
     this(string name) @safe nothrow {
