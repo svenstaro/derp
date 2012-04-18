@@ -42,9 +42,9 @@ int main(string[] args) {
         x += 0.03;
 
         Vector3 camPos = Vector3(
-            sin(x) * 2,
-            cos(x) * 2,
-             20
+            sin(x) * -2,
+            cos(x) * -2,
+             -20
             );
 
         Matrix4 projection = cam.projectionMatrix;//orthographicProjection(-1, 1, -1, 1);
@@ -52,11 +52,23 @@ int main(string[] args) {
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
-            - camPos.x, - camPos.y, - camPos.z, 1
+            camPos.x, camPos.y, camPos.z, 1
             );
+        
+        Matrix4 view = Matrix4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+            );
+	    writeln("we want this mv matrix: ", modelView);
+            writeln("we want this mvp matrix: ",modelView*projection);
         // ProjectionMatrix mat = ProjectionMatrix.look_at(camPos, Vector3(0, 0, 0), Vector3(0, 1, 0));
-        ShaderProgram.defaultPipeline.setMvpMatrix(modelView * projection);
+        //ShaderProgram.defaultPipeline.setMvpMatrix(modelView * projection);
 
+        
+        cameraNode.position = camPos;
+        
         window.update();
         window.clear();
         writeln("...");

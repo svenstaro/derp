@@ -52,10 +52,18 @@ class SpriteComponent : Component, Renderable {
         
         this.vbo.shaderProgram.setTexture(this.texture, "uTexture0", 0);
         // set model-view-projection stuff here?
+	    
+	   
         writeln(this.node.derivedMatrix);
         writeln(queue.camera.viewMatrix);
         writeln(queue.camera.projectionMatrix);
+	    
         assert(this.node !is null, "Spire has to be attached to a node");
+	    auto mv = this.node.derivedMatrix*queue.camera.viewMatrix;
+	    auto mvp = mv*queue.camera.projectionMatrix;
+	    writeln("calc mv matrix: ", mvp);
+	    writeln("calc mvp matrix: ", mvp);
+	this.vbo.shaderProgram.sendUniform("uModelViewProjectionMatrix", mvp);
         this.vbo.shaderProgram.sendUniform("uModelMatrix", this.node.derivedMatrix);
         this.vbo.shaderProgram.sendUniform("uViewMatrix", queue.camera.viewMatrix);
         this.vbo.shaderProgram.sendUniform("uProjectionMatrix", queue.camera.projectionMatrix);

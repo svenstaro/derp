@@ -283,6 +283,9 @@ void main() {
 
 static string defaultVertexShader = "#version 120
 uniform mat4 uModelViewProjectionMatrix;
+uniform mat4 uModelMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
 attribute vec3 vVertex;
 attribute vec2 vTexCoord;
 attribute vec4 vColor;
@@ -291,6 +294,9 @@ varying vec4 fColor;
 varying vec2 fTexCoord;
 
 void main() {
+    //mat4 modelView = uModelMatrix * uViewMatrix;
+    //mat4 modelViewProjection = modelView * uProjectionMatrix;
+    //gl_Position = modelViewProjection  * vec4(vVertex, 1.0);
     gl_Position = uModelViewProjectionMatrix * vec4(vVertex, 1.0);
     // gl_Position = vec4(vVertex.x, vVertex.y, 0.0, 1.0);
     // gl_TexCoord[0].st = vTexCoord;
