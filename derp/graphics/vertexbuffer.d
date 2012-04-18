@@ -30,6 +30,7 @@ struct VertexData {
  * Renders a single Quad.
  */
 class VertexBufferObject {
+public:	
     ShaderProgram shaderProgram;
 
     uint array; // vertex buffer object, keeps track of vertex attributes etc.

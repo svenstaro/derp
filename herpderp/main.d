@@ -1,4 +1,5 @@
 import derp.all;
+import derp.graphics.camera;
 
 import std.stdio;
 import std.math;
@@ -18,28 +19,35 @@ Matrix4 orthographicProjection(float l, float r, float t, float b, float n = 0.0
 }
 
 int main(string[] args) {
-    Window w = new Window("Hello World", 800, 600, Window.Mode.Windowed);
-
+    Window window = new Window("Hello World", 800, 600, Window.Mode.Windowed);
+    window.backgroundColor = Color.Gray;
+    
     // Load texture
-    ResourceManager mgr = new ResourceManager();
-    Resource image = mgr.load("data/icon.png");
-    Texture tex = new Texture(image);
+    ResourceManager resourceManager = new ResourceManager();
+    Resource image = resourceManager.load("data/icon.png");
+    Texture texture = new Texture(image);
 
-    Sprite s = new Sprite(tex);
+    SpriteComponent sprite = new SpriteComponent("Sprite", texture);
 
-    w.backgroundColor = Color.Gray;
+    CameraComponent cam = new CameraComponent("testCam", degrees(80), 1, 1, 1000);
 
+    Node rootNode = new Node("rootNode");
+    Node cameraNode = new Node("cameraNode", rootNode);
+    Node spriteNode = new Node("spriteNode", rootNode);
+    cameraNode.attachComponent(cam);
+    spriteNode.attachComponent(sprite);
+    
     float x = 0;
-    while(w.isOpen()) {
+    while(window.isOpen()) {
         x += 0.03;
 
         Vector3 camPos = Vector3(
             sin(x) * 2,
             cos(x) * 2,
-            - 4
+             20
             );
 
-        Matrix4 projection = orthographicProjection(-1, 1, -1, 1);
+        Matrix4 projection = cam.projectionMatrix;//orthographicProjection(-1, 1, -1, 1);
         Matrix4 modelView = Matrix4(
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -49,13 +57,14 @@ int main(string[] args) {
         // ProjectionMatrix mat = ProjectionMatrix.look_at(camPos, Vector3(0, 0, 0), Vector3(0, 1, 0));
         ShaderProgram.defaultPipeline.setMvpMatrix(modelView * projection);
 
-        w.update();
-        w.clear();
-        s.render();
+        window.update();
+        window.clear();
+        writeln("...");
+        cam.render(new Viewport());
         glCheck();
-        w.display();
+        window.display();
     }
-    w.close();
+    window.close();
 
     return 0;
 }

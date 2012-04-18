@@ -8,6 +8,7 @@ import std.algorithm;
 import std.math;
 
 import derp.core.geo;
+import derp.graphics.render;
 
 /// TransformSpace for Transformations
 enum TransformSpace {
@@ -30,9 +31,9 @@ private:
     string _name;
 
 private:
-    Vector3 _localPosition;
-    Quaternion _localOrientation;
-    Vector3 _localScale;
+    Vector3 _localPosition = Vector3(0, 0, 0);
+    Quaternion _localOrientation = Quaternion.identity;
+    Vector3 _localScale = Vector3(1, 1, 1);
 
     Vector3 _cachedDerivedPosition;
     Quaternion _cachedDerivedOrientation;
@@ -144,7 +145,8 @@ public:
     /// Local transformation Matrix.
     @property Matrix4 matrix() @safe nothrow {
         if(this._needMatrixUpdate) {
-            this._cachedMatrix = this.orientation.to_matrix!(4, 4).translate(this.position.x, this.position.y, this.position.z).scale(this.scale.x, this.scale.y, this.scale.z);
+            //this._cachedMatrix = this.orientation.to_matrix!(4, 4).translate(this.position.x, this.position.y, this.position.z).scale(this.scale.x, this.scale.y, this.scale.z);
+            makeTransform(this._cachedMatrix, this.position, Vector3(1,1,1), this.orientation);
             this._needMatrixUpdate = false;
         }
         return this._cachedMatrix;
@@ -153,10 +155,10 @@ public:
     /// Global transformation Matrix.
     @property Matrix4 derivedMatrix() @safe nothrow {
         if(this._needDerivedMatrixUpdate) {
-            if(this._parent !is null) {
-                this._cachedDerivedMatrix = this._parent.derivedMatrix * this._cachedMatrix;
+            if(this.isRoot) {
+                this._cachedDerivedMatrix = this.matrix;
             } else {
-                this._cachedDerivedMatrix = this._cachedMatrix;
+                this._cachedDerivedMatrix = this._parent.derivedMatrix * this.matrix;
             }
             this._needDerivedMatrixUpdate = false;
         }
@@ -332,6 +334,7 @@ public:
     /// Attach a Component to this Node.
     void attachComponent(Component c) @safe nothrow {
         c._node = this;
+        this._components ~= c;
     }
     
     /// Detach a Component from this Node
@@ -377,6 +380,17 @@ private:
         foreach(c; this._components)
             c._needUpdate = true;
     }
+public:    
+    import std.stdio : writeln;
+    void prepareRender(RenderQueue queue) const {
+        writeln("Node "~this.name~".prepareRender");
+        foreach(c; this.components) {
+            c.prepareRender(queue);
+        }
+        foreach(c; this.children) {
+            c.prepareRender(queue);
+        }
+    }
 }
 
 /**
@@ -387,6 +401,7 @@ class Component {
 private:    
     Node _node; //TODO: FIXME: this has to become a weak_reference!
     string _name;
+protected:
     bool _needUpdate = true;
 
 public:
@@ -410,58 +425,9 @@ public:
     @property string name() const @safe nothrow {
         return this._name;
     }
-}
-
-/**
- * CameraComponent
- */
-class CameraComponent : Component{
-private:	
-    Matrix4 _projectionMatrix;
-    Matrix4 _cachedViewMatrix;
-public:
-    ///
-    this(string name, Angle fovY, float aspectRatio, float front, float back) @safe nothrow {
-        float tangent = tan((fovY/2).radians);   // tangent of half fovY
-        float height = front * tangent;          // half height of near plane
-        float width = height * aspectRatio;      // half width of near plane
-        // params: left, right, bottom, top, near, far
-        this(name, -width, width, -height, height, front, back);
-    }	
-
-    ///
-    this(string name, float left, float right, float top, float bottom, float near, float far) @safe nothrow {		
-        super(name);
-        this._projectionMatrix = Matrix4.perspective(left, right, bottom, top, near, far);
-    }
     
-public:
-    ///return projection matrix
-    @property Matrix4 projectionMatrix() const @safe nothrow {
-        return _projectionMatrix;
+    void prepareRender(RenderQueue queue) const {
+        // do nothing, since most components won't
+        // be visible anyway
     }
-
-    /// return cached view matrix. if nessacary, generate it
-    @property Matrix4 viewMatrix() @safe nothrow {
-        if(this._needUpdate)
-        {
-            makeTransform(this._cachedViewMatrix, this._node.position, Vector3(1,1,1), this._node.orientation);
-            this._needUpdate = false;
-        }
-        return this._cachedViewMatrix;
-    }
-public:
-    /// Returns a Ray From ScreenPoint into the Scene
-    //~ Ray cameraToViewportRay(uint screenX, uint screenY) {
-        //~ Matrix4 inverseVP = this.projectionMatrix * this.viewMatrix.inverse();
-        //~ real nx = (2.0f * screenX) - 1.0f;
-        //~ real ny = 1.0f - (2.0f * screenY);
-        //~ Vector3 nearPoint = Vector3(nx, ny, -1.0f);
-        //~ Vector3 midPoint = Vector3(nx, ny, 0.0f);
-        //~ Ray ray;
-        //~ ray.origin = inverseVP * nearPoint;
-        //~ ray.direction = (inverseVP * midPoint) - ray.origin;
-        //~ ray.direction.normalize();
-        //~ return ray;
-    //~ }
 }

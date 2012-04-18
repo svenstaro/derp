@@ -1,5 +1,11 @@
 default: compile
 
+clean:
+	rm bin/* && rm lib/libderp.a
+
+recompile:
+	rm bin/* && rm lib/libderp.a && make
+
 dep:
 	git submodule update --init
 	cd externals/gl3n && make

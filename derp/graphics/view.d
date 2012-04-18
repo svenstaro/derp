@@ -9,35 +9,20 @@ import std.string;
 import std.conv;
 
 import derp.core.geo;
-
-/**
- * A camera in 3D space.
- */
-class Camera {
-    Viewport[] connectedViewports;
-    void connectViewport(Viewport viewport) {
-        viewport.setCurrentCamera(this);
-    }
-
-    void update() {
-        // set OpenGL camera mode
-        // gluOrtho2D(0, 100, 0, 100);
-
-    }
-}
+import derp.graphics.camera;
 
 /**
  * A viewport represents a part of a surface in which to render.
  */
 class Viewport {
-    Camera currentCamera = null;
+    CameraComponent currentCamera = null;
     Rect bounds;
 
-    this(Camera camera = null) {
+    this(CameraComponent camera = null) {
         this.setCurrentCamera(camera);
     }
 
-    void setCurrentCamera(Camera camera) {
+    void setCurrentCamera(CameraComponent camera) {
         if(this.currentCamera) {
             // This viewport is already connected to a camera, remove it from its viewports list.
             remove(this.currentCamera.connectedViewports, indexOf(this.currentCamera.connectedViewports, this));
@@ -47,14 +32,10 @@ class Viewport {
         }
         this.currentCamera = camera;
     }
-
-    void update() {
-        // set OpenGL viewport
-
-        // update the camera projection
-        if(this.currentCamera) {
-            this.currentCamera.update();
-        }
+    
+    void render() {
+        assert(this.currentCamera !is null, "Viewport needs a camera to render");
+        this.currentCamera.render(this);
     }
 }
 
@@ -71,19 +52,11 @@ class Viewport2D : Viewport {
     Vector2 offset;
 
     this() {
-        this.setCurrentCamera(new Camera());
+        this.setCurrentCamera(new CameraComponent("defaultCamera", degrees(80), 1, 1, 100));
     }
 
     void centerAt(Vector2 center) {
         this.offset = this.internalSize * 0.5 - center;
     }
 
-    void updateCamera() {
-        // set OpenGL camera projection
-    }
-
-    void update() {
-        updateCamera();
-        super.update();
-    }
 }

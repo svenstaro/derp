@@ -3,15 +3,16 @@ module derp.graphics.sprite;
 import derelict.opengl3.gl3;
 
 import derp.core.geo;
+import derp.core.scene;
 import derp.graphics.vertexbuffer;
 import derp.graphics.draw;
 import derp.graphics.view;
 import derp.graphics.texture;
 import derp.graphics.shader;
+import derp.graphics.render;
 
-class Sprite {
+class SpriteComponent : Component, Renderable {
     Vector2 origin; /// Origin inside the sprite rect. From 0|0 to 1|1 (so the origin stays the same upon resizing).
-    Vector2 offset; /// Screen position of the origin
     Vector2 scale; /// Scale the texture along x and y axis.
     Texture texture;
     bool smooth = true;
@@ -19,7 +20,8 @@ class Sprite {
     VertexData[] vertices;
     VertexBufferObject vbo;
 
-    this(Texture texture = null, ShaderProgram shader = null) {
+    this(string name, Texture texture = null, ShaderProgram shader = null) {
+        super(name);
 
         if(texture)
             this.setTexture(texture);
@@ -34,8 +36,13 @@ class Sprite {
         vertices ~= VertexData(-1, -1, 0, 1, 1, 1, 1, 0, 0);
         this.vbo.setVertices(vertices);
     }
-
-    void render() {
+    import std.stdio : writeln;
+    void prepareRender(RenderQueue queue) {
+        writeln("SpriteComponent "~this.name~".prepareRender");
+        queue.push(this);
+    }
+    import std.stdio;
+    void render(RenderQueue queue) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -45,6 +52,13 @@ class Sprite {
         
         this.vbo.shaderProgram.setTexture(this.texture, "uTexture0", 0);
         // set model-view-projection stuff here?
+        writeln(this.node.derivedMatrix);
+        writeln(queue.camera.viewMatrix);
+        writeln(queue.camera.projectionMatrix);
+        assert(this.node !is null, "Spire has to be attached to a node");
+        this.vbo.shaderProgram.sendUniform("uModelMatrix", this.node.derivedMatrix);
+        this.vbo.shaderProgram.sendUniform("uViewMatrix", queue.camera.viewMatrix);
+        this.vbo.shaderProgram.sendUniform("uProjectionMatrix", queue.camera.projectionMatrix);
         this.vbo.render();
     }
 
@@ -68,13 +82,6 @@ class Sprite {
         return Vector2(this.texture.size.x * this.scale.x, this.texture.size.y * this.scale.y);
     }
 
-    /**
-     * Returns the top-left corner of the sprite's drawing position,
-     * determined by origin, position, and size
-     */
-    @property Vector2 position() {
-        return this.offset - Vector2(this.size.x + this.origin.x, this.size.y * this.origin.y);
-    }
 
     void setSize(Vector2 size) {
         this.scale.x = size.x / this.texture.size.x;
@@ -84,9 +91,5 @@ class Sprite {
     void setScale(float scale) {
         this.scale.x = scale;
         this.scale.y = scale;
-    }
-
-    @property Rect screenBounds() {
-        return Rect(this.position, this.size);
     }
 }
