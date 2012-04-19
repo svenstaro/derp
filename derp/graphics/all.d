@@ -10,4 +10,6 @@ public import
     derp.graphics.util,
     derp.graphics.vertexbuffer,
     derp.graphics.view,
-    derp.graphics.window;
+    derp.graphics.window,
+    derp.graphics.camera,
+    derp.graphics.render;

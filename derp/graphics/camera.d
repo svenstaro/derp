@@ -7,6 +7,7 @@ module derp.graphics.camera;
 import std.math;
 import std.stdio;
 
+import derp.math.all;
 import derp.core.geo;
 import derp.core.scene;
 import derp.graphics.view;

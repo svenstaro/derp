@@ -4,8 +4,8 @@ import std.stdio;
 
 import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
-import gl3n.linalg;
 
+import derp.math.all;
 import derp.graphics.util;
 import derp.graphics.shader;
 import derp.graphics.draw;
@@ -122,7 +122,7 @@ public:
         this.shaderProgram.detach();
     }
 
-    void render() {
+    void render(Matrix4 modelMatrix, Matrix4 viewMatrix, Matrix4 projectionMatrix) {
         // attach texture
         this.shaderProgram.attach();
 
@@ -143,6 +143,11 @@ public:
         // glEnable(GL_BLEND);
         glCheck();
 
+        //Send matrices to shader
+        this.shaderProgram.sendUniform("uModelMatrix", modelMatrix);
+        this.shaderProgram.sendUniform("uViewMatrix", viewMatrix);
+        this.shaderProgram.sendUniform("uProjectionMatrix", projectionMatrix);
+        
         // Draw
         glDrawArrays(GL_TRIANGLES, 0, cast(int) this.vertexCount);
         glCheck();

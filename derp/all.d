@@ -4,4 +4,5 @@ module derp.all;
 
 public import
     derp.core.all,
-    derp.graphics.all;
+    derp.graphics.all,
+    derp.math.all;

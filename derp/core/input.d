@@ -7,7 +7,7 @@ module derp.core.input;
 import std.stdio;
 import std.utf;
 
-import gl3n.linalg;
+import derp.math.all;
 import derelict.glfw3.glfw3;
 
 import derp.graphics.window;

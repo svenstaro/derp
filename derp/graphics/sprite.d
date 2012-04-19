@@ -2,6 +2,7 @@ module derp.graphics.sprite;
 
 import derelict.opengl3.gl3;
 
+import derp.math.all;
 import derp.core.geo;
 import derp.core.scene;
 import derp.graphics.vertexbuffer;
@@ -36,12 +37,12 @@ class SpriteComponent : Component, Renderable {
         vertices ~= VertexData(-1, -1, 0, 1, 1, 1, 1, 0, 0);
         this.vbo.setVertices(vertices);
     }
-    import std.stdio : writeln;
+    
     void prepareRender(RenderQueue queue) {
-        writeln("SpriteComponent "~this.name~".prepareRender");
+        
         queue.push(this);
     }
-    import std.stdio;
+    
     void render(RenderQueue queue) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -50,24 +51,9 @@ class SpriteComponent : Component, Renderable {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, smooth ? GL_LINEAR : GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, smooth ? GL_LINEAR : GL_NEAREST);
         
+        this.vbo.shaderProgram.attach();
         this.vbo.shaderProgram.setTexture(this.texture, "uTexture0", 0);
-        // set model-view-projection stuff here?
-	    
-	   
-        writeln(this.node.derivedMatrix);
-        writeln(queue.camera.viewMatrix);
-        writeln(queue.camera.projectionMatrix);
-	    
-        assert(this.node !is null, "Spire has to be attached to a node");
-	    auto mv = this.node.derivedMatrix*queue.camera.viewMatrix;
-	    auto mvp = mv*queue.camera.projectionMatrix;
-	    writeln("calc mv matrix: ", mvp);
-	    writeln("calc mvp matrix: ", mvp);
-	this.vbo.shaderProgram.sendUniform("uModelViewProjectionMatrix", mvp);
-        this.vbo.shaderProgram.sendUniform("uModelMatrix", this.node.derivedMatrix);
-        this.vbo.shaderProgram.sendUniform("uViewMatrix", queue.camera.viewMatrix);
-        this.vbo.shaderProgram.sendUniform("uProjectionMatrix", queue.camera.projectionMatrix);
-        this.vbo.render();
+        this.vbo.render(this.node.derivedMatrix, queue.camera.viewMatrix, queue.camera.projectionMatrix);
     }
 
     void setTexture(Texture texture) {

@@ -10,6 +10,7 @@ import std.string;
 import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
 
+import derp.math.all;
 import derp.core.geo;
 import derp.core.input;
 import derp.graphics.util;
@@ -17,53 +18,80 @@ import derp.graphics.draw;
 import derp.graphics.view;
 
 class Window : Context {
+public:    
     enum Mode {
         Windowed = GLFW_WINDOWED,
         Fullscreen = GLFW_FULLSCREEN
     }
-
-    GLFWwindow glfwWindow;
+    
     Color backgroundColor;
 
+private:
+    GLFWwindow _glfwWindow;
+    Viewport[] _viewports;
+
+public:
     this(string title, int width, int height, Mode mode = Mode.Windowed, bool vsync = true) {
         // try to initialize the graphics environment
         initializeGraphics(this);
 
-        glfwWindow = glfwOpenWindow(width, height, mode, title.toStringz(), null);
-        if(!glfwWindow) {
+        this._glfwWindow = glfwOpenWindow(width, height, mode, title.toStringz(), null);
+        if(!this._glfwWindow) {
             throw new GraphicsException("Cannot initialize window " ~ title, this);
         }
 
         // Ensure we can capture the escape key being pressed below
-        glfwSetInputMode(glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
+        glfwSetInputMode(this._glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
 
         // Enable vertical sync (on cards that support it)
         if(vsync) glfwSwapInterval(1);
 
         this.activate();
-        this.setViewport(getBounds()); // set full viewport
+        Viewport defaultViewport = new Viewport();
+        defaultViewport.bounds = this.bounds;
+        this._viewports ~= defaultViewport;
+    }
+    
+    @property Viewport[] viewports() {
+        return this._viewports;
     }
 
     void getBounds(ref int x, ref int y, ref int w, ref int h) {
-        glfwGetWindowPos(this.glfwWindow, &x, &y);
-        glfwGetWindowSize(this.glfwWindow, &w, &h);
+        glfwGetWindowPos(this._glfwWindow, &x, &y);
+        glfwGetWindowSize(this._glfwWindow, &w, &h);
+    }
+    
+    @property Rect bounds() {
+        int x, y, w, h;
+        glfwGetWindowPos(this._glfwWindow, &x, &y);
+        glfwGetWindowSize(this._glfwWindow, &w, &h);
+        return Rect(x, y, w, h);
     }
 
-    Rect getBounds() {
-        int x, y, w, h;
-        glfwGetWindowPos(this.glfwWindow, &x, &y);
-        glfwGetWindowSize(this.glfwWindow, &w, &h);
-        return Rect(x, y, w, h);
+    @property Vector2 size() {
+        return this.bounds.size;
+    }
+
+    @property uint width() {
+        return cast(uint)this.bounds.size.x;
+    }
+
+    @property uint height() {
+        return cast(uint)this.bounds.size.y;
+    }
+
+    @property Vector2 pos() {
+        return this.bounds.pos;
     }
 
     void close() {
         if(this.isOpen()) {
-            glfwCloseWindow(glfwWindow);
+            glfwCloseWindow(this._glfwWindow);
         }
     }
 
     bool isOpen() {
-        return cast(bool) glfwIsWindow(glfwWindow);
+        return cast(bool) glfwIsWindow(this._glfwWindow);
     }
 
     void activate() {
@@ -72,10 +100,16 @@ class Window : Context {
 
     void update() {
         int x, y;
-        glfwGetMousePos(glfwWindow, &x, &y);
+        glfwGetMousePos(this._glfwWindow, &x, &y);
 
         int w, h;
-        glfwGetWindowSize(glfwWindow, &w, &h);
+        glfwGetWindowSize(this._glfwWindow, &w, &h);
+    }
+    
+    void render() {
+        foreach(ref v; this._viewports) {
+            v.render(this);
+        }
     }
 
     void clear() {

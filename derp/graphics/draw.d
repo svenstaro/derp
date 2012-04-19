@@ -6,7 +6,7 @@ module derp.graphics.draw;
 
 import std.stdio;
 import std.string;
-import std.math;
+import derp.math.all;
 
 struct Color {
     static Color Black          = Color(0, 0, 0);

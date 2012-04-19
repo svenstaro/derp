@@ -5,8 +5,8 @@
 module derp.core.scene;
 
 import std.algorithm;
-import std.math;
 
+import derp.math.all;
 import derp.core.geo;
 import derp.graphics.render;
 
@@ -219,16 +219,13 @@ public:
         Vector3 yAxis;
         Vector3 zAxis;
         //TODO: UFCS
-        to_axis(this.orientation, xAxis, yAxis, zAxis);
+        this.orientation.toAxis(xAxis, yAxis, zAxis);
     
-        if (xAxis.length_squared <  0.00005f) 
-        {
+        if (xAxis.length_squared <  0.00005f) {
             // Oops, a 180 degree turn (infinite possible rotation axes)
             // Default to yaw i.e. use current UP
             fromAngleAxis(rotQuat, degrees(180), yAxis);
-        }
-        else
-        {
+        } else {
             // Derive shortest arc to new direction
             rotQuat = rotationTo(zAxis, zAdjustVec);
         }
@@ -291,7 +288,7 @@ public:
     bool hasChildNode(Node node) const @trusted nothrow {
         try{
             return countUntil(this._children, node) != -1;
-        }catch(Exception e){
+        } catch(Exception e) {
             return false;
         }
     }
@@ -333,7 +330,12 @@ public:
 public:
     /// Attach a Component to this Node.
     void attachComponent(Component c) @safe nothrow {
+        if(c._node !is null && c._node !is this) {
+            c._node.detachComponent(c);
+        }
         c._node = this;
+        if(this.hasComponent(c))
+            return;          
         this._components ~= c;
     }
     
@@ -351,6 +353,15 @@ public:
         return this._components;
     }        
 
+    /// Checks whether the component is attached to this node
+    /// TODO: @safe, remove try catch block from canFind
+    bool hasComponent(Component c) const @trusted nothrow {
+        try {
+            return canFind(this._components, c);
+        } catch(Exception e) {}
+        return false;
+    }
+    
 private:
     enum Update {
         Position,

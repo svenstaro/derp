@@ -6,8 +6,9 @@ import std.traits;
 
 import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
+import derp.math.all;
 import gl3n.linalg;
-import gl3n.util : isVector = is_vector, isMatrix = is_matrix;
+
 
 import derp.core.geo;
 import derp.graphics.util;
@@ -82,6 +83,7 @@ private:
     int _handle;
     int[string] _uniformLocationCache;
     int[string] _attribLocationCache;
+    bool _isAttached = false;
 public:
     this(Shader[] shaders) {
         this.create(shaders);
@@ -89,6 +91,10 @@ public:
 
     delete(void* shaderProgram) {
         (cast(ShaderProgram)shaderProgram).destroy();
+    }
+    
+    @property bool isAttached() {
+        return this._isAttached;
     }
 
     @property string infoLog() {
@@ -153,11 +159,13 @@ public:
     void attach() {
         glUseProgram(this._handle);
         glCheck();
+        this._isAttached = true;
     }
 
     void detach() {
         glUseProgram(0);
         glCheck();
+        this._isAttached = false;
     }
 
     int getUniformLocation(string name) {
@@ -184,7 +192,7 @@ public:
     
     /// send Uniform
     void sendUniform(T)(int position, T t) {
-        attach();
+        assert(this.isAttached, "cannot send uniform, shader not attached");
         static if(isFloatingPoint!T) {
             glUniform1f(position, t);
         }
@@ -200,13 +208,13 @@ public:
         else static if(isMatrix!T && isNumeric!(T.mt) && T.cols >= 2 && T.cols <= 4 && T.rows >= 2 && T.rows <= 4) {
             static if(isFloatingPoint!(T.mt)) {
                 static if(T.cols != T.rows)
-                    mixin("glUniformMatrix"~to!string(T.cols)~"x"~to!string(T.rows)~"fv(position, 1, GL_FALSE, t.value_ptr);");
+                    mixin("glUniformMatrix"~to!string(T.cols)~"x"~to!string(T.rows)~"fv(position, 1, false, t.value_ptr);");
                 else
                     mixin("glUniformMatrix"~to!string(T.cols)~"fv(position, 1, false, t.value_ptr);");
             }
             else static if(isIntegral!(T.mt)) {
                 static if(T.cols != T.rows)
-                    mixin("glUniformMatrix"~to!string(T.cols)~"x"~to!string(T.rows)~"fi(position, 1, GL_FALSE, t.value_ptr);");
+                    mixin("glUniformMatrix"~to!string(T.cols)~"x"~to!string(T.rows)~"fi(position, 1, false, t.value_ptr);");
                 else
                     mixin("glUniformMatrix"~to!string(T.cols)~"fi(position, 1, false, t.value_ptr);");   
             }
@@ -215,7 +223,6 @@ public:
         {
             static assert(false, "Type "~T.stringof~" can not be sent via sendUniform");
         }
-        detach();
         glCheck();
     }
     
@@ -224,18 +231,12 @@ public:
         sendUniform(getUniformLocation(name), t);
     }
 
-    /// Sets the model-view-projection matrix as "uModelViewProjectionMatrix"
-    /// or `name`
-    void setMvpMatrix(Matrix4 matrix, string name = "uModelViewProjectionMatrix") {
-        sendUniform(name, matrix);
-    }
-
     void setTexture(Texture texture, string name = "texture", int location = 0) {
         uint pos = getUniformLocation(name);
         assert(pos != -1, "Cannot find texture sampler `" ~ name ~ "` in shader.");
 
         attach();
-        glUniform1i(pos, location);
+        sendUniform(pos, location);
         texture.bind();
         glActiveTexture(GL_TEXTURE0 + location);
         detach();
@@ -270,14 +271,14 @@ public:
 }
 
 static string defaultFragmentShader  = "#version 120
+varying vec3 fPosition;
+varying vec3 fNormal;
 varying vec4 fColor;
 varying vec2 fTexCoord;
 uniform sampler2D uTexture0;
 
 void main() {
     gl_FragColor = texture2D(uTexture0, fTexCoord);
-    //gl_FragColor = fColor;
-    //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
 ";
 
@@ -287,22 +288,22 @@ uniform mat4 uModelMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
 attribute vec3 vVertex;
+attribute vec3 vNormal;
 attribute vec2 vTexCoord;
 attribute vec4 vColor;
 
+varying vec3 fPosition;
+varying vec3 fNormal;
 varying vec4 fColor;
 varying vec2 fTexCoord;
 
 void main() {
-    //mat4 modelView = uModelMatrix * uViewMatrix;
-    //mat4 modelViewProjection = modelView * uProjectionMatrix;
-    //gl_Position = modelViewProjection  * vec4(vVertex, 1.0);
-    gl_Position = uModelViewProjectionMatrix * vec4(vVertex, 1.0);
-    // gl_Position = vec4(vVertex.x, vVertex.y, 0.0, 1.0);
-    // gl_TexCoord[0].st = vTexCoord;
-
-    // fColor = vColor;
-    fColor = vColor; // vec4(1.0, 0.0, 0.0, 1.0);
+    vec4 vPos = uViewMatrix * uModelMatrix * vec4(vVertex, 1.0);
+    gl_Position = uProjectionMatrix * vPos;
+    
+    fPosition = vPos.xyz;
+    fNormal = vNormal;
+    fColor = vColor;
     fTexCoord = vTexCoord;
 }
 ";
