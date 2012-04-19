@@ -9,5 +9,3 @@ public import
     derp.math.vector,
     derp.math.matrix,
     derp.math.quaternion;
-    
-
