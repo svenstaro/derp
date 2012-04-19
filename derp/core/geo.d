@@ -71,4 +71,4 @@ struct Box {
 struct Frustum {
 }
 
-// TODO: intersections
+// TODO: intersection

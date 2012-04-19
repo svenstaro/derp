@@ -66,18 +66,18 @@ public:
     }
 public:
     /// Returns a Ray From ScreenPoint into the Scene
-    //~ Ray cameraToViewportRay(uint screenX, uint screenY) {
-        //~ Matrix4 inverseVP = this.projectionMatrix * this.viewMatrix.inverse();
-        //~ real nx = (2.0f * screenX) - 1.0f;
-        //~ real ny = 1.0f - (2.0f * screenY);
-        //~ Vector3 nearPoint = Vector3(nx, ny, -1.0f);
-        //~ Vector3 midPoint = Vector3(nx, ny, 0.0f);
-        //~ Ray ray;
-        //~ ray.origin = inverseVP * nearPoint;
-        //~ ray.direction = (inverseVP * midPoint) - ray.origin;
-        //~ ray.direction.normalize();
-        //~ return ray;
-    //~ }
+    Ray cameraToViewportRay(uint screenX, uint screenY) {
+        Matrix4 inverseVP = this.projectionMatrix * this.viewMatrix.inverse();
+        real nx = (2.0f * screenX) - 1.0f;
+        real ny = 1.0f - (2.0f * screenY);
+        Vector4 nearPoint = Vector4(nx, ny, -1.0f, 0.0f);
+        Vector4 midPoint = Vector4(nx, ny, 0.0f, 0.0f);
+        Ray ray;
+        ray.origin = Vector3((inverseVP * nearPoint).xyz);
+        ray.direction = Vector3((inverseVP * midPoint).xyz) - ray.origin;
+        ray.direction.normalize();
+        return ray;
+    }
 
     /// Renders the scene for the Viewport `viewport`.
     void render(Viewport viewport) {
