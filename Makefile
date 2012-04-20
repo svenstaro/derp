@@ -15,7 +15,7 @@ dep:
 	cd externals/Derelict3/build && dmd derelict.d && ./derelict
 
 prepare:
-	dmd -Iexternals/dbs -L-Lexternals/dbs/lib/ -L-ldbs build.d -ofbuild
+	dmd -Iexternals/dbs -L-Lexternals/dbs/lib/ -L-ldbs compile.d -ofcompile
 
 compile:
-	./build
+	./compile
