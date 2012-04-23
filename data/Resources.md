@@ -26,58 +26,58 @@
 
 The resource manager's interface for creating and loading resources:
 
-        // ResourceManager.createUnstored(); ResourceManager.store()
-        Resource ResourceManager.create(type, source, name = Autodetect, loader = Autodetect);
+    // ResourceManager.createUnstored(); ResourceManager.store()
+    Resource ResourceManager.create(type, source, name = Autodetect, loader = Autodetect);
 
-        // new Resource();
-        Resource ResourceManager.createUnstored(type, source, name = Autodetect, loader = Autodetect);
-        
-        // ResourceManager.create(); Resource.load();
-        // -> Resource.load will call ResourceManager.store() if it is not yet stored
-        Resource ResourceManager.load(type, source, name = Autodetect, loader = Autodetect); 
+    // new Resource();
+    Resource ResourceManager.createUnstored(type, source, name = Autodetect, loader = Autodetect);
+    
+    // ResourceManager.create(); Resource.load();
+    // -> Resource.load will call ResourceManager.store() if it is not yet stored
+    Resource ResourceManager.load(type, source, name = Autodetect, loader = Autodetect); 
 
 
-        // Returns a stored resource
-        Resource ResourceManager.get(name);
+    // Returns a stored resource
+    Resource ResourceManager.get(name);
 
-        // Stores, may call Resource.autodetectName(), which may throw exception 
-        // if not loaded and not able to recognize from ResourceSources.
-        // see "Resource Name Generation"
-        Resource ResourceManager.store(resource, name = Autodetect); 
+    // Stores, may call Resource.autodetectName(), which may throw exception 
+    // if not loaded and not able to recognize from ResourceSources.
+    // see "Resource Name Generation"
+    Resource ResourceManager.store(resource, name = Autodetect); 
 
 For each of the above calls, there is a casting shortcut, e.g.:
 
-        Type ResourceManager.get(Type t)(name);
-        // equivalent to 
-        // cast(Type) ResourceManager.get(Type, name);
-        // example:
-        auto r = resourceManager.get!Texture("backgroundImage");
+    Type ResourceManager.get(Type t)(name);
+    // equivalent to 
+    // cast(Type) ResourceManager.get(Type, name);
+    // example:
+    auto r = resourceManager.get!Texture("backgroundImage");
 
 Some basic loading calls:
 
-        // default call, automatic cast and automatic UrlString generation (from string)
-        Texture a = resourceManager.load!Texture("path/to/file.png");
+    // default call, automatic cast and automatic UrlString generation (from string)
+    Texture a = resourceManager.load!Texture("path/to/file.png");
 
-        // automatic cast, manual UrlString creation
-        Texture b = resourceManager.load!Texture(UrlString("path/to/file.png"));
-        
-        // manual cast, manual UrlString creation
-        Texture c = cast(Texture) resourceManager.load(Texture, UrlString("path/to/file.png"));
+    // automatic cast, manual UrlString creation
+    Texture b = resourceManager.load!Texture(UrlString("path/to/file.png"));
+    
+    // manual cast, manual UrlString creation
+    Texture c = cast(Texture) resourceManager.load(Texture, UrlString("path/to/file.png"));
 
-        // manual cast, automatic UrlString creation
-        Texture d = cast(Texture) resourceManager.load(Texture, "path/to/file.png");
-        
+    // manual cast, automatic UrlString creation
+    Texture d = cast(Texture) resourceManager.load(Texture, "path/to/file.png");
+    
 
 ### Generated resource
 
 For procedural content generation, the ResourceLoader is the generator, the ResourceSource keeps a map of settings for the loader:
 
-        // automatic cast, automatic ResourceSource creation (because 
-        ResourceSettings noiseSettings("width", 128, "height", 128);
-        noiseSettings["foo"] = "bar";        // array access
-        noiseSettings.set("bar", "baz");     // set method
-        noiseSettings.type = Noise.Voronoi;  // opDispatch overwritten
-        Texture e = resourceManager.load!Texture(noiseGenerator, noiseSettings);
+    // automatic cast, automatic ResourceSource creation (because 
+    ResourceSettings noiseSettings("width", 128, "height", 128);
+    noiseSettings["foo"] = "bar";        // array access
+    noiseSettings.set("bar", "baz");     // set method
+    noiseSettings.type = Noise.Voronoi;  // opDispatch overwritten
+    Texture e = resourceManager.load!Texture(noiseGenerator, noiseSettings);
 
 ## Automatic Loader detection by ResourceSource
 
@@ -123,5 +123,5 @@ The resource loader holds all resources in memory, in a map, ordered by resource
 
 A resource group can apply loading (caching) and unloading (flagging as unrequired) on all its resources
 - Useful for level-specific resources etc.
-- A resource does not need a resource group
+- A resource does not need a resource group.
 - The resource manager holds all resource groups, so they can be accessed by name (but they do not need to be, e.g. a level class can also hold a pointer to its own resource group).
