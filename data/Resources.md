@@ -24,7 +24,7 @@
 3. If the data is already loaded (in step 2), the Resource is created with that data
 4. Otherwise the Resource is created with Loader and URL parameters, to load when required
 
-The resource manager's interface for creating and loading resources:
+The resource manager's interface for creating and loading resources.
 
     // ResourceManager.createUnstored(); ResourceManager.store()
     Resource ResourceManager.create(type, source, name = Autodetect, loader = Autodetect);
@@ -35,7 +35,6 @@ The resource manager's interface for creating and loading resources:
     // ResourceManager.create(); Resource.load();
     // -> Resource.load will call ResourceManager.store() if it is not yet stored
     Resource ResourceManager.load(type, source, name = Autodetect, loader = Autodetect); 
-
 
     // Returns a stored resource
     Resource ResourceManager.get(name);
@@ -58,14 +57,18 @@ Some basic loading calls:
     // default call, automatic cast and automatic UrlString generation (from string)
     Texture a = resourceManager.load!Texture("path/to/file.png");
 
-    // automatic cast, manual UrlString creation
-    Texture b = resourceManager.load!Texture(UrlString("path/to/file.png"));
-    
-    // manual cast, manual UrlString creation
-    Texture c = cast(Texture) resourceManager.load(Texture, UrlString("path/to/file.png"));
+    // only prepare a resource, to be called when used
+    Texture b = resourceManager.create!Texture("path/to/file.png"); 
+    // the Texture class will resolve the name to "file.png", even if it's not loaded
 
-    // manual cast, automatic UrlString creation
-    Texture d = cast(Texture) resourceManager.load(Texture, "path/to/file.png");
+    // get a stored texture's filesize
+    uint size = b.filesize; // the filesize @property makes sure the texture is being loaded
+
+    // create a group of textures for a level
+    ResourceGroup textures = resourceManager.createGroup("textures");
+    textures.add(resourceManager.createUnstored!Texture("path/to/file.png"));
+    // later...
+    textures.loadAll();
     
 
 ### Generated resource
