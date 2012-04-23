@@ -7,7 +7,10 @@
 
 import std.stdio;
 import std.string;
+import std.range;
 import std.algorithm;
+import std.file;
+import std.array;
 
 import dbs.all;
 
@@ -45,29 +48,40 @@ int main(string[] args) {
     derelict.linkPaths = ["externals/Derelict3/lib/"];
     derelict.includePaths = ["externals/Derelict3/import/"];
 
+
+    Dependency[string] list;
+
     Target derp = new Target("derp", TargetType.StaticLibrary);
+    list["derp"] = derp;
     derp.createModulesFromDirectory("derp/");
     derp.dependencies ~= [cast(Dependency)luajit, dl, curl, luad, orange, derelict, gl3n];
 
     Target derper = new Target("derper");
+    list["derper"] = derper;
     derper.createModulesFromDirectory("derper/");
     derper.dependencies ~= [cast(Dependency)derp, luad, derelict, gl3n];
     derper.flags = format(docString, "derper");
 
     Target herpderp = new Target("herpderp");
+    list["herpderp"] = herpderp;
     herpderp.createModulesFromDirectory("herpderp/");
     herpderp.dependencies ~= [cast(Dependency)derp, luad, derelict, gl3n];
     derper.flags = format(docString, "herpderp");
 
+    foreach(string f; dirEntries("test/src/", SpanMode.shallow)) {
+        string name = "test-" ~ f[f.lastIndexOf('/') + 1 .. $ - 2];
+
+        Target test = new Target(name);
+        list[name] = test;
+        test.addModule(f);
+        test.dependencies ~= [cast(Dependency)derp, luad, derelict, gl3n];
+    }
+
     string[] targets = args[1 .. $];
 
     if(!targets.length)
-        targets = ["derp", "derper", "herpderp"];
+        targets = list.keys;
 
-    Dependency[string] list;
-    list["derp"] = derp;
-    list["derper"] = derper;
-    list["herpderp"] = herpderp;
     // list["tests"] = derp;
 
     foreach(t; targets) {
