@@ -17,34 +17,23 @@ import derp.core.resources;
 import derp.graphics.util;
 import derp.graphics.view;
 
-class Texture {
+class Texture : Resource {
     uint ilHandle;
     uint glHandle;
 
     vec2i size;
     uint bitsPerPixel;
     int format;
-    
-    this() {
-    }
-    
-    this(Resource r) {
-        loadFromResource(r);
-    }
-    
-    this(byte[] data) {
-        loadFromMemory(data);
-    }
-    
-    void loadFromResource(Resource r) {
-        this.loadFromMemory(cast(byte[])r.bytes);
-    }
 
-    void loadFromMemory(byte[] data) {
+    bool initialized = false;
+
+    void initialize() {
         _create();
 
         _ilBind();
-        ilLoadL(IL_TYPE_UNKNOWN, data.ptr, cast(uint)data.length);
+        this.required = true; // this is where we need the data, at lease
+        ilLoadL(IL_TYPE_UNKNOWN, this.data.ptr, cast(uint)this.data.length);
+        this.required = false;
         ilCheck();
 
         // Receive image information
@@ -56,11 +45,12 @@ class Texture {
         // writefln("Found image data: %s x %s x %s", size.x, size.y, bitsPerPixel);
 
         // Push data to OpenGL
-        bind(); 
+        bind();
         glTexImage2D(GL_TEXTURE_2D, 0, bitsPerPixel / 8, size.x, size.y, 0, format, GL_UNSIGNED_BYTE, ilGetData());
         glCheck();
         unbind();
 
+        this.initialized = true;
         // Cleanup
         //_ilUnbind();
         //glBindTexture(GL_TEXTURE_2D, 0);
@@ -68,6 +58,8 @@ class Texture {
     }
 
     void bind() {
+        if(!this.initialized) this.initialize(); // this may load the data
+
         glBindTexture(GL_TEXTURE_2D, glHandle);
         glCheck();
     }

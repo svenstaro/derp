@@ -102,8 +102,9 @@ class Derp {
      *      name   = The resource name. Leave empty for Autodetect. Default: ""
      */
     LuaFunction luaLoad(string source, string name = "") {
-        Resource r = this.resourceManager.load(source, name == "" ? Autodetect : name);
-        return lua.loadString(r.text);
+        Script script = this.resourceManager.loadT!Script(new UrlString(source), null, name);
+        return lua.loadString(script.text);
+        script.free(); // we don't need it anymore, probably
     }
 
     /**

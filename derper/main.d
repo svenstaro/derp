@@ -64,12 +64,12 @@ Usage:
     ubyte[] data;
     if(args.length >= 2) {
         // Load the zipfile
-        Resource zipFile = app.resourceManager.load(args[1]);
-        data = zipFile.bytes;
+        Resource zipFile = app.resourceManager.loadT!Resource(new UrlString(args[1]));
+        data = cast(ubyte[])zipFile.data;
     } else {
         // try to load from our own end ;)
-        Resource zipFile = app.resourceManager.load(args[0]);
-        data = extractZipArchiveFromBinary(zipFile.bytes);
+        Resource zipFile = app.resourceManager.loadT!Resource(new UrlString(args[0]));
+        data = extractZipArchiveFromBinary(cast(ubyte[])zipFile.data);
     }
 
     Loader loader;

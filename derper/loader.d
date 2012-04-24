@@ -32,8 +32,9 @@ class Loader {
     }
 
     void doFile() {
-        Resource main = this.derp.resourceManager.load("main.lua");
+        Script main = this.derp.resourceManager.loadT!Script(new UrlString("main.lua"));
         derp.lua.doString(main.text);
+        main.free(); // we don't need it anymore, probably
     }
 
     void luaLoad() {
