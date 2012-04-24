@@ -6,8 +6,6 @@ class BytesGenerator : ResourceGenerator {
     byte[] generate(ResourceSettings settings) {
         return new byte[settings.get!int("length")];
     }
-
-
 }
 
 void main() {
