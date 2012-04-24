@@ -41,6 +41,7 @@ class Texture : Resource {
         size.y = ilGetInteger(IL_IMAGE_HEIGHT);
         bitsPerPixel = ilGetInteger(IL_IMAGE_BPP) * 8; // DevIL returns *bytes* per pixel
         format = ilGetInteger(IL_IMAGE_FORMAT);
+        this.initialized = true;
 
         // writefln("Found image data: %s x %s x %s", size.x, size.y, bitsPerPixel);
 
@@ -50,7 +51,6 @@ class Texture : Resource {
         glCheck();
         unbind();
 
-        this.initialized = true;
         // Cleanup
         //_ilUnbind();
         //glBindTexture(GL_TEXTURE_2D, 0);
