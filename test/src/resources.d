@@ -10,6 +10,4 @@ void main() {
     s.d = 42;
     assert(s.d == "42");
     assert(s.get!int("a") + s.get!int("d") == 44);
-
-    ResourceManager manager = new ResourceManager();
 }

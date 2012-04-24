@@ -170,7 +170,9 @@ public:
     }
 
     bool load() {
-        return this._loader.loadInto(this);
+        bool success = this._loader.loadInto(this);
+        this._required = true;
+        return success;
     }
 
     void free() {
@@ -208,7 +210,8 @@ abstract class ResourceLoader {
             return false;
         }
         resource.data = data;
-        this.manager.resourceSizeChanged(resource);
+        assert(this.manager !is null, "Cannot use unregistered ResourceLoader for loading.");
+        this.manager.resourceLoaded(resource);
         return true;
     }
 
@@ -245,6 +248,29 @@ abstract class UrlResourceLoader : ResourceLoader {
 }
 
 abstract class ResourceGenerator : ResourceLoader {
+    byte[] cacheData;
+    ResourceSettings cacheSettings;
+
+    // to be overwritten
+    byte[] generate(ResourceSettings settings);
+
+    void cache(ResourceSettings settings) {
+        if(cacheData.length == 0 || cacheSettings != settings) {
+            cacheData = generate(settings);
+            cacheSettings = settings;
+        }
+    }
+
+    bool loadRawData(ResourceSource source, out byte[] data) {
+        cache(cast(ResourceSettings)source);
+        data = cacheData;
+        return true;
+    }
+
+    ulong size(ResourceSource source) {
+        cache(cast(ResourceSettings)source);
+        return this.cacheData.length;
+    }
 }
 
 /**
@@ -350,6 +376,9 @@ class ResourceManager {
     ResourceGroup[string] resourceGroups;   /// List of all resource groups for this manager.
     Resource[string] resources;             /// List of created resources.
 
+    ulong softLimit = 0; /// Limit to which the cache should be filled, in bytes. Set to 0 for no limit.
+    ulong hardLimit = 0; /// Limit when to disallow memory allocation, in bytes. Set to 0 for no limit.
+
     /**
      * Constructor.
      */
@@ -396,7 +425,7 @@ class ResourceManager {
         return defaultLoader;
     }
 
-    /**
+    /* WARNING! THIS IS DOCS OF THE OLD IMPLEMENTATION. LEGACY CONTENT TO BE EXPECTED!
      * Loads a resource.
      *
      * Parameters:
@@ -407,42 +436,6 @@ class ResourceManager {
      *  sourceType = The source type of this resource. Determines which
      *               resource loader is being used.
      */
-    /*Resource load(string source, string name = Autodetect, string sourceType = Autodetect) {
-        // autodetect source type here
-        if(sourceType == Autodetect) {
-            foreach(p; sourceTypePatterns.keys) {
-                auto r = regex(p, "i");
-                if(match(source, r)) {
-                    sourceType = sourceTypePatterns[p];
-                    break;
-                }
-            }
-            if(sourceType == Autodetect) {
-                // writeln("Could not Auto-Detect SourceType for " ~ source);
-                // writeln("  using default SourceType " ~ defaultSourceType);
-                sourceType = defaultSourceType;
-            } else {
-                // writeln("Auto-Detect SourceType: " ~ sourceType);
-                // writeln("  for " ~ source);
-            }
-        }
-
-        if(!(sourceType in loaders)) {
-            writeln("Cannot find ResourceLoader for SourceType " ~ sourceType);
-            return null;
-        }
-
-        ResourceLoader l = loaders[sourceType];
-        Resource r = l(source, name);
-        r.sourceType = sourceType;
-
-        // autodetect source type here
-        if(name == Autodetect) {
-            name = l.autodetectName(source);
-        }
-        resources[name]  = r;
-        return r;
-    }*/
 
     ResourceType autodetectType(ResourceSource source) {
         if(is(typeof(source) == UrlString)) {
@@ -521,7 +514,7 @@ class ResourceManager {
     Resource load(ResourceType type, ResourceSource source, ResourceLoader loader = null, string name = "") {
         Resource r = this.createUnstored(type, source, loader);
         r.load();
-        this.store(r);
+        this.store(r, name);
         return r;
     }
 
@@ -541,8 +534,39 @@ class ResourceManager {
         return cast(T)this.get(name);
     }
 
-    void resourceSizeChanged(Resource resource) {
+    @property ulong totalMemory() {
+        ulong total = 0;
+        foreach(n, r; this.resources) {
+            total += r.data.length;
+        }
+        return total;
+    }
+
+    void resourceLoaded(Resource resource) {
+        ulong add = (resource.name in resources ? 0 : resource.data.length);
+
         // TODO: free memory when limits are reached
+        if(softLimit > 0) {
+            while(totalMemory + add > softLimit) {
+                // free biggest unrequired resource
+                Resource biggest = null;
+                foreach(n, r; this.resources) {
+                    if(!r.required && r.data.length > 0 && (biggest is null || biggest.data.length < r.data.length))
+                        biggest = r;
+                }
+                if(biggest !is null) {
+                    biggest.free();
+                }
+                else {
+                    break; // cound not find another unrequired resource
+                }
+            }
+        }
+
+        ulong t = totalMemory + add;
+        if(hardLimit > 0 && t > hardLimit) {
+            throw new Exception(format("Loading a resource exceeded memory hard limit of %s by %s bytes.", hardLimit, t - hardLimit));
+        }
     }
 
     // Stores, may call Resource.autodetectName(), which may return an empty name.
