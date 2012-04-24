@@ -33,9 +33,7 @@ public:
     }
 
     void renderAll() {
-	    writeln("queue.renderall");
         foreach(renderable; _queue) {
-		writeln("queue.renderall _call: renderable.render");
             renderable.render(this);
         }
     }
