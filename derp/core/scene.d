@@ -1,5 +1,5 @@
 /**
-    Bugs: _parent Node has to become a weak referece, 
+    Bugs: _parent Node has to become a weak referece,
     else the GC might not free it. (double linked)
 */
 module derp.core.scene;
@@ -20,11 +20,11 @@ enum TransformSpace {
 /***
     The Node class represents a Point in the Scene.
     It has a Position, Orientation and Scale.
-    If any information of this node is requested, 
+    If any information of this node is requested,
     it is recalculated if it is outdated.
 */
 final class Node {
-private:    
+private:
     Node[] _children;
     Component[] _components;
     Node _parent = null; //TODO: FIXME: this has to become a weak_reference!
@@ -57,7 +57,7 @@ public:
         setParent(parent);
         this.scale = Vector3(1, 1, 1);
     }
-    
+
     /// Returns this Nodes name.
     @property string name() const @safe nothrow {
         return this._name;
@@ -203,7 +203,7 @@ public:
         }
         this._requestUpdate(Update.Orientation);
     }
-    
+
     ///
     @property void direction(Vector3 vector) @safe nothrow {
         if(vector == Vector3(0,0,0))
@@ -214,13 +214,13 @@ public:
 
         Quaternion targetWorldOrientation;
         Quaternion rotQuat;
-    
+
         Vector3 xAxis;
         Vector3 yAxis;
         Vector3 zAxis;
         //TODO: UFCS
         this.orientation.toAxis(xAxis, yAxis, zAxis);
-    
+
         if (xAxis.length_squared <  0.00005f) {
             // Oops, a 180 degree turn (infinite possible rotation axes)
             // Default to yaw i.e. use current UP
@@ -236,7 +236,7 @@ public:
     ///
     void lookAt(Vector3 point) @safe nothrow {
         this.direction = (point - this.position);
-    }	
+    }
 
 public:
     /// Creates a new Node with this Node as parent.
@@ -282,7 +282,7 @@ public:
         }
         return this._cachedRootNode;
     }
-    
+
     /// Returns true if node is a child of this Node.
     /// TODO: @safe, remove try catch block from countuntil
     bool hasChildNode(Node node) const @trusted nothrow {
@@ -292,7 +292,7 @@ public:
             return false;
         }
     }
-    
+
     /// Returns true if node is a sibling of this Node
     bool hasSiblingNode(Node node) const @safe nothrow {
         foreach(e; this._children)
@@ -300,18 +300,18 @@ public:
                 return true;
         return false;
     }
-    
+
     /// Returns count of children this Node has.
     ulong countChildren() const @safe nothrow {
         return this._children.length;
     }
-    
+
     /// Returns array of children this Node has.
     @property const(Node[]) children() const @safe nothrow {
         return this._children;
     }
-    
-    /// Returns the Node identified by name if it is a 
+
+    /// Returns the Node identified by name if it is a
     /// sibling of this Node.
     /// If it is not found it returns null.
     Node findSibling(string name) @safe nothrow {
@@ -326,7 +326,7 @@ public:
             }
         return null;
     }
-    
+
 public:
     /// Attach a Component to this Node.
     void attachComponent(Component c) @safe nothrow {
@@ -335,10 +335,10 @@ public:
         }
         c._node = this;
         if(this.hasComponent(c))
-            return;          
+            return;
         this._components ~= c;
     }
-    
+
     /// Detach a Component from this Node
     /// TODO: @safe, remove try catch block from countUntil
     void detachComponent(Component c) @trusted nothrow {
@@ -347,11 +347,11 @@ public:
             remove(this._components, countUntil(this._components, c));
         }catch(Exception e){}
     }
-    
+
     // Returns all components attached to this node
     @property const(Component[]) components() const @safe nothrow {
         return this._components;
-    }        
+    }
 
     /// Checks whether the component is attached to this node
     /// TODO: @safe, remove try catch block from canFind
@@ -361,7 +361,7 @@ public:
         } catch(Exception e) {}
         return false;
     }
-    
+
 private:
     enum Update {
         Position,
@@ -387,14 +387,12 @@ private:
 
         foreach(c; this._children)
             c._requestUpdate(update);
-        
+
         foreach(c; this._components)
             c._needUpdate = true;
     }
-public:    
-    import std.stdio : writeln;
+public:
     void prepareRender(RenderQueue queue) const {
-        writeln("Node "~this.name~".prepareRender");
         foreach(c; this.components) {
             c.prepareRender(queue);
         }
@@ -409,7 +407,7 @@ public:
  * it.
  */
 class Component {
-private:    
+private:
     Node _node; //TODO: FIXME: this has to become a weak_reference!
     string _name;
 protected:
@@ -426,17 +424,17 @@ public:
         if(this._node) return this._node.path ~ "/" ~ this._name;
         else return "<unattached>/" ~ this._name;
     }
-    
+
     /// Returns the Node this Component is attached to.
     @property Node node() @safe nothrow {
         return this._node;
     }
-    
+
     /// Returns this Components name.
     @property string name() const @safe nothrow {
         return this._name;
     }
-    
+
     void prepareRender(RenderQueue queue) const {
         // do nothing, since most components won't
         // be visible anyway

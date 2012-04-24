@@ -5,7 +5,6 @@
 module derp.graphics.camera;
 
 import std.math;
-import std.stdio;
 
 import derp.math.all;
 import derp.core.geo;
@@ -18,7 +17,7 @@ import derp.graphics.render;
  * CameraComponent
  */
 class CameraComponent : Component{
-private:	
+private:
     Matrix4 _projectionMatrix;
     Matrix4 _cachedViewMatrix;
 public:
@@ -42,13 +41,13 @@ public:
         float width = height * aspectRatio;      // half width of near plane
         // params: left, right, bottom, top, near, far
         setPerspective(-width, width, -height, height, front, back);
-    }	
+    }
 
     ///
-    void setPerspective(float left, float right, float top, float bottom, float near, float far) @safe nothrow {		
+    void setPerspective(float left, float right, float top, float bottom, float near, float far) @safe nothrow {
         this._projectionMatrix = Matrix4.perspective(left, right, bottom, top, near, far);
     }
-    
+
 public:
     ///return projection matrix
     @property Matrix4 projectionMatrix() const @safe nothrow {
@@ -81,7 +80,6 @@ public:
 
     /// Renders the scene for the Viewport `viewport`.
     void render(Viewport viewport) {
-	writeln("camera.render");
         assert(this.node !is null, "Camera needs to be attached to a Node to render a scene.");
 
         RenderQueue queue = new RenderQueue(this, viewport);
