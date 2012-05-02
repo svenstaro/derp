@@ -16,6 +16,7 @@ import dbs.all;
 
 int main(string[] args) {
     string docString = "-D -Dddocs/%s/";
+    bool gendocs = false;
 
     Settings.LibraryPath = "lib/";
     Settings.ExecutablePath = "bin/";
@@ -55,18 +56,19 @@ int main(string[] args) {
     list["derp"] = derp;
     derp.createModulesFromDirectory("derp/");
     derp.dependencies ~= [cast(Dependency)luajit, dl, curl, luad, orange, derelict, gl3n];
+    if(gendocs) derp.flags = format(docString, "derp");
 
     Target derper = new Target("derper");
     list["derper"] = derper;
     derper.createModulesFromDirectory("derper/");
     derper.dependencies ~= [cast(Dependency)derp, luad, derelict, gl3n];
-    derper.flags = format(docString, "derper");
+    if(gendocs) derper.flags = format(docString, "derper");
 
     Target herpderp = new Target("herpderp");
     list["herpderp"] = herpderp;
     herpderp.createModulesFromDirectory("herpderp/");
     herpderp.dependencies ~= [cast(Dependency)derp, luad, derelict, gl3n];
-    derper.flags = format(docString, "herpderp");
+    if(gendocs) herpderp.flags = format(docString, "herpderp");
 
     foreach(string f; dirEntries("test/src/", SpanMode.shallow)) {
         string name = "test-" ~ f[f.lastIndexOf('/') + 1 .. $ - 2];
