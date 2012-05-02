@@ -1,10 +1,9 @@
-default: compile
+default: dep prepare bake-force
 
 clean:
-	rm bin/* && rm lib/libderp.a
+	rm -r bin/ lib/*derp* build/
 
-recompile:
-	rm bin/* && rm lib/libderp.a && make
+recompile: clean bake
 
 dep:
 	git submodule update --init
@@ -17,5 +16,8 @@ dep:
 prepare:
 	dmd -Iexternals/dbs -L-Lexternals/dbs/lib/ -L-ldbs compile.d -ofcompile
 
-compile:
-	./compile
+bake-force:
+	./compile -fj 4
+
+bake:
+	./compile -j 4

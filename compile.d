@@ -21,7 +21,7 @@ int main(string[] args) {
     Settings.ExecutablePath = "bin/";
     Settings.ObjectFilePath = "build/";
     Settings.SelectedCompiler = Compiler.DMD;
-    Settings.CompilerFlags = "-fPIC -g -gc -gs -unittest";
+    Settings.CompilerFlags = "-g -unittest -debug -op"; // fPIC, gs, gc
     Settings.getOpt(args);
 
     SystemDependency luajit = new SystemDependency("luajit-5.1");
