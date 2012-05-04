@@ -21,3 +21,6 @@ bake-force:
 
 bake:
 	./compile -j 4
+
+test: bake
+	bin/test-all
