@@ -22,17 +22,23 @@ int main(string[] args) {
     spriteNode.attachComponent(sprite);
     sprite.smooth = false;
 
+    sprite.size = 100;
+    spriteNode.position = Vector3(400, 300, 0);
+
     // Setup view
     CameraComponent cam = window.viewports[0].currentCamera;
     cam.projectionMode = CameraComponent.ProjectionMode.Orthographic;
-    cam.orthographicBounds = Rect(-0.5, -1, 1.5, 1.5);
+    cam.orthographicBounds = Rect(0, 0, 800, 600);
     camNode.attachComponent(cam);
 
     // Example main loop
     float x = 0;
     while(window.isOpen()) {
         x += 0.05;
-        //camNode.position = Vector3(sin(x), 0, 0);
+        spriteNode.rotation = degrees(- x * 10);
+        sprite.scale = 0.1 * sin(4 * x) + 1;
+        
+        camNode.position = Vector3(sin(x), cos(x), 0) * -100;
 
         window.update();
         window.clear();

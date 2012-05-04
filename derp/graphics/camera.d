@@ -140,17 +140,16 @@ public:
     }
 
     /// Returns the projection matrix, cached.
-    @property Matrix4 projectionMatrix() @trusted nothrow {
+    @property Matrix4 projectionMatrix() @safe nothrow {
         if(this._needProjectionUpdate) {
             this._updateProjectionMatrix();
             this._needProjectionUpdate = false;
         }
-        try {writeln("Projection Matrix: ", this._projectionMatrix);} catch(Exception e){}
         return _projectionMatrix;
     }
 
     /// Return the view matrix, cached.
-    @property Matrix4 viewMatrix() @trusted nothrow {
+    @property Matrix4 viewMatrix() @safe nothrow {
         if(this._needUpdate) {
             auto pos = this.node.position;
             if(this._projectionMode == ProjectionMode.Orthographic) {
@@ -164,8 +163,6 @@ public:
             makeTransform(this._cachedViewMatrix, pos, Vector3(1,1,1), this.node.orientation);
             this._needUpdate = false;
         }
-        // this._cachedViewMatrix = Matrix4.identity;
-        try {writeln("View Matrix: ", this._cachedViewMatrix);} catch(Exception e){}
         return this._cachedViewMatrix;
     }
 

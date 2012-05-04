@@ -63,6 +63,18 @@ public:
         return this._name;
     }
 
+    /// Rotation on x-y plane / around z-axis (for 2D elements)
+    @property Angle rotation() const @safe nothrow {
+        return radians(this._localOrientation.roll());
+    }
+
+    /// ditto
+    @property void rotation(Angle angle) @safe nothrow {
+        this._localOrientation = Quaternion.zrotation(angle.radians);
+        this._requestUpdate(Update.Orientation);
+    }
+
+
     /// Position relative to parent.
     @property Vector3 position() const @safe nothrow {
         return this._localPosition;

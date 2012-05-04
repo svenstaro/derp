@@ -18,49 +18,71 @@ import derp.graphics.util;
 import derp.graphics.view;
 
 class Texture : Resource {
-    uint ilHandle;
-    uint glHandle;
+private:
+    uint _ilHandle;
+    uint _glHandle;
 
-    vec2i size;
-    uint bitsPerPixel;
-    int format;
+    vec2i _size;
+    uint _bitsPerPixel;
+    int _format;
 
-    bool initialized = false;
+    bool _initialized = false;
+
+public:
+    @property vec2i size() {
+        this.initialize();
+        return this._size;
+    }
+
+    @property uint bitsPerPixel() {
+        this.initialize();
+        return this._bitsPerPixel;
+    }
+
+    @property uint format() {
+        this.initialize();
+        return this._format;
+    }
 
     void initialize() {
-        _create();
+        if(this._initialized) return;
+        this._create();
 
-        _ilBind();
-        this.required = true; // this is where we need the data, at lease
+        // this is the only place we need the data, so it must be loaded beyond this point
+        this.required = true; 
+        this._ilBind();
         ilLoadL(IL_TYPE_UNKNOWN, this.data.ptr, cast(uint)this.data.length);
-        this.required = false;
         ilCheck();
+        this.required = false; // we don't need the data anymore
 
         // Receive image information
-        size.x = ilGetInteger(IL_IMAGE_WIDTH);
-        size.y = ilGetInteger(IL_IMAGE_HEIGHT);
-        bitsPerPixel = ilGetInteger(IL_IMAGE_BPP) * 8; // DevIL returns *bytes* per pixel
-        format = ilGetInteger(IL_IMAGE_FORMAT);
-        this.initialized = true;
+        this._size.x = ilGetInteger(IL_IMAGE_WIDTH);
+        this._size.y = ilGetInteger(IL_IMAGE_HEIGHT);
+        this._bitsPerPixel = ilGetInteger(IL_IMAGE_BPP) * 8; // DevIL returns *bytes* per pixel
+        this._format = ilGetInteger(IL_IMAGE_FORMAT);
+        this._initialized = true;
 
         // writefln("Found image data: %s x %s x %s", size.x, size.y, bitsPerPixel);
 
         // Push data to OpenGL
-        bind();
-        glTexImage2D(GL_TEXTURE_2D, 0, bitsPerPixel / 8, size.x, size.y, 0, format, GL_UNSIGNED_BYTE, ilGetData());
+        this.bind();
+        glTexImage2D(GL_TEXTURE_2D, 0, 
+                this._bitsPerPixel / 8, 
+                this._size.x, this._size.y, 0, 
+                this._format, GL_UNSIGNED_BYTE, ilGetData());
         glCheck();
-        unbind();
+        this.unbind();
 
         // Cleanup
         //_ilUnbind();
         //glBindTexture(GL_TEXTURE_2D, 0);
-        //ilDeleteImages(1, &ilHandle); // Because we have already copied image data into texture data we can release memory used by image.
+        //ilDeleteImages(1, &_ilHandle); // Because we have already copied image data into texture data we can release memory used by image.
     }
 
     void bind() {
-        if(!this.initialized) this.initialize(); // this may load the data
+        this.initialize(); // this may load the data
 
-        glBindTexture(GL_TEXTURE_2D, glHandle);
+        glBindTexture(GL_TEXTURE_2D, _glHandle);
         glCheck();
     }
 
@@ -71,15 +93,15 @@ class Texture : Resource {
 
 private:
     void _create() {
-        ilGenImages(1, &ilHandle);
+        ilGenImages(1, &_ilHandle);
         ilCheck();
 
-        glGenTextures(1, &glHandle);
+        glGenTextures(1, &_glHandle);
         glCheck();
     }
 
     void _ilBind() {
-        ilBindImage(ilHandle);
+        ilBindImage(_ilHandle);
         ilCheck();
     }
 
