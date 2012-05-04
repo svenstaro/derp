@@ -15,7 +15,7 @@ import derp.graphics.shader;
 import derp.graphics.render;
 
 class SpriteComponent : Component, Renderable {
-private:
+protected:
     Vector2 _scale;
     Texture _texture;
     Color _color = Color(1, 1, 1);

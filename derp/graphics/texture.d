@@ -29,6 +29,8 @@ private:
     bool _initialized = false;
 
 public:
+    bool isRawData = false;
+
     @property vec2i size() {
         this.initialize();
         return this._size;
@@ -50,16 +52,44 @@ public:
 
         // this is the only place we need the data, so it must be loaded beyond this point
         this.required = true; 
-        this._ilBind();
-        ilLoadL(IL_TYPE_UNKNOWN, this.data.ptr, cast(uint)this.data.length);
-        ilCheck();
+
+        void* rawData;
+        if(this.isRawData) {
+            ResourceSettings s = cast(ResourceSettings)this.source;
+            writeln(s.settings);
+
+            this._size.x = s.get!int("width", 0);
+            this._size.y = s.get!int("height", 0);
+            assert(this._size.x > 0 && this._size.y > 0);
+
+            string mode = s.get("mode", "rgba");
+            if(mode == "rgba") {
+                this._bitsPerPixel = 32;
+                this._format = GL_RGBA;
+            } else if(mode == "rgb") {
+                this._bitsPerPixel = 24;
+                this._format = GL_RGB;
+            } else if(mode == "alpha") {
+                this._bitsPerPixel = 8;
+                this._format = GL_ALPHA;
+            }
+
+            this._bitsPerPixel = ilGetInteger(IL_IMAGE_BPP) * 8; // DevIL returns *bytes* per pixel
+            this._format = GL_RGBA;
+            rawData = &this.data[0];
+        } else {
+            this._ilBind();
+            ilLoadL(IL_TYPE_UNKNOWN, this.data.ptr, cast(uint)this.data.length);
+            rawData = ilGetData();
+            ilCheck();
+            // Receive image information
+            this._size.x = ilGetInteger(IL_IMAGE_WIDTH);
+            this._size.y = ilGetInteger(IL_IMAGE_HEIGHT);
+            this._bitsPerPixel = ilGetInteger(IL_IMAGE_BPP) * 8; // DevIL returns *bytes* per pixel
+            this._format = ilGetInteger(IL_IMAGE_FORMAT);
+        }
         this.required = false; // we don't need the data anymore
 
-        // Receive image information
-        this._size.x = ilGetInteger(IL_IMAGE_WIDTH);
-        this._size.y = ilGetInteger(IL_IMAGE_HEIGHT);
-        this._bitsPerPixel = ilGetInteger(IL_IMAGE_BPP) * 8; // DevIL returns *bytes* per pixel
-        this._format = ilGetInteger(IL_IMAGE_FORMAT);
         this._initialized = true;
 
         // writefln("Found image data: %s x %s x %s", size.x, size.y, bitsPerPixel);
@@ -69,7 +99,7 @@ public:
         glTexImage2D(GL_TEXTURE_2D, 0, 
                 this._bitsPerPixel / 8, 
                 this._size.x, this._size.y, 0, 
-                this._format, GL_UNSIGNED_BYTE, ilGetData());
+                this._format, GL_UNSIGNED_BYTE, rawData);
         glCheck();
         this.unbind();
 

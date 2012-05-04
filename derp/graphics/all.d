@@ -6,6 +6,7 @@ public import
     derp.graphics.draw,
     derp.graphics.shader,
     derp.graphics.sprite,
+    derp.graphics.text,
     derp.graphics.texture,
     derp.graphics.util,
     derp.graphics.vertexbuffer,

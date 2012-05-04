@@ -72,6 +72,7 @@ class ResourceSettings : ResourceSource {
 
     T get(T = string)(string name) {
         static if(isIntegral!T) return get(name, 0);
+        else static if(is(T == string)) return get(name, "");
         else return get(name, null);
     }
 

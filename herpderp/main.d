@@ -14,10 +14,15 @@ int main(string[] args) {
     ResourceManager resourceManager = new ResourceManager();
     Texture texture = resourceManager.loadT!Texture(new UrlString("data/icon.png"));
 
+    // Load font
+    Font font = resourceManager.loadT!Font(new UrlString("data/fonts/dejavu/DejaVuSans.ttf"));
+    font.pixelSize = 20;
+
     // Create scene graph
     Node rootNode = new Node("rootNode");
     Node camNode = new Node("camNode", rootNode);
     Node spriteNode = new Node("spriteNode", rootNode);
+    Node fontNode = new Node("fontNode", rootNode);
 
     // Create sprite
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
@@ -33,6 +38,11 @@ int main(string[] args) {
     cam.orthographicBounds = Rect(0, 0, 800, 600);
     camNode.attachComponent(cam);
 
+    // Headline
+    TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
+    fontNode.attachComponent(text);
+    fontNode.position = Vector3(400, 100, 0);
+
     // Example main loop
     float x = 0;
     int i = 0;
@@ -42,7 +52,7 @@ int main(string[] args) {
         spriteNode.rotation = degrees(- x * 10);
         sprite.scale = 0.1 * sin(4 * x) + 1;
         
-        camNode.position = Vector3(sin(x), cos(x), 0) * -100;
+        //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
 
         window.update();
         window.clear();
