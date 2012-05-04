@@ -9,6 +9,9 @@ import std.string;
 
 import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
+import derelict.devil.il;
+import derelict.devil.ilu;
+import derelict.devil.ilut;
 
 import derp.math.all;
 import derp.core.geo;
@@ -141,6 +144,23 @@ public:
     void setViewport(Rect bounds) {
         glViewport(cast(int)bounds.pos.x, cast(int)bounds.pos.y,
             cast(int)bounds.size.x, cast(int)bounds.size.y);
+    }
+
+    void saveScreenshot(string filename) {
+        ubyte[] data = new ubyte[this.width * this.height * 3];
+        glReadPixels(0, 0, this.width, this.height, GL_RGB, GL_UNSIGNED_BYTE, data.ptr); 
+
+        uint ilHandle;
+
+        // Save the image
+        ilEnable(IL_FILE_OVERWRITE);
+        ilGenImages(1, &ilHandle);
+        ilBindImage(ilHandle);
+        ilTexImage(this.width, this.height, 1, 3, IL_RGB, IL_UNSIGNED_BYTE, data.ptr);
+
+        // Save image
+        ilSave(IL_PNG, filename.toStringz());
+        ilDeleteImages(1, &ilHandle);
     }
 
     void keyPressed(int key) {

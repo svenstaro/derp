@@ -2,6 +2,8 @@ import derp.all;
 
 import std.stdio;
 import std.random;
+import std.format;
+import std.string;
 
 int main(string[] args) {
     // Create the window
@@ -33,7 +35,9 @@ int main(string[] args) {
 
     // Example main loop
     float x = 0;
+    int i = 0;
     while(window.isOpen()) {
+        i++;
         x += 0.05;
         spriteNode.rotation = degrees(- x * 10);
         sprite.scale = 0.1 * sin(4 * x) + 1;
@@ -44,6 +48,13 @@ int main(string[] args) {
         window.clear();
         window.render();
         window.display();
+
+        // Uncomment the following line to save the frames. Use
+        //  $ cd /tmp/scrot/ && convert -resize 400x300 -delay 4 *.png animation.gif
+        // to make an animated GIF from it. Make sure the directory /tmp/scrot/
+        // exists before running the application.
+
+        // window.saveScreenshot(format("/tmp/scrot/frame-%04s.png", i));
     }
     window.close();
     return 0;
