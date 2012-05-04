@@ -18,12 +18,12 @@ import derp.graphics.draw;
 import derp.graphics.view;
 
 class Window : Context {
-public:    
+public:
     enum Mode {
         Windowed = GLFW_WINDOWED,
         Fullscreen = GLFW_FULLSCREEN
     }
-    
+
     Color backgroundColor;
 
 private:
@@ -31,7 +31,13 @@ private:
     Viewport[] _viewports;
 
 public:
-    this(string title, int width, int height, Mode mode = Mode.Windowed, bool vsync = true) {
+    enum ViewportType {
+        None,
+        Viewport,
+        Viewport2D
+    }
+
+    this(string title, int width, int height, Mode mode = Mode.Windowed, bool vsync = true, ViewportType defaultViewportType = ViewportType.Viewport2D) {
         // try to initialize the graphics environment
         initializeGraphics(this);
 
@@ -47,11 +53,14 @@ public:
         if(vsync) glfwSwapInterval(1);
 
         this.activate();
-        Viewport defaultViewport = new Viewport();
-        defaultViewport.bounds = this.bounds;
-        this._viewports ~= defaultViewport;
+
+        if(defaultViewportType == ViewportType.Viewport) {
+            this._viewports ~= new Viewport(null, this.bounds);
+        } else if(defaultViewportType == ViewportType.Viewport2D) {
+            this._viewports ~= new Viewport2D(this.bounds);
+        }
     }
-    
+
     @property Viewport[] viewports() {
         return this._viewports;
     }
@@ -60,7 +69,7 @@ public:
         glfwGetWindowPos(this._glfwWindow, &x, &y);
         glfwGetWindowSize(this._glfwWindow, &w, &h);
     }
-    
+
     @property Rect bounds() {
         int x, y, w, h;
         glfwGetWindowPos(this._glfwWindow, &x, &y);
@@ -105,7 +114,7 @@ public:
         int w, h;
         glfwGetWindowSize(this._glfwWindow, &w, &h);
     }
-    
+
     void render() {
         foreach(ref v; this._viewports) {
             v.render(this);
@@ -133,7 +142,7 @@ public:
         glViewport(cast(int)bounds.pos.x, cast(int)bounds.pos.y,
             cast(int)bounds.size.x, cast(int)bounds.size.y);
     }
-    
+
     void keyPressed(int key) {
         if(key == Input.Key.Escape)
             close();

@@ -20,8 +20,9 @@ class Viewport {
 public:
     Rect bounds;
 
-private:    
+private:
     CameraComponent _currentCamera = null;
+    bool _allowChangeCamera = true;
 
 public:
     this(CameraComponent camera = null, Rect bounds = Rect(0, 0, 100, 100)) {
@@ -30,6 +31,10 @@ public:
     }
 
     @property void currentCamera(CameraComponent camera) {
+        if(!this._allowChangeCamera) {
+            throw new Exception("For this viewport the camera may not be changed.");
+        }
+
         if(this._currentCamera) {
             // This viewport is already connected to a camera, remove it from its viewports list.
             remove(this._currentCamera.connectedViewports, countUntil(this._currentCamera.connectedViewports, this));
@@ -39,11 +44,11 @@ public:
         }
         this._currentCamera = camera;
     }
-    
+
     @property CameraComponent currentCamera() {
         return this._currentCamera;
     }
-    
+
     void render(Window window) {
         assert(this._currentCamera !is null, "Viewport needs a camera to render");
         window.setViewport(this.bounds);
@@ -60,15 +65,13 @@ public:
  * systems.
  */
 class Viewport2D : Viewport {
-    Vector2 _internalSize;
-    Vector2 _offset;
-
-    this() {
-        this.currentCamera = new CameraComponent("defaultCamera", degrees(80), 1, 1, 100);
+    this(Rect bounds = Rect(0, 0, 100, 100)) {
+        super(new CameraComponent("defaultCamera", bounds), bounds);
+        this._allowChangeCamera = false; // forbid any further changes to the camera
     }
 
     void centerAt(Vector2 center) {
-        this._offset = this._internalSize * 0.5 - center;
+        // TODO
+        // ?? this._offset = this._internalSize * 0.5 - center;
     }
-
 }

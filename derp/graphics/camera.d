@@ -4,7 +4,9 @@
 
 module derp.graphics.camera;
 
+import std.stdio;
 import std.math;
+import std.algorithm;
 
 import derp.math.all;
 import derp.core.geo;
@@ -16,54 +18,157 @@ import derp.graphics.render;
 /**
  * CameraComponent
  */
-class CameraComponent : Component{
+class CameraComponent : Component {
+public:
+    enum ProjectionMode {
+        Perspective,
+        Orthographic
+    }
+
 private:
     Matrix4 _projectionMatrix;
     Matrix4 _cachedViewMatrix;
+
+    // Cached stuff for perspective mode (so we can get and modify the values)
+    Angle _fieldOfView = degrees(60); // in y-axis
+    float _aspectRatio = 1; // w / h
+
+    ProjectionMode _projectionMode;
+    Rect _viewBounds;
+    float _nearClipDistance = 1;
+    float _farClipDistance = 1000;
+
+    bool _needProjectionUpdate = true;
+
 public:
     Viewport[] connectedViewports;
-public:
-    /// Constructor.
-    this(string name, Angle fovY, float aspectRatio, float front, float back) @safe nothrow {
+
+    /// Default constructor (uses perspective mode at 60° FOV with an AR of 1:1)
+    this(string name) @safe nothrow {
+        this(name, degrees(60), 1.0);
+    }
+
+    /// Constructor with perspective projection.
+    this(string name, Angle fov, float aspectRatio) @safe nothrow {
         super(name);
-        setPerspective(fovY, aspectRatio, front, back);
+        this.projectionMode = ProjectionMode.Perspective;
+        this.fieldOfView = fov;
+        this.aspectRatio = aspectRatio;
     }
 
-    /// ditto
-    this(string name, float left, float right, float top, float bottom, float near, float far) @safe nothrow {
+    /// Constructor with orthographic projection.
+    this(string name, Rect bounds) @safe nothrow {
         super(name);
-        setPerspective(left, right, top, bottom, near, far);
-    }
-    ///
-    void setPerspective(Angle fovY, float aspectRatio, float front, float back) @safe nothrow {
-        float tangent = tan((fovY/2).radians);   // tangent of half fovY
-        float height = front * tangent;          // half height of near plane
-        float width = height * aspectRatio;      // half width of near plane
-        // params: left, right, bottom, top, near, far
-        setPerspective(-width, width, -height, height, front, back);
+        this.projectionMode = ProjectionMode.Orthographic;
+        this.orthographicBounds = bounds;
     }
 
-    ///
-    void setPerspective(float left, float right, float top, float bottom, float near, float far) @safe nothrow {
-        this._projectionMatrix = Matrix4.perspective(left, right, bottom, top, near, far);
+    @property ProjectionMode projectionMode() @safe nothrow {
+        return this._projectionMode;
     }
 
-public:
-    ///return projection matrix
-    @property Matrix4 projectionMatrix() const @safe nothrow {
+    @property void projectionMode(ProjectionMode projectionMode) @safe nothrow {
+        this._projectionMode = projectionMode;
+        this._needProjectionUpdate = true;
+    }
+
+    @property float nearClipDistance() @safe nothrow {
+        return this._nearClipDistance;
+    }
+
+    @property void nearClipDistance(float nearClipDistance) @safe nothrow {
+        this._nearClipDistance = nearClipDistance;
+        this._needProjectionUpdate = true;
+    }
+
+    @property float farClipDistance() @safe nothrow {
+        return this._farClipDistance;
+    }
+
+    @property void farClipDistance(float farClipDistance) @safe nothrow {
+        this._farClipDistance = farClipDistance;
+        this._needProjectionUpdate = true;
+    }
+
+    @property Angle fieldOfView() @safe nothrow {
+        assert(this._projectionMode == ProjectionMode.Perspective, "Cannot use field of view setting in orthographic mode.");
+        return this._fieldOfView;
+    }
+
+    @property void fieldOfView(Angle fieldOfView) @safe nothrow {
+        assert(this._projectionMode == ProjectionMode.Perspective, "Cannot use field of view setting in orthographic mode.");
+        this._fieldOfView = fieldOfView;
+        this._needProjectionUpdate = true;
+    }
+
+    @property float aspectRatio() @safe nothrow {
+        assert(this._projectionMode == ProjectionMode.Perspective, "No need to use aspect ratio setting in orthographic mode.");
+        return this._aspectRatio;
+    }
+
+    /**
+     * Sets the aspect ratio to match the width and height of the target.
+     *
+     * Examples:
+     * ---
+     * makeAspectRatio(4, 3);       // 4:3
+     * makeAspectRatio(16, 9);      // 16:9
+     * makeAspectRatio(16, 10);     // 16:10
+     * makeAspectRatio(210, 297);   // DIN-Format
+     * ---
+     */
+    void makeAspectRatio(float width, float height) @safe nothrow {
+        this.aspectRatio = width / height;
+    }
+
+    @property void aspectRatio(float aspectRatio) @safe nothrow {
+        assert(this._projectionMode == ProjectionMode.Perspective, "No need to use aspect ratio setting in orthographic mode.");
+        this._aspectRatio = aspectRatio;
+        this._needProjectionUpdate = true;
+    }
+
+    @property void orthographicBounds(Rect bounds) @safe nothrow {
+        assert(this._projectionMode == ProjectionMode.Orthographic, "Cannot use orthographic bounds in perspective mode.");
+        this._viewBounds = bounds;
+        this._needProjectionUpdate = true;
+        this._needUpdate = true;
+    }
+
+    @property const Rect orthographicBounds() @safe nothrow {
+        assert(this._projectionMode == ProjectionMode.Orthographic, "Cannot use orthographic bounds in perspective mode.");
+        return this._viewBounds;
+    }
+
+    /// Returns the projection matrix, cached.
+    @property Matrix4 projectionMatrix() @trusted nothrow {
+        if(this._needProjectionUpdate) {
+            this._updateProjectionMatrix();
+            this._needProjectionUpdate = false;
+        }
+        try {writeln("Projection Matrix: ", this._projectionMatrix);} catch(Exception e){}
         return _projectionMatrix;
     }
 
-    /// return cached view matrix. if nessacary, generate it
-    @property Matrix4 viewMatrix() @safe nothrow {
-        if(this._needUpdate)
-        {
-            makeTransform(this._cachedViewMatrix, this.node.position, Vector3(1,1,1), this.node.orientation);
+    /// Return the view matrix, cached.
+    @property Matrix4 viewMatrix() @trusted nothrow {
+        if(this._needUpdate) {
+            auto pos = this.node.position;
+            if(this._projectionMode == ProjectionMode.Orthographic) {
+                auto v = this._viewBounds;
+                pos += Vector3(
+                        -v.size.x / 2 - v.pos.x,
+                        -v.size.y / 2 - v.pos.y,
+                        0);
+            }
+
+            makeTransform(this._cachedViewMatrix, pos, Vector3(1,1,1), this.node.orientation);
             this._needUpdate = false;
         }
+        // this._cachedViewMatrix = Matrix4.identity;
+        try {writeln("View Matrix: ", this._cachedViewMatrix);} catch(Exception e){}
         return this._cachedViewMatrix;
     }
-public:
+
     /// Returns a Ray From ScreenPoint into the Scene
     Ray cameraToViewportRay(uint screenX, uint screenY) {
         Matrix4 inverseVP = this.projectionMatrix * this.viewMatrix.inverse();
@@ -85,5 +190,36 @@ public:
         RenderQueue queue = new RenderQueue(this, viewport);
         this.node.rootNode.prepareRender(queue); // fill the queue
         queue.renderAll();
+    }
+
+private:
+    void _updatePerspective() @safe nothrow {
+        // Calculate size of the near plane (part of the view frustum)
+        float height = this._nearClipDistance * tan(this._fieldOfView.radians / 2) * 2;
+        float width = height * this._aspectRatio * 2;
+        this._viewBounds = Rect(- width / 2, width, - height / 2, height);
+    }
+
+    void _updateProjectionMatrix() @trusted nothrow {
+        assert(this._farClipDistance >= this._nearClipDistance, "Far clip distance cannot be smaller than near clip distance.");
+
+        // NOTICE: Parameters for Matrix.orthographic and Matrix.perspective are
+        // float left, float right, float bottom, float top, float near, float far
+
+        if(this._projectionMode == ProjectionMode.Orthographic) {
+            this._projectionMatrix = Matrix4.orthographic(
+                this._viewBounds.left, this._viewBounds.right,
+                this._viewBounds.bottom, this._viewBounds.top,
+                this._nearClipDistance, this._farClipDistance);
+            float x = this._viewBounds.size.x / 2;
+            float y = this._viewBounds.size.y / 2;
+            this._projectionMatrix = Matrix4.orthographic(-x, x, y, -y, this._nearClipDistance, this._farClipDistance);
+        } else {
+            this._updatePerspective();
+            this._projectionMatrix = Matrix4.perspective(
+                this._viewBounds.left, this._viewBounds.right,
+                this._viewBounds.bottom, this._viewBounds.top,
+                this._nearClipDistance, this._farClipDistance);
+        }
     }
 }

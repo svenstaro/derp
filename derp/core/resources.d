@@ -71,6 +71,11 @@ class ResourceSettings : ResourceSource {
     }
 
     T get(T = string)(string name) {
+        static if(isIntegral!T) return get(name, 0);
+        else return get(name, null);
+    }
+
+    T get(T = string)(string name, T defaultValue) {
         if(name in this.settings) {
             string value = this.settings[name];
 
@@ -79,9 +84,7 @@ class ResourceSettings : ResourceSource {
             } else
                 return to!T(value);
         } else {
-            static if(isIntegral!T)
-                return 0;
-            else return null;
+            return defaultValue;
         }
     }
 

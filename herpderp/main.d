@@ -4,44 +4,35 @@ import std.stdio;
 import std.random;
 
 int main(string[] args) {
-    //Create a Window
+    // Create the window
     Window window = new Window("Hello World", 800, 600, Window.Mode.Windowed);
     window.backgroundColor = Color.Black;
 
     // Load texture
     ResourceManager resourceManager = new ResourceManager();
     Texture texture = resourceManager.loadT!Texture(new UrlString("data/icon.png"));
-    writeln("Loaded texture \"", texture.name, "\"");
 
-    //Create SceneGraph
+    // Create scene graph
     Node rootNode = new Node("rootNode");
-    Node cameraNode = new Node("cameraNode", rootNode);
+    Node camNode = new Node("camNode", rootNode);
     Node spriteNode = new Node("spriteNode", rootNode);
 
-    //Create Components
+    // Create sprite
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
-    CameraComponent cam = new CameraComponent("testCam", degrees(60), window.width/window.height, 1, 1000);
-
-    //Attach Components
-    cameraNode.attachComponent(cam);
     spriteNode.attachComponent(sprite);
+    sprite.smooth = false;
 
-    // Set Render Target
-    window.viewports[0].currentCamera = cam;
-    window.viewports[0].bounds = Rect(Vector2(0, 0), window.size);
+    // Setup view
+    CameraComponent cam = window.viewports[0].currentCamera;
+    cam.projectionMode = CameraComponent.ProjectionMode.Orthographic;
+    cam.orthographicBounds = Rect(-0.5, -1, 1.5, 1.5);
+    camNode.attachComponent(cam);
 
-    //Render Demo Scene
+    // Example main loop
     float x = 0;
     while(window.isOpen()) {
-        x += 0.03;
-
-        Vector3 camPos = Vector3(
-            sin(x) * -2,
-            cos(x) * -2,
-             -20
-            );
-
-        cameraNode.position = camPos;
+        x += 0.05;
+        //camNode.position = Vector3(sin(x), 0, 0);
 
         window.update();
         window.clear();

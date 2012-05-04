@@ -28,13 +28,13 @@ class SpriteComponent : Component, Renderable {
             this.setTexture(texture);
 
         vbo = new VertexBufferObject(shader);
-        vertices ~= VertexData(-1, -1, 0, 1, 1, 1, 1, 0, 0);
-        vertices ~= VertexData( 1, -1, 0, 1, 1, 1, 1, 1, 0);
-        vertices ~= VertexData( 1,  1, 0, 1, 1, 1, 1, 1, 1);
+        vertices ~= VertexData(-0.5, -0.5, 0, 1, 1, 1, 1, 0, 0);
+        vertices ~= VertexData( 0.5, -0.5, 0, 1, 1, 1, 1, 1, 0);
+        vertices ~= VertexData( 0.5,  0.5, 0, 1, 1, 1, 1, 1, 1);
 
-        vertices ~= VertexData( 1,  1, 0, 1, 1, 1, 1, 1, 1);
-        vertices ~= VertexData(-1,  1, 0, 1, 1, 1, 1, 0, 1);
-        vertices ~= VertexData(-1, -1, 0, 1, 1, 1, 1, 0, 0);
+        vertices ~= VertexData( 0.5,  0.5, 0, 1, 1, 1, 1, 1, 1);
+        vertices ~= VertexData(-0.5,  0.5, 0, 1, 1, 1, 1, 0, 1);
+        vertices ~= VertexData(-0.5, -0.5, 0, 1, 1, 1, 1, 0, 0);
         this.vbo.setVertices(vertices);
     }
     

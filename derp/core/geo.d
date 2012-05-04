@@ -12,15 +12,20 @@ struct Rect {
     Vector2 pos;
     Vector2 size;
 
-    this(Vector2 pos, Vector2 size) {
+    this(Vector2 pos, Vector2 size) @safe nothrow {
         this.pos = pos;
         this.size = size;
     }
 
-    this(float x = 0, float y = 0, float w = 0, float h = 0) {
+    this(float x = 0, float y = 0, float w = 0, float h = 0) @safe nothrow {
         this.pos = Vector2(x, y);
         this.size = Vector2(w, h);
     }
+
+    @property float left() @safe nothrow { return this.pos.x; }
+    @property float right() @safe nothrow { return this.pos.x + this.size.x; }
+    @property float top() @safe nothrow { return this.pos.y; }
+    @property float bottom() @safe nothrow { return this.pos.y + this.size.y; }
 }
 
 

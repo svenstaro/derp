@@ -2,14 +2,13 @@ module derp.math.matrix;
 
 import derp.math.all;
 
-public import gl3n.linalg : Matrix2=mat2, Matrix3=mat3, MAtrix34=mat34,Matrix4=mat4;
-public import gl3n.util : isMatrix = is_matrix;
-
-//~ alias mat2 Matrix2;
-//~ alias mat3 Matrix3;
-//~ alias mat34 Matrix34;
-//~ alias mat4 Matrix4;
-
+public import gl3n.linalg : 
+    Matrix2 = mat2, 
+    Matrix3 = mat3, 
+    Matrix34 = mat34,
+    Matrix4  = mat4;
+public import gl3n.util : 
+    isMatrix = is_matrix;
 
 auto ref makeTransform(ref Matrix4 matrix, in Vector3 position, in Vector3 scale, in Quaternion orientation) @safe nothrow {
     // Ordering:
