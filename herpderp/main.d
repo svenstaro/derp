@@ -16,7 +16,7 @@ int main(string[] args) {
 
     // Load font
     Font font = resourceManager.loadT!Font(new UrlString("data/fonts/dejavu/DejaVuSans.ttf"));
-    font.pixelSize = 20;
+    font.pointSize = 50;
 
     // Create scene graph
     Node rootNode = new Node("rootNode");
@@ -39,9 +39,9 @@ int main(string[] args) {
     camNode.attachComponent(cam);
 
     // Headline
-    TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
+    TextComponent text = new TextComponent("headline", "Derpy", font);
     fontNode.attachComponent(text);
-    fontNode.position = Vector3(400, 100, 0);
+    fontNode.position = Vector3(400, 200, 0);
 
     // Example main loop
     float x = 0;
@@ -65,6 +65,10 @@ int main(string[] args) {
         // exists before running the application.
 
         // window.saveScreenshot(format("/tmp/scrot/frame-%04s.png", i));
+
+        if(false && i == 10) {
+            window.saveScreenshot("frame-10.png");
+        }
     }
     window.close();
     return 0;

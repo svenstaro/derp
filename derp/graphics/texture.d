@@ -54,13 +54,18 @@ public:
         this.required = true; 
 
         void* rawData;
+        bool useRawData;
         if(this.isRawData) {
-            ResourceSettings s = cast(ResourceSettings)this.source;
-            writeln(s.settings);
+            ResourceSettings s;
+            try {
+                s = cast(ResourceSettings)this.source;
+            } catch(Exception e) {
+                assert(false, "Cannot read raw data - source is not ResourceSettings. You need it to set the `width` and `height` parameters.");
+            }
 
             this._size.x = s.get!int("width", 0);
             this._size.y = s.get!int("height", 0);
-            assert(this._size.x > 0 && this._size.y > 0);
+            assert(this._size.x > 0 && this._size.y > 0, "Texture needs `width` and `height` parameters in ResourceSettings. You may also set `this.useRawData` to false to read the metadata from formatted metadata (e.g. if you have raw PNG or JPG data instead of raw pixel data).");
 
             string mode = s.get("mode", "rgba");
             if(mode == "rgba") {

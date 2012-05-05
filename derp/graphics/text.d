@@ -77,17 +77,21 @@ class FontRenderer : ResourceGenerator {
         string text = settings.get("text");
 
         // pen position in pixels
-        int pen_x = 20; 
-        int pen_y = 20;
+        int pen_x = 0; 
+        int pen_y = 128;
 
-        int width = 128;
-        int height = 128;
+        int width = 256;
+        int height = 256;
         
         settings.set!int("width", width);
         settings.set!int("height", height);
-        settings.set!string("mode", "alpha");
+        settings.set!string("mode", "rgba");
 
-        byte[] bitmap = new byte[width * height];
+        byte[] bitmap = new byte[width * height * 4];
+        for(int i = 0; i < width * height * 4; i += 4) {
+            bitmap[i + 0] = bitmap[i + 1] = bitmap[i + 2] = cast(byte)255;
+            bitmap[i + 3] = cast(byte)0;
+        }
 
         foreach(char c; text) {
             FT_GlyphSlot slot = this.font.render(c);
@@ -101,7 +105,7 @@ class FontRenderer : ResourceGenerator {
 
             for(int j = 0; j < h; ++j) {
                 for(int i = 0; i < w; ++i) {
-                    bitmap[x + i + (y + j) * width] = slot.bitmap.buffer[i + j * w];
+                    bitmap[3 + 4 * (x + i + (y + j) * width)] = slot.bitmap.buffer[i + j * w];
                 }
             }
 
@@ -127,7 +131,6 @@ public:
         this._render();
         super(name, this._texture);
         this.scale = 1;
-        writeln(this.size);
     }
 
     @property string text() {
