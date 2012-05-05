@@ -28,7 +28,7 @@ int main(string[] args) {
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
     spriteNode.attachComponent(sprite);
     sprite.smooth = false;
-    sprite.color = Color.Red;
+    sprite.color = Color.Green;
 
     sprite.size = 100;
     spriteNode.position = Vector3(400, 300, 0);
