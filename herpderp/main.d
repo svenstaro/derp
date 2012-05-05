@@ -16,7 +16,7 @@ int main(string[] args) {
 
     // Load font
     Font font = resourceManager.loadT!Font(new UrlString("data/fonts/dejavu/DejaVuSans.ttf"));
-    font.pointSize = 50;
+    font.pointSize = 20;
 
     // Create scene graph
     Node rootNode = new Node("rootNode");
@@ -28,6 +28,7 @@ int main(string[] args) {
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
     spriteNode.attachComponent(sprite);
     sprite.smooth = false;
+    sprite.color = Color.Red;
 
     sprite.size = 100;
     spriteNode.position = Vector3(400, 300, 0);
@@ -39,9 +40,11 @@ int main(string[] args) {
     camNode.attachComponent(cam);
 
     // Headline
-    TextComponent text = new TextComponent("headline", "Derpy", font);
+    TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
+    text.color = Color.Yellow;
     fontNode.attachComponent(text);
-    fontNode.position = Vector3(400, 200, 0);
+    fontNode.position = Vector3(200, 300, 0);
+    fontNode.rotation = degrees(90);
 
     // Example main loop
     float x = 0;
@@ -49,8 +52,11 @@ int main(string[] args) {
     while(window.isOpen()) {
         i++;
         x += 0.05;
-        spriteNode.rotation = degrees(- x * 10);
-        sprite.scale = 0.1 * sin(4 * x) + 1;
+        spriteNode.rotation = degrees(- i * 0.5);
+        sprite.scale = 0.1 * sin(i * 0.05) + 1;
+        
+        fontNode.rotation = degrees(i);
+    
         
         //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
 
@@ -64,11 +70,12 @@ int main(string[] args) {
         // to make an animated GIF from it. Make sure the directory /tmp/scrot/
         // exists before running the application.
 
-        // window.saveScreenshot(format("/tmp/scrot/frame-%04s.png", i));
+        //if(i <= 720)
+        //    window.saveScreenshot(format("/tmp/scrot/frame-%04s.png", i));
 
-        if(false && i == 10) {
-            window.saveScreenshot("frame-10.png");
-        }
+        //if(i == 10) {
+        //    window.saveScreenshot("frame-10.png");
+        //}
     }
     window.close();
     return 0;

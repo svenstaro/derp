@@ -7,6 +7,7 @@ import derelict.freetype.ft;
 
 import derp.core.resources;
 import derp.core.scene;
+import derp.math.vector;
 import derp.graphics.draw;
 import derp.graphics.render;
 import derp.graphics.shader;
@@ -58,11 +59,12 @@ public:
         return FT_Get_Char_Index(this.fontFace, character);
     }
 
-    FT_GlyphSlot render(char character) {
+    FT_GlyphSlot render(char character, bool loadOnly = false) {
         this.initialize();
         ftCheck(FT_Load_Glyph(this.fontFace, this.getCharacterIndex(character), 0));
-        ftCheck(FT_Render_Glyph(this.fontFace.glyph, FT_Render_Mode.FT_RENDER_MODE_NORMAL));
-        
+        if(!loadOnly) {
+            ftCheck(FT_Render_Glyph(this.fontFace.glyph, FT_Render_Mode.FT_RENDER_MODE_NORMAL));
+        }
         return this.fontFace.glyph;
     }
 }
@@ -73,25 +75,37 @@ class FontRenderer : ResourceGenerator {
         this.font = font; 
     }
 
+    vec2i getSize(string text) {
+        float w = 0;
+        foreach(char c; text) {
+            FT_GlyphSlot slot = this.font.render(c, true); // load, but don't render
+            w += slot.advance.x / 64;
+        }
+        float h = this.font.fontFace.size.metrics.height / 64;
+        return vec2i(cast(int)ceil(w), cast(int)ceil(h));
+    }
+
     byte[] generate(ResourceSettings settings) {
         string text = settings.get("text");
 
-        // pen position in pixels
-        int pen_x = 0; 
-        int pen_y = 128;
-
-        int width = 256;
-        int height = 256;
+        vec2i texSize = this.getSize(text);
         
-        settings.set!int("width", width);
-        settings.set!int("height", height);
+        settings.set!int("width", texSize.x);
+        settings.set!int("height", texSize.y);
         settings.set!string("mode", "rgba");
 
-        byte[] bitmap = new byte[width * height * 4];
-        for(int i = 0; i < width * height * 4; i += 4) {
+        // pen position in pixels
+        int pen_x = 0; 
+        int pen_y = cast(int)(this.font.fontFace.size.metrics.ascender / 64);
+
+        // create empty bitmap
+        byte[] bitmap = new byte[texSize.x * texSize.y * 4];
+        for(int i = 0; i < texSize.x * texSize.y * 4; i += 4) {
             bitmap[i + 0] = bitmap[i + 1] = bitmap[i + 2] = cast(byte)255;
             bitmap[i + 3] = cast(byte)0;
         }
+
+        // calculate size
 
         foreach(char c; text) {
             FT_GlyphSlot slot = this.font.render(c);
@@ -105,7 +119,7 @@ class FontRenderer : ResourceGenerator {
 
             for(int j = 0; j < h; ++j) {
                 for(int i = 0; i < w; ++i) {
-                    bitmap[3 + 4 * (x + i + (y + j) * width)] = slot.bitmap.buffer[i + j * w];
+                    bitmap[3 + 4 * (x + i + (y + j) * texSize.x)] = slot.bitmap.buffer[i + j * w];
                 }
             }
 
