@@ -27,10 +27,9 @@ int main(string[] args) {
     // Create sprite
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
     spriteNode.attachComponent(sprite);
-    sprite.smooth = false;
-    sprite.color = Color.Green;
+    sprite.smooth = true;
+    //sprite.subRect = Rect(0.4, 0.4, 0.2, 0.2);
 
-    sprite.size = 100;
     spriteNode.position = Vector3(400, 300, 0);
 
     // Setup view

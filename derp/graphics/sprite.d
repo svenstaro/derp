@@ -21,6 +21,7 @@ protected:
     Color _color = Color(1, 1, 1);
     bool _smooth = true;
     bool _needsUpdate = true;
+    Rect _subRect = Rect(0, 0, 1, 1); // these are UV-Coordinates, range 0..1
 
     VertexBufferObject _vbo;
 
@@ -43,16 +44,17 @@ public:
         auto sx = this.size.x / 2;
         auto sy = this.size.y / 2;
         auto c = this._color;
+        auto s = this._subRect;
 
         // First triangle
-        vertices ~= VertexData(-sx, -sy, 0, c.r, c.g, c.b, c.a, 0, 0);
-        vertices ~= VertexData( sx, -sy, 0, c.r, c.g, c.b, c.a, 1, 0);
-        vertices ~= VertexData( sx,  sy, 0, c.r, c.g, c.b, c.a, 1, 1);
+        vertices ~= VertexData(-sx, -sy, 0, c.r, c.g, c.b, c.a, s.left,  s.top   ); 
+        vertices ~= VertexData( sx, -sy, 0, c.r, c.g, c.b, c.a, s.right, s.top   );
+        vertices ~= VertexData( sx,  sy, 0, c.r, c.g, c.b, c.a, s.right, s.bottom);
 
         // Second triangle
-        vertices ~= VertexData( sx,  sy, 0, c.r, c.g, c.b, c.a, 1, 1);
-        vertices ~= VertexData(-sx,  sy, 0, c.r, c.g, c.b, c.a, 0, 1);
-        vertices ~= VertexData(-sx, -sy, 0, c.r, c.g, c.b, c.a, 0, 0);
+        vertices ~= VertexData( sx,  sy, 0, c.r, c.g, c.b, c.a, s.right, s.bottom);
+        vertices ~= VertexData(-sx,  sy, 0, c.r, c.g, c.b, c.a, s.left,  s.bottom);
+        vertices ~= VertexData(-sx, -sy, 0, c.r, c.g, c.b, c.a, s.left,  s.top   );
 
         this._vbo.setVertices(vertices);
     }
@@ -103,6 +105,15 @@ public:
 
     @property void color(Color color) {
         this._color = color;
+        this._needsUpdate = true;    
+    }
+
+    @property Rect subRect() {
+        return this._subRect;
+    }
+
+    @property void subRect(Rect subRect) {
+        this._subRect = subRect;
         this._needsUpdate = true;    
     }
 
