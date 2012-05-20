@@ -282,9 +282,9 @@ uniform sampler2D uTexture0;
 // the value (-1 for mod > 1) to the input color, otherwise it multiplies
 float colorCombine(float tex, float mod) {
     if (mod > 1 || mod < 0)
-        return tex + mod - 1;
+        return max(0, min(1, tex + mod - 1));
     else
-        return tex * mod;
+        return max(0, min(1, tex * mod));
 }
 
 void main() {
