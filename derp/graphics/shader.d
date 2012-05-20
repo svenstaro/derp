@@ -277,8 +277,24 @@ varying vec4 fColor;
 varying vec2 fTexCoord;
 uniform sampler2D uTexture0;
 
+// combines two color values
+// if the modifier is greater than 1, or less than 0, it adds
+// the value (-1 for mod > 1) to the input color, otherwise it multiplies
+float colorCombine(float tex, float mod) {
+    if (mod > 1 || mod < 0)
+        return tex + mod - 1;
+    else
+        return tex * mod;
+}
+
 void main() {
-    gl_FragColor = texture2D(uTexture0, fTexCoord) * fColor;
+    vec4 tex = texture2D(uTexture0, fTexCoord);
+    gl_FragColor = vec4(
+            colorCombine(tex.r, fColor.r),
+            colorCombine(tex.g, fColor.g),
+            colorCombine(tex.b, fColor.b),
+            colorCombine(tex.a, fColor.a)
+            );
 }
 ";
 

@@ -23,7 +23,7 @@ struct Color {
 
     static Color Background     = Color(0.055, 0.2235, 0.4);
 
-    float r, g, b, a = 1.0;
+    float r, g, b, a = 1;
 
     this(float r, float g, float b, float a = 1) {
         this.r = r;
@@ -61,4 +61,7 @@ struct Color {
     }
 
     alias max value; // for Hue/Saturation/Value
+    alias hue h;
+    alias saturation s;
+    alias value v;
 }

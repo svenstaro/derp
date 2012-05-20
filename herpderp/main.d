@@ -28,6 +28,8 @@ int main(string[] args) {
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
     spriteNode.attachComponent(sprite);
     sprite.smooth = true;
+    sprite.color = Color(0.1, 0.1, 0.1, 0);
+    sprite.colorBlendMode = SpriteComponent.BlendMode.Additive;
     //sprite.subRect = Rect(0.4, 0.4, 0.2, 0.2);
 
     spriteNode.position = Vector3(400, 300, 0);

@@ -15,10 +15,17 @@ import derp.graphics.shader;
 import derp.graphics.render;
 
 class SpriteComponent : Component, Renderable {
+public:
+    enum BlendMode {
+        Additive,
+        Multiplicative
+    }
+
 protected:
     Vector2 _scale;
     Texture _texture;
     Color _color = Color(1, 1, 1);
+    BlendMode _colorBlendMode = BlendMode.Multiplicative;
     bool _smooth = true;
     bool _needsUpdate = true;
     Rect _subRect = Rect(0, 0, 1, 1); // these are UV-Coordinates, range 0..1
@@ -28,10 +35,18 @@ protected:
 public:
     this(string name, Texture texture = null, ShaderProgram shader = null) {
         super(name);
+        
+        // initialize stuff
+        this.scale = 1;
+        this.color = Color.White;
+        this.colorBlendMode = BlendMode.Multiplicative;
+        this.smooth = true;
+        this.subRect = Rect(0, 0, 1, 1);
+
         if(texture) {
             texture.initialize();
             this.texture = texture;
-        }
+        }                        
         this._vbo = new VertexBufferObject(shader);
     }
 
@@ -45,6 +60,13 @@ public:
         auto sy = this.size.y / 2;
         auto c = this._color;
         auto s = this._subRect;
+
+        if(this._colorBlendMode == BlendMode.Additive) {
+            if(c.r >= 0) c.r += 1;
+            if(c.g >= 0) c.g += 1;
+            if(c.b >= 0) c.b += 1;
+            if(c.a >= 0) c.a += 1;
+        }
 
         // First triangle
         vertices ~= VertexData(-sx, -sy, 0, c.r, c.g, c.b, c.a, s.left,  s.top   ); 
@@ -94,17 +116,26 @@ public:
         return this._smooth;
     }
 
-    @property void smooth(bool smooth) {
-        this._smooth = smooth;
-    }
-
-
     @property Color color() {
         return this._color;
     }
 
     @property void color(Color color) {
         this._color = color;
+        this._needsUpdate = true;    
+    }
+
+    @property void smooth(bool smooth) {
+        this._smooth = smooth;
+    }
+
+
+    @property BlendMode colorBlendMode() {
+        return this._colorBlendMode;
+    }
+
+    @property void colorBlendMode(BlendMode colorBlendMode) {
+        this._colorBlendMode = colorBlendMode;
         this._needsUpdate = true;    
     }
 
