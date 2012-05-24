@@ -23,6 +23,7 @@ int main(string[] args) {
     Node camNode = new Node("camNode", rootNode);
     Node spriteNode = new Node("spriteNode", rootNode);
     Node fontNode = new Node("fontNode", rootNode);
+    Node meshNode = new Node("meshNode", rootNode);
 
     // Create sprite
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
@@ -44,6 +45,23 @@ int main(string[] args) {
     fontNode.attachComponent(text);
     fontNode.position = Vector3(200, 300, 0);
     fontNode.rotation = degrees(90);
+
+    MeshComponent mesh = new MeshComponent("testmesh");
+    auto v = mesh.vertices;
+    float radius = 100;
+    for(int i = 0; i < 16; i++) {
+        float a1 = i / 16.0 * 2 * PI;
+        float a2 = (i + 1) / 16.0 * 2 * PI;
+
+        v ~= VertexData( radius * sin(a1), radius * cos(a1), 0, i / 15.0, i / 15.0, i / 15.0, 1.0, 0, 0);
+        v ~= VertexData( radius * sin(a2), radius * cos(a2), 0, i / 15.0, i / 15.0, i / 15.0, 1.0, 0, 0);
+        v ~= VertexData( 0,       0,       0, i / 15.0, i / 15.0, i / 15.0, 1.0, 0, 0);
+    }
+    mesh.vertices = v;
+
+    meshNode.attachComponent(mesh);
+    meshNode.position = Vector3(600, 300, 0);
+
 
     // Example main loop
     float x = 0;

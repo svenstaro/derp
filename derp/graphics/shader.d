@@ -235,11 +235,14 @@ public:
         uint pos = getUniformLocation(name);
         assert(pos != -1, "Cannot find texture sampler `" ~ name ~ "` in shader.");
 
-        attach();
-        sendUniform(pos, location);
-        texture.bind();
+        this.attach();
+        this.sendUniform(pos, location);
+        if(texture is null)
+            glBindTexture(GL_TEXTURE_2D, 0);
+        else
+            texture.bind();
         glActiveTexture(GL_TEXTURE0 + location);
-        detach();
+        this.detach();
     }
 
     /**

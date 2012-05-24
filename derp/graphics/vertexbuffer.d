@@ -30,26 +30,19 @@ struct VertexData {
  * Renders a single Quad.
  */
 class VertexBufferObject {
-public:	
-    ShaderProgram shaderProgram;
+private:
+    VertexData[] _vertices;
 
+public:	
     uint array; // vertex buffer object, keeps track of vertex attributes etc.
     uint buffer;
     ulong vertexCount;
 
-    this(ShaderProgram shaderProgram = null) {
-        if(shaderProgram) {
-            this.shaderProgram = shaderProgram;
-        } else {
-            this.shaderProgram = ShaderProgram.defaultPipeline;
-        }
+    this() {
         create();
     }
 
     void create() {
-        // bind texture
-        this.shaderProgram.attach();
-
         // Create VBO
         glGenVertexArrays(1, &array);
         glCheck();
@@ -80,9 +73,6 @@ public:
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(7 * float.sizeof));  // s, t
         glCheck();
 
-        // Setup buffer
-        // this.setVertexArray([]);
-
         // Disable Attribute Sets
         // glDisableVertexAttribArray(0);
         // glDisableVertexAttribArray(1);
@@ -95,36 +85,40 @@ public:
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glCheck();
-        this.shaderProgram.detach();
     }
 
+    @property VertexData[] vertices() {
+        return this._vertices;
+    }
+
+    @property void vertices(VertexData[] vertices) {
+        this._vertices = vertices;
+        this.updateVertices();
+    }
+    
     /**
      * Sends the vertice data to the GPU. It is then accessible via
      * rawVertexArrayHandle.
      */
-    void setVertices(VertexData[] vertices) {
-        this.shaderProgram.attach();
-
+    void updateVertices() {
         glBindVertexArray(array);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glCheck();
 
-        this.vertexCount = vertices.length;
-        glBufferData(GL_ARRAY_BUFFER, vertices.length * VertexData.sizeof, vertices.ptr, GL_STATIC_DRAW);
+        this.vertexCount = this._vertices.length;
+        glBufferData(GL_ARRAY_BUFFER, this._vertices.length * VertexData.sizeof, this._vertices.ptr, GL_STATIC_DRAW);
         glCheck();
 
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glCheck();
-
-        // writefln("Setting %s vertices.", this.vertexCount);
-
-        this.shaderProgram.detach();
     }
 
-    void render(Matrix4 modelMatrix, Matrix4 viewMatrix, Matrix4 projectionMatrix) {
-        // attach texture
-        this.shaderProgram.attach();
+    void render(ShaderProgram shader, Matrix4 modelMatrix, Matrix4 viewMatrix, Matrix4 projectionMatrix) {
+        if(shader is null) {
+            shader = ShaderProgram.defaultPipeline;
+        }
+        shader.attach();
 
         glBindVertexArray(array); // is the vertex buffer object connected to the vertex array obkect?
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -144,9 +138,9 @@ public:
         glCheck();
 
         //Send matrices to shader
-        this.shaderProgram.sendUniform("uModelMatrix", modelMatrix);
-        this.shaderProgram.sendUniform("uViewMatrix", viewMatrix);
-        this.shaderProgram.sendUniform("uProjectionMatrix", projectionMatrix);
+        shader.sendUniform("uModelMatrix", modelMatrix);
+        shader.sendUniform("uViewMatrix", viewMatrix);
+        shader.sendUniform("uProjectionMatrix", projectionMatrix);
         
         // Draw
         glDrawArrays(GL_TRIANGLES, 0, cast(int) this.vertexCount);
@@ -162,8 +156,5 @@ public:
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glCheck();
-
-        this.shaderProgram.detach();
-        // detach texture
     }
 }

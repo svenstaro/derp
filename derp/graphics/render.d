@@ -10,7 +10,7 @@ import std.stdio;
 
 interface Renderable {
     void render(RenderQueue queue);
-    // void prepareRender(RenderQueue queue);
+    // void prepareRender(RenderQueue queue); // this is in Component itself
 }
 
 class RenderQueue {
@@ -38,4 +38,25 @@ public:
         }
     }
 
+}
+
+abstract class Renderer {
+public:
+    string name;
+
+    this(string name) {
+        this.name = name;
+    }
+
+    void render(RenderQueue queue);
+}
+
+class ForwardRenderer : Renderer {
+    this() {
+        super("Derp Forward Renderer");
+    }
+
+    void render(RenderQueue queue) {
+
+    }
 }
