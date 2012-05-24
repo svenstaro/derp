@@ -168,8 +168,10 @@ public:
     void render(RenderQueue queue) {
         if(this._needRender) {
             this._render();
+            this.texture = this._texture;
         }
 
+        writeln(this._texture is null);
         super.render(queue);
     }
 

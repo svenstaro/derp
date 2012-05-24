@@ -237,9 +237,10 @@ public:
 
         this.attach();
         this.sendUniform(pos, location);
-        if(texture is null)
+        if(texture is null) {
+            writeln("TEXTURE is NULL");
             glBindTexture(GL_TEXTURE_2D, 0);
-        else
+        } else
             texture.bind();
         glActiveTexture(GL_TEXTURE0 + location);
         this.detach();
@@ -280,8 +281,24 @@ varying vec4 fColor;
 varying vec2 fTexCoord;
 uniform sampler2D uTexture0;
 
+// combines two color values
+// if the modifier is greater than 1, or less than 0, it adds
+// the value (-1 for mod > 1) to the input color, otherwise it multiplies
+float colorCombine(float tex, float mod) {
+    if (mod > 1 || mod < 0)
+        return max(0, min(1, tex + mod - 1));
+    else
+        return max(0, min(1, tex * mod));
+}
+
 void main() {
-    gl_FragColor = texture2D(uTexture0, fTexCoord) * fColor;
+    vec4 tex = texture2D(uTexture0, fTexCoord);
+    gl_FragColor = vec4(
+            colorCombine(tex.r, fColor.r),
+            colorCombine(tex.g, fColor.g),
+            colorCombine(tex.b, fColor.b),
+            colorCombine(tex.a, fColor.a)
+            );
 }
 ";
 

@@ -29,6 +29,8 @@ int main(string[] args) {
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
     spriteNode.attachComponent(sprite);
     sprite.smooth = true;
+    sprite.color = Color(0.1, 0.1, 0.1, 0);
+    sprite.colorBlendMode = SpriteComponent.BlendMode.Additive;
     //sprite.subRect = Rect(0.4, 0.4, 0.2, 0.2);
 
     spriteNode.position = Vector3(400, 300, 0);
@@ -53,12 +55,14 @@ int main(string[] args) {
         float a1 = i / 16.0 * 2 * PI;
         float a2 = (i + 1) / 16.0 * 2 * PI;
 
-        v ~= VertexData( radius * sin(a1), radius * cos(a1), 0, i / 15.0, i / 15.0, i / 15.0, 1.0, 0, 0);
-        v ~= VertexData( radius * sin(a2), radius * cos(a2), 0, i / 15.0, i / 15.0, i / 15.0, 1.0, 0, 0);
-        v ~= VertexData( 0,       0,       0, i / 15.0, i / 15.0, i / 15.0, 1.0, 0, 0);
+        float w = i / 15.0 + 1;
+        float z = 0;
+
+        v ~= VertexData(radius * sin(a1), radius * cos(a1), z, w, w, w, 2, 0, 0);
+        v ~= VertexData(radius * sin(a2), radius * cos(a2), z, w, w, w, 2, 0, 0);
+        v ~= VertexData(0, 0, z, w, w, w, 2, 0, 0);
     }
     mesh.vertices = v;
-
     meshNode.attachComponent(mesh);
     meshNode.position = Vector3(600, 300, 0);
 
