@@ -8,7 +8,8 @@ import std.string;
 int main(string[] args) {
     // Create the window
     Window window = new Window("Hello World", 800, 600, Window.Mode.Windowed);
-    window.backgroundColor = Color.Black;
+    window.backgroundColor = Color(0.5, 0.5, 0.5);
+    window.backgroundColor = Color.Background;
 
     // Load texture
     ResourceManager resourceManager = new ResourceManager();
@@ -43,29 +44,30 @@ int main(string[] args) {
 
     // Headline
     TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
-    text.color = Color.Yellow;
+    text.color = Color(1, 1, 0.6);
     fontNode.attachComponent(text);
-    fontNode.position = Vector3(200, 300, 0);
+    fontNode.position = Vector3(400, 100, 0);
     fontNode.rotation = degrees(90);
 
     MeshComponent mesh = new MeshComponent("testmesh");
-    auto v = mesh.vertices;
+    //auto v = mesh.vertices;
+    VertexData[] v;
     float radius = 100;
     for(int i = 0; i < 16; i++) {
         float a1 = i / 16.0 * 2 * PI;
         float a2 = (i + 1) / 16.0 * 2 * PI;
 
-        float w = i / 15.0 + 1;
-        float z = 0;
+        float w = i / 15.0;
+        float z = i / 16.0 - 0.5;
 
         v ~= VertexData(radius * sin(a1), radius * cos(a1), z, w, w, w, 2, 0, 0);
         v ~= VertexData(radius * sin(a2), radius * cos(a2), z, w, w, w, 2, 0, 0);
         v ~= VertexData(0, 0, z, w, w, w, 2, 0, 0);
     }
     mesh.vertices = v;
+    mesh.texture = texture;
     meshNode.attachComponent(mesh);
-    meshNode.position = Vector3(600, 300, 0);
-
+    meshNode.position = Vector3(400, 400, 0);
 
     // Example main loop
     float x = 0;
@@ -73,10 +75,12 @@ int main(string[] args) {
     while(window.isOpen()) {
         i++;
         x += 0.05;
-        spriteNode.rotation = degrees(- i * 0.5);
-        sprite.scale = 0.1 * sin(i * 0.05) + 1;
+        // spriteNode.rotation = degrees(- i * 0.5);
+        sprite.scale = 0.1 * abs(sin(i * 0.05)) + 1;
+
+        meshNode.orientation = Quaternion.zrotation(degrees(i * 2).radians);
         
-        fontNode.rotation = degrees(i);
+        fontNode.rotation = degrees(sin(i * 0.05) * 10);
     
         
         //camNode.position = Vector3(sin(x), cos(x), 0) * -100;

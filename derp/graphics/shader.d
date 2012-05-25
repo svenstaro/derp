@@ -238,10 +238,10 @@ public:
         this.attach();
         this.sendUniform(pos, location);
         if(texture is null) {
-            writeln("TEXTURE is NULL");
             glBindTexture(GL_TEXTURE_2D, 0);
-        } else
+        } else {
             texture.bind();
+        }
         glActiveTexture(GL_TEXTURE0 + location);
         this.detach();
     }

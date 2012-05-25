@@ -171,7 +171,6 @@ public:
             this.texture = this._texture;
         }
 
-        writeln(this._texture is null);
         super.render(queue);
     }
 

@@ -37,11 +37,15 @@ public:
     void render(RenderQueue queue) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        
         // shader attach
         ShaderProgram shader = ShaderProgram.defaultPipeline;
         shader.attach();
-        shader.setTexture(null, "uTexture0", 0);
+        shader.setTexture(this.texture, "uTexture0", 0);
         this._vbo.render(shader, this.node.derivedMatrix, queue.camera.viewMatrix, queue.camera.projectionMatrix);
     }
 }
