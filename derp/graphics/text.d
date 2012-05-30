@@ -82,7 +82,7 @@ class FontRenderer : ResourceGenerator {
             w += slot.advance.x / 64;
         }
         float h = this.font.fontFace.size.metrics.height / 64;
-        return vec2i(cast(int)ceil(w), cast(int)ceil(h));
+        return vec2i(cast(int)ceil(w), cast(int)ceil(h) + 1);
     }
 
     byte[] generate(ResourceSettings settings) {

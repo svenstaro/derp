@@ -16,7 +16,7 @@ int main(string[] args) {
 
     // Load font
     Font font = resourceManager.loadT!Font(new UrlString("data/fonts/dejavu/DejaVuSans.ttf"));
-    font.pointSize = 20;
+    font.pointSize = 30;
 
     // Create scene graph
     Node rootNode = new Node("rootNode");
@@ -42,8 +42,7 @@ int main(string[] args) {
     TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
     text.color = Color.Yellow;
     fontNode.attachComponent(text);
-    fontNode.position = Vector3(200, 300, 0);
-    fontNode.rotation = degrees(90);
+    fontNode.position = Vector3(400, 100, 0);
 
     // Example main loop
     float x = 0;
@@ -54,7 +53,11 @@ int main(string[] args) {
         spriteNode.rotation = degrees(- i * 0.5);
         sprite.scale = 0.1 * sin(i * 0.05) + 1;
         
+<<<<<<< Updated upstream
         fontNode.rotation = degrees(i);
+=======
+        //fontNode.rotation = degrees(sin(i * 0.05) * 10);
+>>>>>>> Stashed changes
     
         
         //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
