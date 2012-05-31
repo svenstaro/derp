@@ -17,6 +17,8 @@ import derp.core.resources;
 import derp.graphics.util;
 import derp.graphics.view;
 
+private static Texture _emptyTexture = null;
+
 class Texture : Resource {
 private:
     uint _ilHandle;
@@ -30,6 +32,31 @@ private:
 
 public:
     bool isRawData = false;
+
+    static @property Texture empty() {
+        if(_emptyTexture is null) {
+            class EmptyRenderer : ResourceGenerator {
+                byte[] generate(ResourceSettings settings) {
+                    byte[] bitmap = new byte[4];
+                    for(int i = 0; i < 4; ++i)
+                        bitmap[i] = cast(byte)255;
+                    return bitmap;
+                }
+            }
+
+            ResourceManager mgr = new ResourceManager();
+            EmptyRenderer renderer = new EmptyRenderer();
+            mgr.registerLoader("empty-renderer", renderer);
+            _emptyTexture = mgr.loadT!Texture(
+                    new ResourceSettings(
+                        "width", 1,
+                        "height", 1,
+                        "mode", "rgba"),
+                    renderer, "empty-texture");
+            _emptyTexture.isRawData = true;
+        }
+        return _emptyTexture;
+    }
 
     @property vec2i size() {
         this.initialize();

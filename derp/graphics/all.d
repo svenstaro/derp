@@ -4,6 +4,7 @@ module derp.graphics.all;
 
 public import
     derp.graphics.draw,
+    derp.graphics.polygon,
     derp.graphics.shader,
     derp.graphics.sprite,
     derp.graphics.text,

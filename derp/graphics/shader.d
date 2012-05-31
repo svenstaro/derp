@@ -237,8 +237,11 @@ public:
 
         attach();
         sendUniform(pos, location);
-        texture.bind();
         glActiveTexture(GL_TEXTURE0 + location);
+        if(texture !is null)
+            texture.bind();
+        else
+            glBindTexture(GL_TEXTURE_2D, 0);
         detach();
     }
 
@@ -278,7 +281,7 @@ varying vec2 fTexCoord;
 uniform sampler2D uTexture0;
 
 void main() {
-    gl_FragColor = texture2D(uTexture0, fTexCoord) * fColor;
+gl_FragColor = texture2D(uTexture0, fTexCoord) * fColor;
 }
 ";
 

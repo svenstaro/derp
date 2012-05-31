@@ -66,6 +66,32 @@ struct Triangle {
     }
 }
 
+struct Triangle2 {
+    Vector2[3] vertices;
+    
+    this(Vector2 a, Vector2 b, Vector2 c) {
+        this.vertices = [a, b, c];
+    }
+
+    bool containsPoint(Vector2 point) {
+        bool sameSide(Vector3 p1, Vector3 p2, Vector3 a, Vector3 b) {
+            Vector3 cp1 = cross(b - a, p1 - a);
+            Vector3 cp2 = cross(b - a, p2 - a);
+            return dot(cp1, cp2) >= 0;
+        }
+
+        Vector3 v0 = Vector3(this.vertices[0].x, this.vertices[0].y, 0);
+        Vector3 v1 = Vector3(this.vertices[1].x, this.vertices[1].y, 0);
+        Vector3 v2 = Vector3(this.vertices[2].x, this.vertices[2].y, 0);
+        Vector3 p = Vector3(point.x, point.y, 0);
+
+        return
+            sameSide(p, v0, v1, v2) &&
+            sameSide(p, v1, v2, v0) &&
+            sameSide(p, v2, v0, v1);
+    }
+}
+
 /// TODO
 struct Box {
     Vector3 center;
