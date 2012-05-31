@@ -28,6 +28,7 @@ public:
     this(string name, ShaderProgram shader = null) {
         super(name);
         this._vbo = new VertexBufferObject(shader);
+        this.clearPoints();
     }
 
     void _updateVertices() {
@@ -98,13 +99,27 @@ public:
         this._vbo.render(this.node.derivedMatrix, queue.camera.viewMatrix, queue.camera.projectionMatrix);
     }
 
-    @property Vector2[] points() {
+    void setPoints(Vector2[] points) {
+        this._points = points;
+        this._needUpdate = true;
+    }
+
+    void addPoint(Vector2 point) {
+        this._points ~= point;
+        this._needUpdate = true;
+    }
+
+    void clearPoints() {
+        this.setPoints([]);
+    }
+
+    Vector2[] getPoints() {
         return this._points;
     }
 
-    @property void points(Vector2[] points) {
-        this._points = points;
-        this._needUpdate = true;
+
+    @property Vector2[] points() {
+        return this._points;
     }
 
     @property Color color() {

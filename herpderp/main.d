@@ -47,18 +47,16 @@ int main(string[] args) {
 
     PolygonComponent poly = new PolygonComponent("test-1");
     poly.color = Color(0, 1, 1, 0.8);
-    auto points = poly.points;
-    points ~= Vector2(-100,  100);
-    points ~= Vector2( 200,  180);
-    points ~= Vector2( 100, -100);
-    points ~= Vector2(-100, -100);
-    points ~= Vector2(10, 0);
-    points ~= Vector2(50, 0);
-    points ~= Vector2(50, 50);
-    points ~= Vector2(0, 50);
-    points ~= Vector2(0, 10);
-    points ~= Vector2(-100, -90);
-    poly.points = points;
+    poly.addPoint(Vector2(-100,  100));
+    poly.addPoint(Vector2( 200,  180));
+    poly.addPoint(Vector2( 100, -100));
+    poly.addPoint(Vector2(-100, -100));
+    poly.addPoint(Vector2(10, 0));
+    poly.addPoint(Vector2(50, 0));
+    poly.addPoint(Vector2(50, 50));
+    poly.addPoint(Vector2(0, 50));
+    poly.addPoint(Vector2(0, 10));
+    poly.addPoint(Vector2(-100, -90));
     polyNode.attachComponent(poly);
     polyNode.position = Vector3(120, 120, 0);
 
