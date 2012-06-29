@@ -10,19 +10,36 @@ import derp.graphics.util;
 import derp.graphics.shader;
 import derp.graphics.draw;
 
-struct VertexData {
-    float x, y, z, r, g, b, a, s, t;
+struct SubRect {
+    float s;
+    float t;
+}
 
-    this(float x = 0, float y = 0, float z = 0, float r = 0, float g = 0, float b = 0, float a = 1, float s = 0, float t = 0) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
-        this.s = s;
-        this.t = t;
+struct VertexData {
+    union
+    {
+        struct {
+            float[3] position;
+            float[3] normal;
+            float[4] color;
+            float[2] texcoord;
+        }
+        float[12] _vertices;
+    }
+    
+    
+    this(float[3] position, float[3] normal, float[4] color, float[2] texcoord) {
+        this.position = position;
+        this.normal = normal;
+        this.color = color;
+        this.texcoord = texcoord;
+    }
+    
+    this(float x = 0, float y = 0, float z = 0, float nx = 0, float ny = 0, float nz = 0, float r = 0, float g = 0, float b = 0, float a = 1, float s = 0, float t = 0) {
+        this.position = [x, y, z];
+        this.normal = [nx, ny, nz];
+        this.color = [r, g, b, a];
+        this.texcoord = [s, t];
     }
 }
 
@@ -66,6 +83,7 @@ public:
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(3);
         glCheck();
 
         // glBindAttribLocation(this.shaderProgram.handle, 0, "_vertex");
@@ -76,8 +94,9 @@ public:
         // Define Attribute Sets
         // DOC: glVertexAttribPointer(index, size, type, normalized, stride (offset between 2 attributes), offset);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(0 * float.sizeof));  // x, y, z
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(3 * float.sizeof));  // r, g, b, a
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(7 * float.sizeof));  // s, t
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(3 * float.sizeof));  // x, y, z
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(7 * float.sizeof));  // r, g, b, a
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(10 * float.sizeof));  // s, t
         glCheck();
 
         // Setup buffer

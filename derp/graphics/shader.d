@@ -120,8 +120,9 @@ public:
 
         // link
         glBindAttribLocation(this._handle, 0, "vVertex");
-        glBindAttribLocation(this._handle, 1, "vColor");
-        glBindAttribLocation(this._handle, 2, "vTexCoord");
+        glBindAttribLocation(this._handle, 1, "vNormal");
+        glBindAttribLocation(this._handle, 2, "vColor");
+        glBindAttribLocation(this._handle, 3, "vTexCoord");
         glCheck();
 
 
@@ -276,6 +277,7 @@ varying vec3 fNormal;
 varying vec4 fColor;
 varying vec2 fTexCoord;
 uniform sampler2D uTexture0;
+uniform bool bNoTexture;
 
 void main() {
     gl_FragColor = texture2D(uTexture0, fTexCoord) * fColor;
@@ -283,10 +285,23 @@ void main() {
 ";
 
 static string defaultVertexShader = "#version 120
+struct Color {
+    vec4 color;
+};
+struct Material {
+    Color ambient;
+    Color diffuse;
+    Color specular;
+    Color emissive;
+    float shininess;
+};
+
+
 uniform mat4 uModelViewProjectionMatrix;
 uniform mat4 uModelMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform Material material;
 attribute vec3 vVertex;
 attribute vec3 vNormal;
 attribute vec2 vTexCoord;

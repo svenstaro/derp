@@ -13,5 +13,6 @@ public import
     derp.graphics.view,
     derp.graphics.window,
     derp.graphics.camera,
-    derp.graphics.render;
+    derp.graphics.render,
+    derp.graphics.mesh;
 
