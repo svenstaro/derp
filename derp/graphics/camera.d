@@ -151,7 +151,7 @@ public:
     /// Return the view matrix, cached.
     @property Matrix4 viewMatrix() @safe nothrow {
         if(this._needUpdate) {
-            auto pos = this.node.position;
+            auto pos = this.node.derivedPosition;
             if(this._projectionMode == ProjectionMode.Orthographic) {
                 auto v = this._viewBounds;
                 pos += Vector3(
@@ -160,7 +160,7 @@ public:
                         0);
             }
 
-            makeTransform(this._cachedViewMatrix, pos, Vector3(1,1,1), this.node.orientation);
+            makeTransform(this._cachedViewMatrix, pos, Vector3(1,1,1), this.node.derivedOrientation);
             this._needUpdate = false;
         }
         return this._cachedViewMatrix;
@@ -192,9 +192,9 @@ public:
 private:
     void _updatePerspective() @safe nothrow {
         // Calculate size of the near plane (part of the view frustum)
-        float height = this._nearClipDistance * tan(this._fieldOfView.radians / 2) * 2;
-        float width = height * this._aspectRatio * 2;
-        this._viewBounds = Rect(- width / 2, width, - height / 2, height);
+        float height = this._nearClipDistance * tan(this._fieldOfView.radians / 2);
+        float width = height * this._aspectRatio;
+        this._viewBounds = Rect(- width, -height, 2*width, 2*height);
     }
 
     void _updateProjectionMatrix() @trusted nothrow {
@@ -213,6 +213,8 @@ private:
             this._projectionMatrix = Matrix4.orthographic(-x, x, y, -y, this._nearClipDistance, this._farClipDistance);
         } else {
             this._updatePerspective();
+            try{
+            this._viewBounds.writeln("viewBounds");}catch(Exception e){}
             this._projectionMatrix = Matrix4.perspective(
                 this._viewBounds.left, this._viewBounds.right,
                 this._viewBounds.bottom, this._viewBounds.top,
