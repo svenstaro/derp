@@ -20,7 +20,8 @@ int main(string[] args) {
 
     // Create scene graph
     Node rootNode = new Node("rootNode");
-    Node camNode = new Node("camNode", rootNode);
+    Node camBaseNode = new Node("camBaseNode", rootNode);
+    Node camNode = new Node("camNode", camBaseNode);
     Node spriteNode = new Node("spriteNode", rootNode);
     Node fontNode = new Node("fontNode", rootNode);
     Node polyNode = new Node("polyNode", rootNode);
@@ -29,15 +30,16 @@ int main(string[] args) {
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
     spriteNode.attachComponent(sprite);
     sprite.smooth = true;
-    //sprite.subRect = Rect(0.4, 0.4, 0.2, 0.2);
+    sprite.subRect = Rect(0.4, 0.4, 0.2, 0.2);
 
-    spriteNode.position = Vector3(400, 300, 0);
+    spriteNode.position = Vector3(0, 0, 0);
 
     // Setup view
     CameraComponent cam = window.viewports[0].currentCamera;
     cam.projectionMode = CameraComponent.ProjectionMode.Orthographic;
-    cam.orthographicBounds = Rect(0, 0, 800, 600);
+    // cam.orthographicBounds = Rect(0, 0, 800, 600);
     camNode.attachComponent(cam);
+    camNode.translate(Vector3(0,0,-10));
 
     // Headline
     TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
@@ -71,6 +73,8 @@ int main(string[] args) {
 
         fontNode.rotation = degrees(i);
         //fontNode.rotation = degrees(sin(i * 0.05) * 10);
+
+        camBaseNode.rotate(degrees(i * 0.01), Vector3(0,1,0), TransformSpace.Parent);
         //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
 
         window.update();
