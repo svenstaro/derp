@@ -213,8 +213,6 @@ private:
             this._projectionMatrix = Matrix4.orthographic(-x, x, y, -y, this._nearClipDistance, this._farClipDistance);
         } else {
             this._updatePerspective();
-            try{
-            this._viewBounds.writeln("viewBounds");}catch(Exception e){}
             this._projectionMatrix = Matrix4.perspective(
                 this._viewBounds.left, this._viewBounds.right,
                 this._viewBounds.bottom, this._viewBounds.top,

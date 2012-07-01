@@ -68,6 +68,7 @@ struct Color {
 
     alias max value; // for Hue/Saturation/Value
     
-    float[4] toFloat(){return [r,g,b,a];}
-    alias toFloat this;
+    //opengl uses ARGB
+    float[4] toARGB(){return [a,r,g,b];}
+    alias toARGB this;
 }

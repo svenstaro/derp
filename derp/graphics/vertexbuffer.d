@@ -163,6 +163,9 @@ public:
         glCheck();
 
         //Send matrices to shader
+        writeln("modelMatrix: ", modelMatrix);
+        writeln("viewMatrix: ", viewMatrix);
+        writeln("projectionMatrix: ", projectionMatrix);
         this.shaderProgram.sendUniform("uModelMatrix", modelMatrix);
         this.shaderProgram.sendUniform("uViewMatrix", viewMatrix);
         this.shaderProgram.sendUniform("uProjectionMatrix", projectionMatrix);
