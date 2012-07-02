@@ -22,7 +22,7 @@ protected:
     bool _smooth = true;
     Rect _subRect = Rect(0, 0, 1, 1); // these are UV-Coordinates, range 0..1
 
-    VertexBufferObject _vbo;
+    VertexArrayObject _vao;
 
 public:
     this(string name, Texture texture = null, ShaderProgram shader = null) {
@@ -31,7 +31,7 @@ public:
             texture.initialize();
             this.texture = texture;
         }
-        this._vbo = new VertexBufferObject(shader);
+        this._vao = new VertexArrayObject(shader);
     }
 
     void _updateVertices() {
@@ -55,7 +55,7 @@ public:
         vertices ~= VertexData(-sx,  sy, 0, 0, 0, 0, c.r, c.g, c.b, c.a, s.left,  s.bottom);
         vertices ~= VertexData(-sx, -sy, 0, 0, 0, 0, c.r, c.g, c.b, c.a, s.left,  s.top   );
 
-        this._vbo.setVertices(vertices);
+        this._vao.setVertices(vertices);
     }
     
     void prepareRender(RenderQueue queue) {
@@ -75,9 +75,9 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this._smooth ? GL_LINEAR : GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this._smooth ? GL_LINEAR : GL_NEAREST);
         
-        this._vbo.shaderProgram.attach();
-        this._vbo.shaderProgram.setTexture(this._texture, "uTexture0", 0);
-        this._vbo.render(this.node.derivedMatrix, queue.camera.viewMatrix, queue.camera.projectionMatrix);
+        this._vao.shaderProgram.attach();
+        this._vao.shaderProgram.setTexture(this._texture, "uTexture0", 0);
+        this._vao.render(this.node.derivedMatrix, queue.camera.viewMatrix, queue.camera.projectionMatrix);
     }
 
     @property Texture texture() {
