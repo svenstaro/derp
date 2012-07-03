@@ -56,12 +56,12 @@ struct Input {
 
     static vec2i getMousePosition() {
         int x, y;
-        glfwGetMousePos(cast(void*)0, &x, &y);
+        glfwGetCursorPos(cast(void*)0, &x, &y);
         return vec2i(x, y);
     }
 
     static void setMousePosition(vec2i pos) {
-        glfwSetMousePos(cast(void*)0, pos.x, pos.y);
+        glfwSetCursorPos(cast(void*)0, pos.x, pos.y);
     }
 
     enum Key {

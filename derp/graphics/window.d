@@ -7,6 +7,7 @@ module derp.graphics.window;
 import std.stdio;
 import std.string;
 
+import derelict.opengl3.gl;
 import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
 import derelict.devil.il;
@@ -44,6 +45,15 @@ public:
         // try to initialize the graphics environment
         initializeGraphics(this);
 
+        //set glfwWindowHints before opening the window
+        glfwOpenWindowHint(GLFW_RED_BITS, 8);
+        glfwOpenWindowHint(GLFW_GREEN_BITS, 8);
+        glfwOpenWindowHint(GLFW_BLUE_BITS, 8);
+        glfwOpenWindowHint(GLFW_ALPHA_BITS, 0);
+        glfwOpenWindowHint(GLFW_DEPTH_BITS, 24);
+        glfwOpenWindowHint(GLFW_STENCIL_BITS, 8);
+        glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 0);
+        
         this._glfwWindow = glfwOpenWindow(width, height, mode, title.toStringz(), null);
         if(!this._glfwWindow) {
             throw new GraphicsException("Cannot initialize window " ~ title, this);
@@ -112,7 +122,7 @@ public:
 
     void update() {
         int x, y;
-        glfwGetMousePos(this._glfwWindow, &x, &y);
+        glfwGetCursorPos(this._glfwWindow, &x, &y);
 
         int w, h;
         glfwGetWindowSize(this._glfwWindow, &w, &h);
@@ -130,6 +140,8 @@ public:
 
     void clear(Color color) {
         // glViewport(0, 0, 20, 20);
+        glDepthMask(GL_TRUE);
+        glClearDepth(1.0f);
         glClearColor(color.r, color.g, color.b, color.a);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     }

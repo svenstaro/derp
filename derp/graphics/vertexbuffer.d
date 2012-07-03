@@ -184,23 +184,20 @@ public:
         glCheck();
 
         // glDisable(GL_LIGHTING);
-        glDisable(GL_DEPTH_TEST);
+        // glDisable(GL_DEPTH_TEST);
         // glDisable(GL_ALPHA_TEST);
         // glEnable(GL_TEXTURE_2D);
         // glEnable(GL_BLEND);
         glCheck();
 
         //Send matrices to shader
-        writeln("modelMatrix: ", modelMatrix);
-        writeln("viewMatrix: ", viewMatrix);
-        writeln("projectionMatrix: ", projectionMatrix);
+        //~ writeln("modelMatrix: ", modelMatrix);
+        //~ writeln("viewMatrix: ", viewMatrix);
+        //~ writeln("projectionMatrix: ", projectionMatrix);
         this._shaderProgram.sendUniform("uModelMatrix", modelMatrix);
         this._shaderProgram.sendUniform("uViewMatrix", viewMatrix);
         this._shaderProgram.sendUniform("uProjectionMatrix", projectionMatrix);
         
-        setDepthTestMode(DepthTestMode.LessEqual);
-        setBlendMode(BlendMode.Replace);
-        setCullMode(CullMode.Back);
         // Draw
         if(this._indexCount > 0) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this._indexBuffer); 

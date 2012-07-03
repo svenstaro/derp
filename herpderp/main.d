@@ -70,10 +70,6 @@ int main(string[] args) {
         //fontNode.rotation = degrees(i);
 
         //fontNode.rotation = degrees(sin(i * 0.05) * 10);
-        writeln(camBaseNode.position);
-        writeln(camBaseNode.derivedPosition);
-        writeln(camNode.position);
-        writeln(camNode.derivedPosition);
         camBaseNode.rotate(degrees(i * 0.0001), Vector3(0,1,0), TransformSpace.Parent);
     
         
