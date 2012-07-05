@@ -78,9 +78,10 @@ public:
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this._smooth ? GL_LINEAR : GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this._smooth ? GL_LINEAR : GL_NEAREST);
-        this._vao.shaderProgram.attach();
-        this._vao.shaderProgram.setTexture(this._texture, "uTexture0", 0);
-        this._vao.render(this.node.derivedMatrix, queue.camera.viewMatrix, queue.camera.projectionMatrix);
+        ShaderProgram shader = ShaderProgram.defaultPipeline;
+        shader.attach();
+        shader.setTexture(this._texture, "uTexture0", 0);
+        this._vao.render(shader, this.node.derivedMatrix, queue.camera.viewMatrix, queue.camera.projectionMatrix);
     }
     
     

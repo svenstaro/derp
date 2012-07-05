@@ -23,13 +23,8 @@ struct Color {
 
     static Color Background     = Color(0.055, 0.2235, 0.4);
 
-    //union
-    //{
-        //struct {
-            float r, g, b, a = 1.0;
-        //}
-        //float[4] _color;
-    //}
+    
+    float r, g, b, a = 1.0;
 
     this(float r, float g, float b, float a = 1) {
         this.r = r;
@@ -70,5 +65,8 @@ struct Color {
     
     //opengl uses ARGB
     float[4] toARGB(){return [a,r,g,b];}
+    alias hue h;
+    alias saturation s;
+    alias value v;
     alias toARGB this;
 }

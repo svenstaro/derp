@@ -9,6 +9,7 @@ int main(string[] args) {
     // Create the window
     Window window = new Window("Hello World", 800, 600, Window.Mode.Windowed, true, Window.ViewportType.Viewport);
     window.backgroundColor = Color.Gray;
+    window.backgroundColor = Color.Background;
 
     // Load texture
     ResourceManager resourceManager = new ResourceManager();
@@ -31,6 +32,8 @@ int main(string[] args) {
     //~ spriteNode.attachComponent(sprite);
     //~ sprite.smooth = true;
     //~ sprite.subRect = Rect(0.4, 0.4, 0.2, 0.2);
+    //~ sprite.color = Color(0.1, 0.1, 0.1, 0);
+    //~ sprite.colorBlendMode = SpriteComponent.BlendMode.Additive;
 
     spriteNode.position = Vector3(0, 0, 0);
     
@@ -54,7 +57,27 @@ int main(string[] args) {
     //~ TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
     //~ text.color = Color.Yellow;
     //~ fontNode.attachComponent(text);
-    //~ fontNode.position = Vector3(300, 100, 0);
+    fontNode.position = Vector3(400, 100, 0);
+
+    MeshComponent mesh = new MeshComponent("testmesh");
+    //auto v = mesh.vertices;
+    VertexData[] v;
+    float radius = 100;
+    for(int i = 0; i < 16; i++) {
+        float a1 = i / 16.0 * 2 * PI;
+        float a2 = (i + 1) / 16.0 * 2 * PI;
+
+        float w = i / 15.0;
+        float z = i / 16.0 - 0.5;
+
+        v ~= VertexData(radius * sin(a1), radius * cos(a1), z, w, w, w, 2, 0, 0);
+        v ~= VertexData(radius * sin(a2), radius * cos(a2), z, w, w, w, 2, 0, 0);
+        v ~= VertexData(0, 0, z, w, w, w, 2, 0, 0);
+    }
+    mesh.vertices = v;
+    mesh.texture = texture;
+    meshNode.attachComponent(mesh);
+    meshNode.position = Vector3(400, 400, 0);
 
     // Example main loop
     float x = 0;
@@ -62,12 +85,12 @@ int main(string[] args) {
     while(window.isOpen()) {
         i++;
         x += 0.05;
-        //spriteNode.rotation = degrees(- i * 0.5);
-        //sprite.scale = 0.1 * sin(i * 0.05) + 1;
+        //~ spriteNode.rotation = degrees(- i * 0.5);
+        //~sprite.scale = 0.1 * abs(sin(i * 0.05)) + 1;
+
+        //~ meshNode.orientation = Quaternion.zrotation(degrees(i * 2).radians);
         
-        //meshNode.rotation = degrees(- i * 0.5);
-        
-        //fontNode.rotation = degrees(i);
+        //~ fontNode.rotation = degrees(sin(i * 0.05) * 10);
 
         //fontNode.rotation = degrees(sin(i * 0.05) * 10);
         camBaseNode.rotate(degrees(i * 0.0001), Vector3(0,1,0), TransformSpace.Parent);

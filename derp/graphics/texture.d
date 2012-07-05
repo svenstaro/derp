@@ -106,6 +106,7 @@ public:
                 this._size.x, this._size.y, 0, 
                 this._format, GL_UNSIGNED_BYTE, rawData);
         glCheck();
+
         this.unbind();
 
         // Cleanup
