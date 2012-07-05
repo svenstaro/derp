@@ -14,9 +14,10 @@ import derp.graphics.texture;
 import derp.graphics.shader;
 import derp.graphics.render;
 
+
 class SpriteComponent : Component, Renderable {
 public:
-    enum BlendMode {
+    enum SpriteBlendMode {
         Additive,
         Multiplicative
     }
@@ -25,7 +26,7 @@ protected:
     Vector2 _scale;
     Texture _texture;
     Color _color = Color(1, 1, 1);
-    BlendMode _colorBlendMode = BlendMode.Multiplicative;
+    SpriteBlendMode _colorBlendMode = SpriteBlendMode.Multiplicative;
     bool _smooth = true;
     Rect _subRect = Rect(0, 0, 1, 1); // these are UV-Coordinates, range 0..1
 
@@ -38,7 +39,7 @@ public:
         // initialize stuff
         this.scale = 1;
         this.color = Color.White;
-        this.colorBlendMode = BlendMode.Multiplicative;
+        this.colorBlendMode = SpriteBlendMode.Multiplicative;
         this.smooth = true;
         this.subRect = Rect(0, 0, 1, 1);
 
@@ -46,7 +47,7 @@ public:
             texture.initialize();
             this.texture = texture;
         }
-        this._vao = new VertexArrayObject(shader);
+        this._vao = new VertexArrayObject();
     }
 
     void _updateVertices() {
@@ -60,7 +61,7 @@ public:
         auto c = this._color;
         auto s = this._subRect;
 
-        if(this._colorBlendMode == BlendMode.Additive) {
+        if(this._colorBlendMode == SpriteBlendMode.Additive) {
             if(c.r >= 0) c.r += 1;
             if(c.g >= 0) c.g += 1;
             if(c.b >= 0) c.b += 1;
@@ -124,7 +125,7 @@ public:
 
     @property void color(Color color) {
         this._color = color;
-        this._needsUpdate = true;    
+        this._needUpdate = true;    
     }
 
     @property void smooth(bool smooth) {
@@ -132,11 +133,11 @@ public:
     }
 
 
-    @property BlendMode colorBlendMode() {
+    @property SpriteBlendMode colorBlendMode() {
         return this._colorBlendMode;
     }
 
-    @property void colorBlendMode(BlendMode colorBlendMode) {
+    @property void colorBlendMode(SpriteBlendMode colorBlendMode) {
         this._colorBlendMode = colorBlendMode;
         this._needUpdate = true;    
     }

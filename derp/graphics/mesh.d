@@ -29,32 +29,33 @@ struct Material {
 class MeshComponent : Component, Renderable {
 protected:
     Vector2 _scale;
-    Texture _texture;
+    Texture _texture = null;
     bool _smooth = true;
     VertexData[] _vertices;
     IndexData[] _indices;
     VertexArrayObject _vao;
 
 public:
-    this(string name, Texture texture = null, ShaderProgram shader = null) {
+    this(string name) {
         super(name);
-        if(texture) {
-            texture.initialize();
-            this.texture = texture;
-        }
-        this._vao = new VertexArrayObject(shader);
+        this._vao = new VertexArrayObject();
+        assert(this._vao);
     }    
 
-    void _updateVertices() {
-        this._vao.setVertices(_vertices);
-        //~ this._vao.setIndices([
-            //~ 3,2,0,0,1,3,//f    
-            //~ 6,7,5,5,4,6,//b     
-            //~ 7,3,1,1,5,7,//r     
-            //~ 2,6,4,4,0,2,//l     
-            //~ 7,6,2,2,3,7,//t
-            //~ 1,0,4,4,5,1,//b        
-        //~ ]);
+    @property vertices(VertexData[] vertices) {
+        this._vao.vertices = vertices;
+    }
+    
+    @property VertexData[] vertices() {
+        return this._vao.vertices;
+    }
+    
+    @property indices(IndexData[] indices) {
+        this._vao.indices = indices;
+    }
+    
+    @property IndexData[] indices() {
+        return this._vao.indices;
     }
     
     void prepareRender(RenderQueue queue) {
@@ -62,10 +63,6 @@ public:
     }
 
     void render(RenderQueue queue) {
-        if(this._needUpdate) {
-            this._updateVertices();
-        }
-        
         setDepthTestMode(DepthTestMode.LessEqual);
         setBlendMode(BlendMode.Add);
         //setCullMode(CullMode.Back);
@@ -79,7 +76,6 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this._smooth ? GL_LINEAR : GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this._smooth ? GL_LINEAR : GL_NEAREST);
         ShaderProgram shader = ShaderProgram.defaultPipeline;
-        shader.attach();
         shader.setTexture(this._texture, "uTexture0", 0);
         this._vao.render(shader, this.node.derivedMatrix, queue.camera.viewMatrix, queue.camera.projectionMatrix);
     }
@@ -135,7 +131,7 @@ public:
 
 
 MeshComponent makeCubeMesh(Texture texture) {
-    MeshComponent mesh = new MeshComponent("Cube", texture);
+    MeshComponent mesh = new MeshComponent("Cube");
     
     float[3] V_PX =  [1.0f, 0.0f, 0.0f];
     float[3] V_NX = [-1.0f, 0.0f, 0.0f];
@@ -205,15 +201,19 @@ MeshComponent makeCubeMesh(Texture texture) {
             //~ VertexData([-1.0,  1.0, -1.0] ,V_NY, Color.White, T_00),
             //~ VertexData([1.0,  1.0, -1.0] ,V_NY, Color.Black, T_00),
         ];
-    
-    mesh._vertices = f;
-    
-    foreach(t;f)
-        t.writeln();
-    
+    mesh.vertices = f;
+    //mesh.texture = texture;
     return mesh;
 }
 
 
 
 
+//~ this._vao.setIndices([
+            //~ 3,2,0,0,1,3,//f    
+            //~ 6,7,5,5,4,6,//b     
+            //~ 7,3,1,1,5,7,//r     
+            //~ 2,6,4,4,0,2,//l     
+            //~ 7,6,2,2,3,7,//t
+            //~ 1,0,4,4,5,1,//b        
+        //~ ]);

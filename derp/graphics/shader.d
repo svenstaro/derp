@@ -301,6 +301,7 @@ void main() {
             colorCombine(tex.b, fColor.b),
             colorCombine(tex.a, fColor.a)
             );
+    //gl_FragColor = texture2D(uTexture0, fTexCoord) * fColor;
 }
 ";
 

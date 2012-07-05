@@ -51,6 +51,7 @@ alias uint IndexData;
 class VertexArrayObject {
 private:
     VertexData[] _vertices;
+    IndexData[] _indices;
 
     uint _vao; // vertex buffer object, keeps track of vertex attributes etc.
     uint _vertexBuffer;
@@ -61,10 +62,6 @@ private:
 public:	
     this() {
         create();
-    }
-
-    @property ShaderProgram shaderProgram() {
-        return this._shaderProgram;
     }
     
     void create() {
@@ -78,7 +75,6 @@ public:
         glGenBuffers(1, &this._vertexBuffer);
         glCheck();
         glGenBuffers(1, &this._indexBuffer);
-        glCheck();
 
         // Set the buffer's vertex attributes
         glBindBuffer(GL_ARRAY_BUFFER, this._vertexBuffer);
@@ -125,6 +121,15 @@ public:
         this.updateVertices();
     }
     
+    @property IndexData[] indices() {
+        return this._indices;
+    }
+
+    @property void indices(IndexData[] indices) {
+        this._indices = indices;
+        this.updateIndices();
+    }
+    
     /**
      * Sends the vertice data to the GPU. It is then accessible via
      * rawVertexArrayHandle.
@@ -137,6 +142,7 @@ public:
         this._vertexCount = this._vertices.length;
         glBufferData(GL_ARRAY_BUFFER, this._vertices.length * VertexData.sizeof, this._vertices.ptr, GL_STATIC_DRAW);
         glCheck();
+        this._vertices.writeln();
 
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -144,22 +150,19 @@ public:
     }
     
     ///if indices are set, it uses glDrawElements instead of glDrawArrays
-    void setIndices(IndexData[] indices) {
-        this._shaderProgram.attach();
-
+    @property void updateIndices() {
         glBindVertexArray(this._vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this._indexBuffer);
         glCheck();
         
-        this._indexCount = indices.length;
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.length * IndexData.sizeof, indices.ptr, GL_STATIC_DRAW);
+        this._indexCount = this._indices.length;
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, this._indices.length * IndexData.sizeof, this._indices.ptr, GL_STATIC_DRAW);
         glCheck();
+        this._indices.writeln();
         
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glCheck();
-
-        this._shaderProgram.detach();
     }
 
     void render(ShaderProgram shader, Matrix4 modelMatrix, Matrix4 viewMatrix, Matrix4 projectionMatrix) {
@@ -207,7 +210,7 @@ public:
         //glDisableVertexAttribArray(0);
         //glDisableVertexAttribArray(1);
         //glDisableVertexAttribArray(2);
-        glCheck();
+        //glCheck();
 
         // Unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);

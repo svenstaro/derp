@@ -9,7 +9,6 @@ int main(string[] args) {
     // Create the window
     Window window = new Window("Hello World", 800, 600, Window.Mode.Windowed, true, Window.ViewportType.Viewport);
     window.backgroundColor = Color.Gray;
-    window.backgroundColor = Color.Background;
 
     // Load texture
     ResourceManager resourceManager = new ResourceManager();
@@ -26,7 +25,9 @@ int main(string[] args) {
     Node spriteNode = new Node("spriteNode", rootNode);
     Node fontNode = new Node("fontNode", rootNode);
     Node meshNode = new Node("meshNode", rootNode);
+    Node meshNode2 = new Node("meshNode2", rootNode);
 
+    "nodes created".writeln();
     // Create sprite
     //~ SpriteComponent sprite = new SpriteComponent("Sprite", texture);
     //~ spriteNode.attachComponent(sprite);
@@ -36,12 +37,12 @@ int main(string[] args) {
     //~ sprite.colorBlendMode = SpriteComponent.BlendMode.Additive;
 
     spriteNode.position = Vector3(0, 0, 0);
-    
+
     // Create cube
     MeshComponent mesh = makeCubeMesh(texture);
     meshNode.position = Vector3(0,0,0);
     meshNode.attachComponent(mesh);
-    meshNode.scale = Vector3(10,10,10);
+    meshNode.scale = Vector3(100,100,100);
 
     // Setup view
     CameraComponent cam = new CameraComponent("testCam");
@@ -59,7 +60,7 @@ int main(string[] args) {
     //~ fontNode.attachComponent(text);
     fontNode.position = Vector3(400, 100, 0);
 
-    MeshComponent mesh = new MeshComponent("testmesh");
+    MeshComponent mesh2 = new MeshComponent("testmesh");
     //auto v = mesh.vertices;
     VertexData[] v;
     float radius = 100;
@@ -74,10 +75,10 @@ int main(string[] args) {
         v ~= VertexData(radius * sin(a2), radius * cos(a2), z, w, w, w, 2, 0, 0);
         v ~= VertexData(0, 0, z, w, w, w, 2, 0, 0);
     }
-    mesh.vertices = v;
-    mesh.texture = texture;
-    meshNode.attachComponent(mesh);
-    meshNode.position = Vector3(400, 400, 0);
+    mesh2.vertices = v;
+    //mesh2.texture = texture;
+    meshNode2.attachComponent(mesh2);
+    meshNode2.position = Vector3(400, 400, 0);
 
     // Example main loop
     float x = 0;
@@ -93,7 +94,7 @@ int main(string[] args) {
         //~ fontNode.rotation = degrees(sin(i * 0.05) * 10);
 
         //fontNode.rotation = degrees(sin(i * 0.05) * 10);
-        camBaseNode.rotate(degrees(i * 0.0001), Vector3(0,1,0), TransformSpace.Parent);
+        //camBaseNode.rotate(degrees(i * 0.0001), Vector3(0,1,0), TransformSpace.Parent);
     
         
         //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
