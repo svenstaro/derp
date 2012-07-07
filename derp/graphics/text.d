@@ -14,7 +14,7 @@ import derp.graphics.shader;
 import derp.graphics.sprite;
 import derp.graphics.texture;
 import derp.graphics.util;
-import derp.graphics.vertexbuffer;
+import derp.graphics.vertexdata;
 
 /** 
  * Resolution of the display device. You may set a different value before

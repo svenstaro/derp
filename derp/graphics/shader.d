@@ -18,18 +18,24 @@ import derp.graphics.texture;
 
 import std.array;
 
+import derp.graphics.vertexdata;
+
+alias string ShaderAttribute;
+
 class Shader {
 public:
     enum Type {
-        vertex      = GL_VERTEX_SHADER,
-        fragment    = GL_FRAGMENT_SHADER,
-        geometry    = GL_GEOMETRY_SHADER
+        Vertex      = GL_VERTEX_SHADER,
+        TessControl = GL_TESS_CONTROL_SHADER, 
+        TessEvaluation = GL_TESS_EVALUATION_SHADER,
+        Geometry    = GL_GEOMETRY_SHADER,
+        Fragment    = GL_FRAGMENT_SHADER
     }
     
 private:    
     string _source;
     Type _type;
-    int _handle;
+    int _hShader;
 
     this(string source, Type type) {
         this._source = source;
@@ -42,12 +48,12 @@ private:
     }
 
     void create() {
-        this._handle = glCreateShader(this._type);
+        this._hShader = glCreateShader(this._type);
         // writefln("Created Shader %s", this.handle);
         const char* source = this._source.toStringz();
-        glShaderSource(this._handle, 1, &source, null);
+        glShaderSource(this._hShader, 1, &source, null);
         glCheck();
-        glCompileShader(this._handle);
+        glCompileShader(this._hShader);
         glCheck();
 
         string info = infoLog;
@@ -57,17 +63,17 @@ private:
 
     @property string infoLog() {
         int len;
-        glGetShaderiv(this._handle, GL_INFO_LOG_LENGTH , &len);
+        glGetShaderiv(this._hShader, GL_INFO_LOG_LENGTH , &len);
         if (len > 1) {
             char[] msg = new char[len];
-            glGetShaderInfoLog(this._handle, len, null, cast(char*) msg);
+            glGetShaderInfoLog(this._hShader, len, null, cast(char*) msg);
             return cast(string)msg;
         }
         return "";
     }
 
     void destroy() {
-        glDeleteShader(this._handle);
+        glDeleteShader(this._hShader);
         glCheck();
     }
 }
@@ -80,7 +86,7 @@ import std.stdio;
  */
 final class ShaderProgram {
 private:
-    int _handle;
+    int _hShaderProgram;
     int[string] _uniformLocationCache;
     int[string] _attribLocationCache;
     bool _isAttached = false;
@@ -99,38 +105,37 @@ public:
 
     @property string infoLog() {
         int len;
-        glGetProgramiv(this._handle, GL_INFO_LOG_LENGTH , &len);
+        glGetProgramiv(this._hShaderProgram, GL_INFO_LOG_LENGTH , &len);
         if (len > 1) {
             char[] msg = new char[len];
-            glGetProgramInfoLog(this._handle, len, null, cast(char*) msg);
+            glGetProgramInfoLog(this._hShaderProgram, len, null, cast(char*) msg);
             return cast(string)msg;
         }
         return "";
     }
 
     void create(Shader[] shaders) {
-        this._handle = glCreateProgram();
-        assert(glIsProgram(this._handle), "Failed to create ShaderProgram.");
+        this._hShaderProgram = glCreateProgram();
+        assert(glIsProgram(this._hShaderProgram), "Failed to create ShaderProgram.");
 
         // attach
         foreach(s; shaders) {
-            glAttachShader(this._handle, s._handle);
+            glAttachShader(this._hShaderProgram, s._hShader);
             glCheck();
         }
 
         // link
-        glBindAttribLocation(this._handle, 0, "vVertex");
-        glBindAttribLocation(this._handle, 1, "vNormal");
-        glBindAttribLocation(this._handle, 2, "vColor");
-        glBindAttribLocation(this._handle, 3, "vTexCoord");
+        glBindAttribLocation(this._hShaderProgram, 0, "vPosition");
+        glBindAttribLocation(this._hShaderProgram, 1, "vNormal");
+        glBindAttribLocation(this._hShaderProgram, 2, "vColor");
+        glBindAttribLocation(this._hShaderProgram, 3, "vTexCoord");
         glCheck();
 
-
-        glLinkProgram(this._handle);
+        glLinkProgram(this._hShaderProgram);
         glCheck();
 
         int linkSuccess;
-        glGetProgramiv(this._handle, GL_LINK_STATUS, &linkSuccess);
+        glGetProgramiv(this._hShaderProgram, GL_LINK_STATUS, &linkSuccess);
         assert(linkSuccess == GL_TRUE, "Linker error.");
 
         // check here
@@ -139,26 +144,26 @@ public:
         assert(info == "", "Failed to link program.");
 
         int validateSuccess;
-        glValidateProgram(this._handle);
-        glGetProgramiv(this._handle, GL_VALIDATE_STATUS, &validateSuccess);
+        glValidateProgram(this._hShaderProgram);
+        glGetProgramiv(this._hShaderProgram, GL_VALIDATE_STATUS, &validateSuccess);
         assert(validateSuccess == GL_TRUE, "Validation error.");
 
         glCheck();
 
         // detach
         foreach(s; shaders) {
-            glDetachShader(this._handle, s._handle);
+            glDetachShader(this._hShaderProgram, s._hShader);
             glCheck();
         }
     }
 
     void destroy() {
-        glDeleteProgram(this._handle);
+        glDeleteProgram(this._hShaderProgram);
         glCheck();
     }
 
     void attach() {
-        glUseProgram(this._handle);
+        glUseProgram(this._hShaderProgram);
         glCheck();
         this._isAttached = true;
     }
@@ -174,7 +179,7 @@ public:
         if(px !is null)
             return *px;
         const char* n = name.toStringz();
-        int x = glGetUniformLocation(this._handle, &n[0]);
+        int x = glGetUniformLocation(this._hShaderProgram, &n[0]);
         glCheck();
         this._uniformLocationCache[name] = x;
         return x;
@@ -185,7 +190,7 @@ public:
         if(px !is null)
             return *px;
         const char* n = name.toStringz();
-        int x = glGetAttribLocation(this._handle, &n[0]);
+        int x = glGetAttribLocation(this._hShaderProgram, &n[0]);
         glCheck();
         this._attribLocationCache[name] = x;
         return x;
@@ -257,8 +262,8 @@ public:
     static @property ShaderProgram defaultPipeline() {
         if(!_defaultPipeline) {
             Shader[] shaders;
-            shaders ~= new Shader(defaultVertexShader, Shader.Type.vertex);
-            shaders ~= new Shader(defaultFragmentShader, Shader.Type.fragment);
+            shaders ~= new Shader(defaultVertexShader, Shader.Type.Vertex);
+            shaders ~= new Shader(defaultFragmentShader, Shader.Type.Fragment);
             _defaultPipeline = new ShaderProgram(shaders);
         }
         return _defaultPipeline;
@@ -317,16 +322,16 @@ struct Material {
     float shininess;
 };
 
-
-uniform mat4 uModelViewProjectionMatrix;
 uniform mat4 uModelMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
+
 uniform Material material;
-attribute vec3 vVertex;
+
+attribute vec3 vPosition;
 attribute vec3 vNormal;
-attribute vec2 vTexCoord;
 attribute vec4 vColor;
+attribute vec2 vTexCoord;
 
 varying vec3 fPosition;
 varying vec3 fNormal;

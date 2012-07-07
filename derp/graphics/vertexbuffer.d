@@ -1,4 +1,4 @@
-module derp.graphics.vertexbuffer;
+module derp.graphics.vertexdata;
 
 import std.stdio;
 
@@ -189,9 +189,6 @@ public:
         glCheck();
 
         //Send matrices to shader
-        //~ writeln("modelMatrix: ", modelMatrix);
-        //~ writeln("viewMatrix: ", viewMatrix);
-        //~ writeln("projectionMatrix: ", projectionMatrix);
         shader.sendUniform("uModelMatrix", modelMatrix);
         shader.sendUniform("uViewMatrix", viewMatrix);
         shader.sendUniform("uProjectionMatrix", projectionMatrix);
