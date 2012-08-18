@@ -238,10 +238,10 @@ public:
     }
 
     void setTexture(Texture texture, string name = "texture", int location = 0) {
+        assert(this.isAttached, "cannot send uniform, shader not attached");
         uint pos = getUniformLocation(name);
         assert(pos != -1, "Cannot find texture sampler `" ~ name ~ "` in shader.");
 
-        this.attach();
         this.sendUniform(pos, location);
         if(texture is null) {
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -249,7 +249,6 @@ public:
             texture.bind();
         }
         glActiveTexture(GL_TEXTURE0 + location);
-        this.detach();
     }
 
     /**
@@ -260,7 +259,7 @@ public:
 
     /// ditto
     static @property ShaderProgram defaultPipeline() {
-        if(!_defaultPipeline) {
+        if(this._defaultPipeline is null) {
             Shader[] shaders;
             shaders ~= new Shader(defaultVertexShader, Shader.Type.Vertex);
             shaders ~= new Shader(defaultFragmentShader, Shader.Type.Fragment);
@@ -339,7 +338,7 @@ varying vec4 fColor;
 varying vec2 fTexCoord;
 
 void main() {
-    vec4 vPos = uViewMatrix * uModelMatrix * vec4(vVertex, 1.0);
+    vec4 vPos = uViewMatrix * uModelMatrix * vec4(vPosition, 1.0);
     gl_Position = uProjectionMatrix * vPos;
     
     fPosition = vPos.xyz;

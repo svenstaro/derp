@@ -7,7 +7,7 @@ import derelict.opengl3.gl3;
 import derp.graphics.draw;
 import derp.math.all;
 import derp.core.scene;
-import derp.graphics.vertexbuffer;
+import derp.graphics.vertexdata;
 import derp.graphics.texture;
 import derp.graphics.shader;
 import derp.graphics.render;

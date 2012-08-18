@@ -102,7 +102,7 @@ public:
         // glDisableVertexAttribArray(0);
         // glDisableVertexAttribArray(1);
         // glDisableVertexAttribArray(2);
-        glCheck();
+        // glCheck();
 
         // Clean up context
         glBindVertexArray(0);
@@ -142,7 +142,6 @@ public:
         this._vertexCount = this._vertices.length;
         glBufferData(GL_ARRAY_BUFFER, this._vertices.length * VertexData.sizeof, this._vertices.ptr, GL_STATIC_DRAW);
         glCheck();
-        this._vertices.writeln();
 
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -158,7 +157,6 @@ public:
         this._indexCount = this._indices.length;
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, this._indices.length * IndexData.sizeof, this._indices.ptr, GL_STATIC_DRAW);
         glCheck();
-        this._indices.writeln();
         
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -176,19 +174,23 @@ public:
         glCheck();
 
         // Enable Attribute Sets
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-        glCheck();
+        //~ glEnableVertexAttribArray(0);
+        //~ glEnableVertexAttribArray(1);
+        //~ glEnableVertexAttribArray(2);
+        //~ glEnableVertexAttribArray(3);
+        //~ glCheck();
 
         // glDisable(GL_LIGHTING);
         // glDisable(GL_DEPTH_TEST);
         // glDisable(GL_ALPHA_TEST);
         // glEnable(GL_TEXTURE_2D);
         // glEnable(GL_BLEND);
-        glCheck();
+        // glCheck();
 
         //Send matrices to shader
+        //~ writeln("modelMatrix: ", modelMatrix);
+        //~ writeln("viewMatrix: ", viewMatrix);
+        //~ writeln("projectionMatrix: ", projectionMatrix);
         shader.sendUniform("uModelMatrix", modelMatrix);
         shader.sendUniform("uViewMatrix", viewMatrix);
         shader.sendUniform("uProjectionMatrix", projectionMatrix);
@@ -211,7 +213,7 @@ public:
 
         // Unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
         glCheck();
     }

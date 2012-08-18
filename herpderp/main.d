@@ -55,9 +55,9 @@ int main(string[] args) {
     //camBaseNode.translate(Vector3(0,0,-3000));//BOKEN!
 
     // Headline
-    //~ TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
-    //~ text.color = Color.Yellow;
-    //~ fontNode.attachComponent(text);
+    TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
+    text.color = Color.Yellow;
+    fontNode.attachComponent(text);
     fontNode.position = Vector3(400, 100, 0);
 
     MeshComponent mesh2 = new MeshComponent("testmesh");
@@ -91,7 +91,7 @@ int main(string[] args) {
 
         //~ meshNode.orientation = Quaternion.zrotation(degrees(i * 2).radians);
         
-        //~ fontNode.rotation = degrees(sin(i * 0.05) * 10);
+        fontNode.rotation = degrees(sin(i * 0.05) * 10);
 
         //fontNode.rotation = degrees(sin(i * 0.05) * 10);
         //camBaseNode.rotate(degrees(i * 0.0001), Vector3(0,1,0), TransformSpace.Parent);

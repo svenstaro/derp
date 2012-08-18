@@ -6,6 +6,7 @@ module derp.graphics.window;
 
 import std.stdio;
 import std.string;
+import std.conv;
 
 import derelict.opengl3.gl;
 import derelict.opengl3.gl3;
@@ -46,15 +47,17 @@ public:
         initializeGraphics(this);
 
         //set glfwWindowHints before opening the window
-        glfwOpenWindowHint(GLFW_RED_BITS, 8);
-        glfwOpenWindowHint(GLFW_GREEN_BITS, 8);
-        glfwOpenWindowHint(GLFW_BLUE_BITS, 8);
-        glfwOpenWindowHint(GLFW_ALPHA_BITS, 0);
-        glfwOpenWindowHint(GLFW_DEPTH_BITS, 24);
-        glfwOpenWindowHint(GLFW_STENCIL_BITS, 8);
-        glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 0);
+        glfwWindowHint(GLFW_RED_BITS, 8);
+        glfwWindowHint(GLFW_GREEN_BITS, 8);
+        glfwWindowHint(GLFW_BLUE_BITS, 8);
+        glfwWindowHint(GLFW_ALPHA_BITS, 0);
+        glfwWindowHint(GLFW_DEPTH_BITS, 24);
+        glfwWindowHint(GLFW_STENCIL_BITS, 8);
+        glfwWindowHint(GLFW_FSAA_SAMPLES, 0);
         
-        this._glfwWindow = glfwOpenWindow(width, height, mode, title.toStringz(), null);
+        assert(this._glfwWindow is null);
+        this._glfwWindow = glfwCreateWindow(width, height, mode, title.toStringz(), null);
+        assert(this._glfwWindow !is null);
         if(!this._glfwWindow) {
             throw new GraphicsException("Cannot initialize window " ~ title, this);
         }
@@ -108,12 +111,13 @@ public:
 
     void close() {
         if(this.isOpen()) {
-            glfwCloseWindow(this._glfwWindow);
+            glfwDestroyWindow(this._glfwWindow);
         }
     }
 
     bool isOpen() {
-        return cast(bool) glfwIsWindow(this._glfwWindow);
+        return (glfwGetCurrentContext() !is null) 
+                && (glfwGetCurrentContext() == this._glfwWindow);
     }
 
     void activate() {
@@ -148,7 +152,7 @@ public:
 
     void display() {
         _currentInputWindow = this;
-        glfwSwapBuffers();
+        glfwSwapBuffers(this._glfwWindow);
         glfwPollEvents();
         _currentInputWindow = null;
     }

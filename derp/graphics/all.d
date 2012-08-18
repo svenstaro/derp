@@ -13,7 +13,7 @@ public import
     derp.graphics.text,
     derp.graphics.texture,
     derp.graphics.util,
-    derp.graphics.vertexbuffer,
+    derp.graphics.vertexdata,
     derp.graphics.view,
     derp.graphics.window,
     derp.graphics.render,
