@@ -10,7 +10,7 @@ import derp.math.all;
 import gl3n.linalg;
 
 
-import derp.core.geo;
+import derp.core.shapes;
 import derp.graphics.util;
 import derp.graphics.draw;
 import derp.graphics.view;

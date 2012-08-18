@@ -9,7 +9,7 @@ import std.string;
 import std.conv;
 
 import derp.math.all;
-import derp.core.geo;
+import derp.core.shapes;
 import derp.graphics.camera;
 import derp.graphics.window;
 
@@ -18,14 +18,14 @@ import derp.graphics.window;
  */
 class Viewport {
 public:
-    Rect bounds;
+    Rect2 bounds;
 
 private:
     CameraComponent _currentCamera = null;
     bool _allowChangeCamera = true;
 
 public:
-    this(CameraComponent camera = null, Rect bounds = Rect(0, 0, 100, 100)) {
+    this(CameraComponent camera = null, Rect2 bounds = Rect2(0, 0, 100, 100)) {
         this.currentCamera = camera;
         this.bounds = bounds;
     }
@@ -65,7 +65,7 @@ public:
  * systems.
  */
 class Viewport2D : Viewport {
-    this(Rect bounds = Rect(0, 0, 100, 100)) {
+    this(Rect2 bounds = Rect2(0, 0, 100, 100)) {
         super(new CameraComponent("defaultCamera", bounds), bounds);
         this._allowChangeCamera = false; // forbid any further changes to the camera
     }

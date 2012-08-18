@@ -12,7 +12,7 @@ import derelict.devil.ilu;
 import derelict.devil.ilut;
 
 import derp.math.all;
-import derp.core.geo;
+import derp.core.shapes;
 import derp.core.resources;
 import derp.graphics.util;
 import derp.graphics.view;

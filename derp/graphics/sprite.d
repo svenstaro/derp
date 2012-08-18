@@ -5,7 +5,7 @@ import std.stdio;
 import derelict.opengl3.gl3;
 
 import derp.math.all;
-import derp.core.geo;
+import derp.core.shapes;
 import derp.core.scene;
 import derp.graphics.vertexdata;
 import derp.graphics.draw;
@@ -28,7 +28,7 @@ protected:
     Color _color = Color(1, 1, 1);
     SpriteBlendMode _colorBlendMode = SpriteBlendMode.Multiplicative;
     bool _smooth = true;
-    Rect _subRect = Rect(0, 0, 1, 1); // these are UV-Coordinates, range 0..1
+    Rect2 _subRect = Rect2(0, 0, 1, 1); // these are UV-Coordinates, range 0..1
 
     VertexArrayObject _vao;
 
@@ -41,7 +41,7 @@ public:
         this.color = Color.White;
         this.colorBlendMode = SpriteBlendMode.Multiplicative;
         this.smooth = true;
-        this.subRect = Rect(0, 0, 1, 1);
+        this.subRect = Rect2(0, 0, 1, 1);
 
         if(texture) {
             texture.initialize();
@@ -142,11 +142,11 @@ public:
         this._needUpdate = true;    
     }
 
-    @property Rect subRect() {
+    @property Rect2 subRect() {
         return this._subRect;
     }
 
-    @property void subRect(Rect subRect) {
+    @property void subRect(Rect2 subRect) {
         this._subRect = subRect;
         this._needUpdate = true;    
     }

@@ -16,7 +16,7 @@ import derelict.devil.ilu;
 import derelict.devil.ilut;
 
 import derp.math.all;
-import derp.core.geo;
+import derp.core.shapes;
 import derp.core.input;
 import derp.graphics.util;
 import derp.graphics.draw;
@@ -86,11 +86,11 @@ public:
         glfwGetWindowSize(this._glfwWindow, &w, &h);
     }
 
-    @property Rect bounds() {
+    @property Rect2 bounds() {
         int x, y, w, h;
         glfwGetWindowPos(this._glfwWindow, &x, &y);
         glfwGetWindowSize(this._glfwWindow, &w, &h);
-        return Rect(x, y, w, h);
+        return Rect2(x, y, w, h);
     }
 
     @property Vector2 size() {
@@ -157,7 +157,7 @@ public:
         _currentInputWindow = null;
     }
 
-    void setViewport(Rect bounds) {
+    void setViewport(Rect2 bounds) {
         glViewport(cast(int)bounds.pos.x, cast(int)bounds.pos.y,
             cast(int)bounds.size.x, cast(int)bounds.size.y);
     }

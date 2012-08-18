@@ -7,7 +7,7 @@ module derp.core.scene;
 import std.algorithm;
 
 import derp.math.all;
-import derp.core.geo;
+import derp.core.shapes;
 import derp.graphics.render;
 
 /// TransformSpace for Transformations

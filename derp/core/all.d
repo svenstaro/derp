@@ -5,7 +5,7 @@ module derp.core.all;
 public import
     derp.core.app,
     derp.core.fs,
-    derp.core.geo,
+    derp.core.shapes,
     derp.core.resources,
     derp.core.scene;
 

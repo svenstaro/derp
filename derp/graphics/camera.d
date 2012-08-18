@@ -9,7 +9,7 @@ import std.math;
 import std.algorithm;
 
 import derp.math.all;
-import derp.core.geo;
+import derp.core.shapes;
 import derp.core.scene;
 import derp.graphics.view;
 import derp.graphics.render;
@@ -34,7 +34,7 @@ private:
     float _aspectRatio = 1; // w / h
 
     ProjectionMode _projectionMode;
-    Rect _viewBounds;
+    Rect2 _viewBounds;
     float _nearClipDistance = 1;
     float _farClipDistance = 1000;
 
@@ -57,7 +57,7 @@ public:
     }
 
     /// Constructor with orthographic projection.
-    this(string name, Rect bounds) @safe nothrow {
+    this(string name, Rect2 bounds) @safe nothrow {
         super(name);
         this.projectionMode = ProjectionMode.Orthographic;
         this.orthographicBounds = bounds;
@@ -127,14 +127,14 @@ public:
         this._needProjectionUpdate = true;
     }
 
-    @property void orthographicBounds(Rect bounds) @safe nothrow {
+    @property void orthographicBounds(Rect2 bounds) @safe nothrow {
         assert(this._projectionMode == ProjectionMode.Orthographic, "Cannot use orthographic bounds in perspective mode.");
         this._viewBounds = bounds;
         this._needProjectionUpdate = true;
         this._needUpdate = true;
     }
 
-    @property const Rect orthographicBounds() @safe nothrow {
+    @property const Rect2 orthographicBounds() @safe nothrow {
         assert(this._projectionMode == ProjectionMode.Orthographic, "Cannot use orthographic bounds in perspective mode.");
         return this._viewBounds;
     }
@@ -194,7 +194,7 @@ private:
         // Calculate size of the near plane (part of the view frustum)
         float height = this._nearClipDistance * tan(this._fieldOfView.radians / 2);
         float width = height * this._aspectRatio;
-        this._viewBounds = Rect(- width, -height, 2*width, 2*height);
+        this._viewBounds = Rect2(- width, -height, 2*width, 2*height);
     }
 
     void _updateProjectionMatrix() @trusted nothrow {
