@@ -26,7 +26,7 @@ struct Material {
     float shininess = 0.2f * 128;
 }
 
-class MeshComponent : Component, Renderable {
+class MeshComponent : Component, Renderable{
 protected:
     Vector2 _scale;
     Texture _texture = null;
@@ -59,7 +59,7 @@ public:
     }
     
     void prepareRender(RenderQueue queue) {
-        queue.push(this);
+        queue.push(cast(Renderable)this);
     }
 
     void render(RenderQueue queue) {

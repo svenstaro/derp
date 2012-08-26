@@ -62,6 +62,8 @@ public:
             throw new GraphicsException("Cannot initialize window " ~ title, this);
         }
 
+        glfwMakeContextCurrent(this._glfwWindow);
+        
         // Ensure we can capture the escape key being pressed below
         glfwSetInputMode(this._glfwWindow, GLFW_STICKY_KEYS, GL_TRUE);
 
