@@ -54,16 +54,6 @@ struct Input {
         return glfwGetMouseButton(cast(void*)0, button) == GLFW_PRESS;
     }
 
-    static vec2i getMousePosition() {
-        int x, y;
-        glfwGetMousePos(cast(void*)0, &x, &y);
-        return vec2i(x, y);
-    }
-
-    static void setMousePosition(vec2i pos) {
-        glfwSetMousePos(cast(void*)0, pos.x, pos.y);
-    }
-
     enum Key {
         Space = GLFW_KEY_SPACE,
         Escape = GLFW_KEY_ESC,

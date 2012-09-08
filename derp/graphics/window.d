@@ -44,7 +44,10 @@ public:
         // try to initialize the graphics environment
         initializeGraphics(this);
 
-        this._glfwWindow = glfwOpenWindow(width, height, mode, title.toStringz(), null);
+        this._glfwWindow = glfwCreateWindow(width, height, mode, title.toStringz(), null);
+
+        initializeGraphicsWindow(this._glfwWindow);
+
         if(!this._glfwWindow) {
             throw new GraphicsException("Cannot initialize window " ~ title, this);
         }
@@ -98,12 +101,14 @@ public:
 
     void close() {
         if(this.isOpen()) {
-            glfwCloseWindow(this._glfwWindow);
+            glfwDestroyWindow(this._glfwWindow);
         }
     }
 
     bool isOpen() {
-        return cast(bool) glfwIsWindow(this._glfwWindow);
+        //return cast(bool) glfwIsWindow(this._glfwWindow);
+        // TODO
+        return true;
     }
 
     void activate() {
@@ -112,7 +117,7 @@ public:
 
     void update() {
         int x, y;
-        glfwGetMousePos(this._glfwWindow, &x, &y);
+        glfwGetCursorPos(this._glfwWindow, &x, &y);
 
         int w, h;
         glfwGetWindowSize(this._glfwWindow, &w, &h);
@@ -136,7 +141,7 @@ public:
 
     void display() {
         _currentInputWindow = this;
-        glfwSwapBuffers();
+        glfwSwapBuffers(this._glfwWindow);
         glfwPollEvents();
         _currentInputWindow = null;
     }
