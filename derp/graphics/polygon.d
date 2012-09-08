@@ -79,7 +79,7 @@ public:
     }
     
     void prepareRender(RenderQueue queue) {
-        queue.push(this);
+        queue.push(cast(Renderable)this);
     }
 
     void render(RenderQueue queue) {
