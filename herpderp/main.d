@@ -53,12 +53,8 @@ int main(string[] args) {
         spriteNode.rotation = degrees(- i * 0.5);
         sprite.scale = 0.1 * sin(i * 0.05) + 1;
         
-<<<<<<< Updated upstream
         fontNode.rotation = degrees(i);
-=======
         //fontNode.rotation = degrees(sin(i * 0.05) * 10);
->>>>>>> Stashed changes
-    
         
         //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
 

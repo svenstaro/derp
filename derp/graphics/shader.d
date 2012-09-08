@@ -1,5 +1,6 @@
 module derp.graphics.shader;
 
+import std.algorithm;
 import std.string;
 import std.conv;
 import std.traits;
@@ -8,7 +9,6 @@ import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
 import derp.math.all;
 import gl3n.linalg;
-
 
 import derp.core.geo;
 import derp.graphics.util;
@@ -51,7 +51,8 @@ private:
         glCheck();
 
         string info = infoLog;
-        if(info != "") writeln(info);
+        if(info.toLower().canFind("success")) info = "";
+        if(info != "") writeln("INFO: ", info);
         assert(info == "", "failed to compile shader.");
     }
 
@@ -134,6 +135,7 @@ public:
 
         // check here
         string info = infoLog;
+        if(info.toLower().canFind("linked")) info = "";
         if(info != "") writeln(info);
         assert(info == "", "Failed to link program.");
 

@@ -23,12 +23,15 @@ static FT_Library freetypeLibrary;
 void initializeGraphics(Context context = null) {
     if(graphicsInitialized) return;
 
-    DerelictGL3.load();
     DerelictGLFW3.load();
 
     if(!glfwInit())
         throw new GraphicsException("Failed to initialize GLFW.", context);
+}
 
+void initializeGraphicsWindow(GLFWwindow glfwWindowHandle) {
+    glfwMakeContextCurrent(glfwWindowHandle);
+    DerelictGL3.load();
     // reloadGraphics(context);
 
     // load DevIL
