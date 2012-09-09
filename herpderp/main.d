@@ -63,7 +63,7 @@ int main(string[] args) {
     // Example main loop
     float x = 0;
     int i = 0;
-    while(window.isOpen()) {
+    while(window.isOpen) {
         i++;
         x += 0.05;
         spriteNode.rotation = degrees(- i * 0.5);

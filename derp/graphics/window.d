@@ -32,6 +32,7 @@ public:
 private:
     GLFWwindow _glfwWindow;
     Viewport[] _viewports;
+    bool _isOpen;
 
 public:
     enum ViewportType {
@@ -45,6 +46,7 @@ public:
         initializeGraphics(this);
 
         this._glfwWindow = glfwCreateWindow(width, height, mode, title.toStringz(), null);
+        this._isOpen = true;
 
         initializeGraphicsWindow(this._glfwWindow);
 
@@ -100,15 +102,14 @@ public:
     }
 
     void close() {
-        if(this.isOpen()) {
+        if(this.isOpen) {
             glfwDestroyWindow(this._glfwWindow);
+            this._isOpen = false;
         }
     }
 
-    bool isOpen() {
-        //return cast(bool) glfwIsWindow(this._glfwWindow);
-        // TODO
-        return true;
+    @property bool isOpen() {
+        return this._isOpen;
     }
 
     void activate() {
