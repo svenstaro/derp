@@ -1,26 +1,21 @@
-default: dep prepare bake-force
+default: compile
 
 clean:
-	rm -r bin/ lib/*derp* build/
+	[[ -d build ]] && rm -r build
+	[[ -d bin ]] && rm -r bin
+	[[ -d lib ]] && rm -r lib
 
-recompile: clean bake
-
-dep:
+dependencies:
 	git submodule update --init
 	cd externals/gl3n && make
 	cd externals/LuaD && make
 	cd externals/dbs && make
 	cd externals/orange && make
-	cd externals/Derelict3/build && dmd derelict.d && ./derelict
+	cd externals/Derelict3/build && rdmd derelict.d
 
-prepare:
-	dmd -Iexternals/dbs -L-Lexternals/dbs/lib/ -L-ldbs compile.d -ofcompile
+cmake:
+	mkdir -p build/
+	cd build && cmake -DCMAKE_D_COMPILER=dmd ..
 
-bake-force:
-	./compile -fj 4
-
-bake:
-	./compile -j 4
-
-test: bake
-	bin/test-all
+compile: cmake
+	cd build && make -j4
