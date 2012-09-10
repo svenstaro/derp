@@ -18,4 +18,10 @@ cmake:
 	cd build && cmake -DCMAKE_D_COMPILER=dmd ..
 
 compile: cmake
+	cd build && make -j4 derp derper herpderp
+
+compile-all: cmake
 	cd build && make -j4
+
+test:
+	bin/test_all
