@@ -10,6 +10,3 @@
 [submodule "externals/gl3n"]
 	path = externals/gl3n
 	url = git://github.com/Dav1dde/gl3n.git
-[submodule "externals/dbs"]
-	path = externals/dbs
-	url = git://github.com/opatut/D-Build-System.git
