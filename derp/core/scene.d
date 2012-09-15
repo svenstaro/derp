@@ -158,7 +158,7 @@ public:
     @property Matrix4 matrix() @safe nothrow {
         if(this._needMatrixUpdate) {
             //this._cachedMatrix = this.orientation.to_matrix!(4, 4).translate(this.position.x, this.position.y, this.position.z).scale(this.scale.x, this.scale.y, this.scale.z);
-            makeTransform(this._cachedMatrix, this.position, Vector3(1,1,1), this.orientation);
+            makeTransform(this._cachedMatrix, this.position, this.scale, this.orientation);
             this._needMatrixUpdate = false;
         }
         return this._cachedMatrix;

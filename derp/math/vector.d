@@ -1,5 +1,8 @@
 module derp.math.vector;
 
+//import derp.graphics.draw; // Color
+//import derp.graphics.vertexbuffer; // VertexData
+
 
 public import gl3n.linalg : vec2, vec3, vec4, vec2i, vec3i, vec4i;
 public import gl3n.linalg : distance, cross, dot;
@@ -11,4 +14,3 @@ alias vec4 Vector4;
 alias vec2i Vector2i;
 alias vec3i Vector3i;
 alias vec4i Vector4i;
-

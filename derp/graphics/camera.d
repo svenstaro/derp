@@ -192,9 +192,9 @@ public:
 private:
     void _updatePerspective() @safe nothrow {
         // Calculate size of the near plane (part of the view frustum)
-        float height = this._nearClipDistance * tan(this._fieldOfView.radians / 2);
-        float width = height * this._aspectRatio;
-        this._viewBounds = Rect(- width, -height, 2*width, 2*height);
+        float height = this._nearClipDistance * tan(this._fieldOfView.radians / 2) * 2;
+        float width = height * this._aspectRatio * 2;
+        this._viewBounds = Rect(- width / 2, width, - height / 2, height);
     }
 
     void _updateProjectionMatrix() @trusted nothrow {

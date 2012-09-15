@@ -10,6 +10,7 @@ import derp.graphics.util;
 import derp.graphics.shader;
 import derp.graphics.draw;
 
+
 struct VertexData {
     float x, y, z, r, g, b, a, s, t;
 
@@ -26,29 +27,58 @@ struct VertexData {
     }
 }
 
+class Vertex {
+public:
+    Vector3 pos;
+    Vector2 uv;
+
+    this(Vector3 pos, Vector2 uv = Vector2()) {
+        this.pos = pos;
+        this.uv = uv;
+    }
+
+    VertexData toVertexData(Color color = Color.White) {
+        return VertexData(this.pos.x, this.pos.y, this.pos.z,
+                color.r, color.g, color.b, color.a,
+                this.uv.x, this.uv.y);
+    }
+}
+
+
 /**
  * Renders a single Quad.
  */
 class VertexBufferObject {
-public:	
-    ShaderProgram shaderProgram;
+private:
+    ShaderProgram _shaderProgram;
+    VertexData[] _vertices;
 
+public:	
     uint array; // vertex buffer object, keeps track of vertex attributes etc.
     uint buffer;
     ulong vertexCount;
 
     this(ShaderProgram shaderProgram = null) {
-        if(shaderProgram) {
-            this.shaderProgram = shaderProgram;
-        } else {
-            this.shaderProgram = ShaderProgram.defaultPipeline;
-        }
+        this._shaderProgram = shaderProgram is null ? 
+            ShaderProgram.defaultPipeline : shaderProgram;
         create();
+    }
+
+    @property void shaderProgram(ShaderProgram shaderProgram) {
+        if(this._shaderProgram == shaderProgram) return;
+
+        this._shaderProgram = shaderProgram;
+        this.create(); // update shader properties
+        this.setVertices(this._vertices); // update vertex buffer
+    }
+
+    @property ShaderProgram shaderProgram() {
+        return this._shaderProgram;
     }
 
     void create() {
         // bind texture
-        this.shaderProgram.attach();
+        this._shaderProgram.attach();
 
         // Create VBO
         glGenVertexArrays(1, &array);
@@ -68,9 +98,9 @@ public:
         glEnableVertexAttribArray(2);
         glCheck();
 
-        // glBindAttribLocation(this.shaderProgram.handle, 0, "_vertex");
-        // glBindAttribLocation(this.shaderProgram.handle, 1, "_color");
-        // glBindAttribLocation(this.shaderProgram.handle, 2, "_texCoord");
+        // glBindAttribLocation(this._shaderProgram.handle, 0, "_vertex");
+        // glBindAttribLocation(this._shaderProgram.handle, 1, "_color");
+        // glBindAttribLocation(this._shaderProgram.handle, 2, "_texCoord");
         // glCheck();
 
         // Define Attribute Sets
@@ -95,7 +125,7 @@ public:
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glCheck();
-        this.shaderProgram.detach();
+        this._shaderProgram.detach();
     }
 
     /**
@@ -103,28 +133,29 @@ public:
      * rawVertexArrayHandle.
      */
     void setVertices(VertexData[] vertices) {
-        this.shaderProgram.attach();
+        this._vertices = vertices;
+        
+        // update the vertex buffer
+        this._shaderProgram.attach();
 
         glBindVertexArray(array);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glCheck();
 
-        this.vertexCount = vertices.length;
-        glBufferData(GL_ARRAY_BUFFER, vertices.length * VertexData.sizeof, vertices.ptr, GL_STATIC_DRAW);
+        this.vertexCount = this._vertices.length;
+        glBufferData(GL_ARRAY_BUFFER, this.vertexCount * VertexData.sizeof, this._vertices.ptr, GL_STATIC_DRAW);
         glCheck();
 
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glCheck();
 
-        // writefln("Setting %s vertices.", this.vertexCount);
-
-        this.shaderProgram.detach();
+        this._shaderProgram.detach();
     }
 
     void render(Matrix4 modelMatrix, Matrix4 viewMatrix, Matrix4 projectionMatrix) {
         // attach texture
-        this.shaderProgram.attach();
+        this._shaderProgram.attach();
 
         glBindVertexArray(array); // is the vertex buffer object connected to the vertex array obkect?
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -144,9 +175,9 @@ public:
         glCheck();
 
         //Send matrices to shader
-        this.shaderProgram.sendUniform("uModelMatrix", modelMatrix);
-        this.shaderProgram.sendUniform("uViewMatrix", viewMatrix);
-        this.shaderProgram.sendUniform("uProjectionMatrix", projectionMatrix);
+        this._shaderProgram.sendUniform("uModelMatrix", modelMatrix);
+        this._shaderProgram.sendUniform("uViewMatrix", viewMatrix);
+        this._shaderProgram.sendUniform("uProjectionMatrix", projectionMatrix);
         
         // Draw
         glDrawArrays(GL_TRIANGLES, 0, cast(int) this.vertexCount);
@@ -163,7 +194,7 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glCheck();
 
-        this.shaderProgram.detach();
+        this._shaderProgram.detach();
         // detach texture
     }
 }

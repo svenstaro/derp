@@ -9,19 +9,18 @@ dependencies:
 	git submodule update --init
 	cd externals/gl3n && make
 	cd externals/LuaD && make
-	cd externals/dbs && make
 	cd externals/orange && make
-	cd externals/Derelict3/build && rdmd derelict.d
+	cd externals/Derelict3/build && rdmd build.d
 
 cmake:
 	mkdir -p build/
 	cd build && cmake -DCMAKE_D_COMPILER=dmd ..
 
 compile: cmake
-	cd build && make -j4 derp derper herpderp
+	cd build && make derp derper herpderp
 
 compile-all: cmake
-	cd build && make -j4
+	cd build && make
 
 test:
 	bin/test_all

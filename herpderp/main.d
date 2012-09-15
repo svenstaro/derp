@@ -20,8 +20,7 @@ int main(string[] args) {
 
     // Create scene graph
     Node rootNode = new Node("rootNode");
-    Node camBaseNode = new Node("camBaseNode", rootNode);
-    Node camNode = new Node("camNode", camBaseNode);
+    Node camNode = new Node("camNode", rootNode);
     Node spriteNode = new Node("spriteNode", rootNode);
     Node fontNode = new Node("fontNode", rootNode);
     Node polyNode = new Node("polyNode", rootNode);
@@ -30,37 +29,40 @@ int main(string[] args) {
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
     spriteNode.attachComponent(sprite);
     sprite.smooth = true;
-    sprite.subRect = Rect(0.4, 0.4, 0.2, 0.2);
+    // sprite.subRect = Rect(0.4, 0.4, 0.2, 0.2);
 
-    spriteNode.position = Vector3(0, 0, 0);
+    spriteNode.position = Vector3(400, 300, 0);
 
     // Setup view
     CameraComponent cam = window.viewports[0].currentCamera;
     cam.projectionMode = CameraComponent.ProjectionMode.Orthographic;
-    // cam.orthographicBounds = Rect(0, 0, 800, 600);
+    cam.orthographicBounds = Rect(0, 0, 800, 600);
+    //camNode.translate(Vector3(0,0, 10));
     camNode.attachComponent(cam);
-    camNode.translate(Vector3(0,0,-10));
 
     // Headline
     TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
-    text.color = Color.Yellow;
+    text.color = Color.Green;
     fontNode.attachComponent(text);
     fontNode.position = Vector3(400, 100, 0);
 
     PolygonComponent poly = new PolygonComponent("test-1");
-    poly.color = Color(0, 1, 1, 0.8);
-    poly.addPoint(Vector2(-100,  100));
-    poly.addPoint(Vector2( 200,  180));
-    poly.addPoint(Vector2( 100, -100));
-    poly.addPoint(Vector2(-100, -100));
-    poly.addPoint(Vector2(10, 0));
-    poly.addPoint(Vector2(50, 0));
-    poly.addPoint(Vector2(50, 50));
-    poly.addPoint(Vector2(0, 50));
-    poly.addPoint(Vector2(0, 10));
-    poly.addPoint(Vector2(-100, -90));
+    poly.color = Color(1, 0, 0, 0.8);
+    poly.addPoint(Vector2(   0, -100));
+    poly.addPoint(Vector2(  30, -170));
+    poly.addPoint(Vector2( 100, -200));
+    poly.addPoint(Vector2( 170, -170));
+    poly.addPoint(Vector2( 200, -100));
+    poly.addPoint(Vector2(   0,  150));
+    poly.addPoint(Vector2(-200, -100));
+    poly.addPoint(Vector2(-170, -170));
+    poly.addPoint(Vector2(-100, -200));
+    poly.addPoint(Vector2(- 30, -170));
+    poly.addPoint(Vector2(   0, -100));
+
     polyNode.attachComponent(poly);
-    polyNode.position = Vector3(120, 120, 0);
+    polyNode.position = Vector3(700, 500, 0);
+    polyNode.scale = Vector3(0.2, 0.2, 0.2);
 
     // Example main loop
     float x = 0;
@@ -71,10 +73,11 @@ int main(string[] args) {
         spriteNode.rotation = degrees(- i * 0.5);
         sprite.scale = 0.1 * sin(i * 0.05) + 1;
 
-        fontNode.rotation = degrees(i);
-        //fontNode.rotation = degrees(sin(i * 0.05) * 10);
+        //fontNode.orientation = Quaternion.yrotation(x);
+        // fontNode.rotation = degrees(i);
+        // fontNode.rotation = degrees(sin(i * 0.05) * 10);
 
-        camBaseNode.rotate(degrees(i * 0.01), Vector3(0,1,0), TransformSpace.Parent);
+        // camNode.rotate(degrees(i * 0.01), Vector3(0,1,0), TransformSpace.Parent);
         //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
 
         window.update();
