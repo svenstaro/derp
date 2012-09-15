@@ -69,6 +69,7 @@ public:
         foreach(t; triangles) {
             for(int x = 0; x < 3; ++x) {
                 v ~= VertexData(t.vertices[x].x, t.vertices[x].y, 0, 
+                        0, 0, -1,
                         this._color.r, this._color.g, this._color.b, this._color.a,
                         0, 0);
             }

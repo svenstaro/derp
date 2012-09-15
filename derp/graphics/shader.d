@@ -120,9 +120,10 @@ public:
         }
 
         // link
-        glBindAttribLocation(this._handle, 0, "vVertex");
-        glBindAttribLocation(this._handle, 1, "vColor");
-        glBindAttribLocation(this._handle, 2, "vTexCoord");
+        glBindAttribLocation(this._handle, 0, "vPosition");
+        glBindAttribLocation(this._handle, 1, "vNormal");
+        glBindAttribLocation(this._handle, 2, "vColor");
+        glBindAttribLocation(this._handle, 3, "vTexCoord");
         glCheck();
 
 
@@ -280,10 +281,19 @@ varying vec3 fPosition;
 varying vec3 fNormal;
 varying vec4 fColor;
 varying vec2 fTexCoord;
+// varying vec3 fSunLightDirection;
 uniform sampler2D uTexture0;
 
 void main() {
-gl_FragColor = texture2D(uTexture0, fTexCoord) * fColor;
+    //fSunLightDirection = normalize(fSunLightDirection);
+    vec3 fSunLightDirection = normalize(vec3(1, 2, 0.2));
+
+    vec4 color = texture2D(uTexture0, fTexCoord) * fColor;
+
+    vec4 diffuse = dot(fSunLightDirection, fNormal) * 1 * vec4(1, 1, 1, 1);
+    vec4 ambient = vec4(1, 1, 1, 1) * 0.1;
+
+    gl_FragColor = vec4(clamp(color + diffuse + ambient, 0, 1).xyz, color.a);
 }
 ";
 
@@ -292,10 +302,11 @@ uniform mat4 uModelViewProjectionMatrix;
 uniform mat4 uModelMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
-attribute vec3 vVertex;
+
+attribute vec3 vPosition;
 attribute vec3 vNormal;
-attribute vec2 vTexCoord;
 attribute vec4 vColor;
+attribute vec2 vTexCoord;
 
 varying vec3 fPosition;
 varying vec3 fNormal;
@@ -303,7 +314,7 @@ varying vec4 fColor;
 varying vec2 fTexCoord;
 
 void main() {
-    vec4 vPos = uViewMatrix * uModelMatrix * vec4(vVertex, 1.0);
+    vec4 vPos = uViewMatrix * uModelMatrix * vec4(vPosition, 1.0);
     gl_Position = uProjectionMatrix * vPos;
     
     fPosition = vPos.xyz;

@@ -12,12 +12,15 @@ import derp.graphics.draw;
 
 
 struct VertexData {
-    float x, y, z, r, g, b, a, s, t;
+    float x, y, z, nx, ny, nz, r, g, b, a, s, t;
 
-    this(float x = 0, float y = 0, float z = 0, float r = 0, float g = 0, float b = 0, float a = 1, float s = 0, float t = 0) {
+    this(float x = 0, float y = 0, float z = 0, float nx = 0, float ny = 0, float nz = 0, float r = 0, float g = 0, float b = 0, float a = 1, float s = 0, float t = 0) {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.nx = nx;
+        this.ny = ny;
+        this.nz = nz;
         this.r = r;
         this.g = g;
         this.b = b;
@@ -30,15 +33,18 @@ struct VertexData {
 class Vertex {
 public:
     Vector3 pos;
+    Vector3 n;
     Vector2 uv;
 
-    this(Vector3 pos, Vector2 uv = Vector2()) {
+    this(Vector3 pos, Vector3 normal = Vector3(), Vector2 uv = Vector2()) {
         this.pos = pos;
+        this.n = normal;
         this.uv = uv;
     }
 
     VertexData toVertexData(Color color = Color.White) {
         return VertexData(this.pos.x, this.pos.y, this.pos.z,
+                this.n.x, this.n.y, this.n.z,
                 color.r, color.g, color.b, color.a,
                 this.uv.x, this.uv.y);
     }
@@ -96,6 +102,7 @@ public:
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(3);
         glCheck();
 
         // glBindAttribLocation(this._shaderProgram.handle, 0, "_vertex");
@@ -105,9 +112,13 @@ public:
 
         // Define Attribute Sets
         // DOC: glVertexAttribPointer(index, size, type, normalized, stride (offset between 2 attributes), offset);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(0 * float.sizeof));  // x, y, z
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(3 * float.sizeof));  // r, g, b, a
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(7 * float.sizeof));  // s, t
+
+        // pos norm col uv
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)( 0 * float.sizeof));  // x, y, z
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)( 3 * float.sizeof));  // nx, ny, nz
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)( 6 * float.sizeof));  // r, g, b, a
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, VertexData.sizeof, cast(void*)(10 * float.sizeof));  // s, t
         glCheck();
 
         // Setup buffer
@@ -165,6 +176,7 @@ public:
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(3);
         glCheck();
 
         // glDisable(GL_LIGHTING);

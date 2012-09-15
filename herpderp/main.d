@@ -7,7 +7,7 @@ import std.string;
 
 int main(string[] args) {
     // Create the window
-    Window window = new Window("Hello World", 800, 600, Window.Mode.Windowed);
+    Window window = new Window("Hello World", 800, 600, Window.Mode.Windowed, true, Window.ViewportType.Viewport);
     window.backgroundColor = Color.Black;
 
     // Load texture
@@ -24,6 +24,7 @@ int main(string[] args) {
     Node spriteNode = new Node("spriteNode", rootNode);
     Node fontNode = new Node("fontNode", rootNode);
     Node polyNode = new Node("polyNode", rootNode);
+    Node meshNode = new Node("meshNode", rootNode);
 
     // Create sprite
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
@@ -34,10 +35,14 @@ int main(string[] args) {
     spriteNode.position = Vector3(400, 300, 0);
 
     // Setup view
-    CameraComponent cam = window.viewports[0].currentCamera;
-    cam.projectionMode = CameraComponent.ProjectionMode.Orthographic;
-    cam.orthographicBounds = Rect(0, 0, 800, 600);
-    //camNode.translate(Vector3(0,0, 10));
+    CameraComponent cam = new CameraComponent("camera1", degrees(60), 4/3);
+    cam.nearClipDistance = 1;
+    cam.farClipDistance = 30;
+    // cam.projectionMode = CameraComponent.ProjectionMode.Perspective;
+    window.viewports[0].currentCamera = cam;
+    //cam.orthographicBounds = Rect(0, 0, 800, 600);
+    camNode.position = Vector3(5, 0, -10);
+    //camNode.lookAt(Vector3(0, 0, 0));
     camNode.attachComponent(cam);
 
     // Headline
@@ -64,6 +69,30 @@ int main(string[] args) {
     polyNode.position = Vector3(700, 500, 0);
     polyNode.scale = Vector3(0.2, 0.2, 0.2);
 
+    MeshData data = new MeshData();
+    data.addQuad(
+            new Vertex(Vector3(-1, -1, -1), Vector3(0, 0, -1)),
+            new Vertex(Vector3(-1, +1, -1), Vector3(0, 0, -1)),
+            new Vertex(Vector3(+1, +1, -1), Vector3(0, 0, -1)),
+            new Vertex(Vector3(+1, -1, -1), Vector3(0, 0, -1)));
+    data.addQuad(
+            new Vertex(Vector3(-1, -1, +1), Vector3(0, 0, 1)),
+            new Vertex(Vector3(-1, +1, +1), Vector3(0, 0, 1)),
+            new Vertex(Vector3(+1, +1, +1), Vector3(0, 0, 1)),
+            new Vertex(Vector3(+1, -1, +1), Vector3(0, 0, 1)));
+    data.addQuad(
+            new Vertex(Vector3(-1, -1, -1), Vector3(0, -1, 0)),
+            new Vertex(Vector3(-1, -1, +1), Vector3(0, -1, 0)),
+            new Vertex(Vector3(+1, -1, +1), Vector3(0, -1, 0)),
+            new Vertex(Vector3(+1, -1, -1), Vector3(0, -1, 0)));
+    data.addQuad(
+            new Vertex(Vector3(-1, +1, -1), Vector3(0, 1, 0)),
+            new Vertex(Vector3(-1, +1, +1), Vector3(0, 1, 0)),
+            new Vertex(Vector3(+1, +1, +1), Vector3(0, 1, 0)),
+            new Vertex(Vector3(+1, +1, -1), Vector3(0, 1, 0)));
+    MeshComponent mesh = new MeshComponent("mesh-1", data, new Material());
+    meshNode.attachComponent(mesh);
+
     // Example main loop
     float x = 0;
     int i = 0;
@@ -77,6 +106,8 @@ int main(string[] args) {
         // fontNode.rotation = degrees(i);
         // fontNode.rotation = degrees(sin(i * 0.05) * 10);
 
+        meshNode.orientation = Quaternion.identity;
+        meshNode.rotate(degrees(i), Vector3(0, 1, 0), TransformSpace.Parent);
         // camNode.rotate(degrees(i * 0.01), Vector3(0,1,0), TransformSpace.Parent);
         //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
 

@@ -47,14 +47,14 @@ public:
         auto s = this._subRect;
 
         // First triangle
-        vertices ~= VertexData(-sx, -sy, 0, c.r, c.g, c.b, c.a, s.left,  s.top   ); 
-        vertices ~= VertexData( sx, -sy, 0, c.r, c.g, c.b, c.a, s.right, s.top   );
-        vertices ~= VertexData( sx,  sy, 0, c.r, c.g, c.b, c.a, s.right, s.bottom);
+        vertices ~= VertexData(-sx, -sy, 0, 0, 0, -1, c.r, c.g, c.b, c.a, s.left,  s.top   ); 
+        vertices ~= VertexData( sx, -sy, 0, 0, 0, -1, c.r, c.g, c.b, c.a, s.right, s.top   );
+        vertices ~= VertexData( sx,  sy, 0, 0, 0, -1, c.r, c.g, c.b, c.a, s.right, s.bottom);
 
         // Second triangle
-        vertices ~= VertexData( sx,  sy, 0, c.r, c.g, c.b, c.a, s.right, s.bottom);
-        vertices ~= VertexData(-sx,  sy, 0, c.r, c.g, c.b, c.a, s.left,  s.bottom);
-        vertices ~= VertexData(-sx, -sy, 0, c.r, c.g, c.b, c.a, s.left,  s.top   );
+        vertices ~= VertexData( sx,  sy, 0, 0, 0, -1, c.r, c.g, c.b, c.a, s.right, s.bottom);
+        vertices ~= VertexData(-sx,  sy, 0, 0, 0, -1, c.r, c.g, c.b, c.a, s.left,  s.bottom);
+        vertices ~= VertexData(-sx, -sy, 0, 0, 0, -1, c.r, c.g, c.b, c.a, s.left,  s.top   );
 
         this._vbo.setVertices(vertices);
     }

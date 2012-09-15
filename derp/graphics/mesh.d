@@ -88,9 +88,11 @@ protected:
     VertexBufferObject _vbo;
 
 public:
-    this(string name, MeshData _data, Material _material) {
+    this(string name, MeshData data, Material material) {
         super(name);
-        this._vbo = new VertexBufferObject(_material.shader);
+        this._data = data;
+        this._material = material;
+        this._vbo = new VertexBufferObject(material.shader);
     }
 
     void _updateVertices() {
