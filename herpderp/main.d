@@ -75,28 +75,28 @@ int main(string[] args) {
     MeshData data = new MeshData();
     // front
     data.addQuad(
-            new Vertex(Vector3(+1, -1, -1), Vector3(0, 0, -1), Vector2(0/5.0, 0)),
-            new Vertex(Vector3(+1, +1, -1), Vector3(0, 0, -1), Vector2(1/5.0, 0)),
-            new Vertex(Vector3(-1, +1, -1), Vector3(0, 0, -1), Vector2(1/5.0, 1)),
-            new Vertex(Vector3(-1, -1, -1), Vector3(0, 0, -1), Vector2(0/5.0, 1)));
+            new Vertex(Vector3(+1, -1, -1), Vector3(0, 0, -1), Vector2(0/5.0, 1)),
+            new Vertex(Vector3(+1, +1, -1), Vector3(0, 0, -1), Vector2(1/5.0, 1)),
+            new Vertex(Vector3(-1, +1, -1), Vector3(0, 0, -1), Vector2(1/5.0, 0)),
+            new Vertex(Vector3(-1, -1, -1), Vector3(0, 0, -1), Vector2(0/5.0, 0)));
     // right
     data.addQuad(
-            new Vertex(Vector3(+1, +1, -1), Vector3(0,  1, 0), Vector2(1/5.0, 0)),
-            new Vertex(Vector3(+1, +1, +1), Vector3(0,  1, 0), Vector2(2/5.0, 0)),
-            new Vertex(Vector3(-1, +1, +1), Vector3(0,  1, 0), Vector2(2/5.0, 1)),
-            new Vertex(Vector3(-1, +1, -1), Vector3(0,  1, 0), Vector2(1/5.0, 1)));
+            new Vertex(Vector3(+1, +1, -1), Vector3(0,  1, 0), Vector2(1/5.0, 1)),
+            new Vertex(Vector3(+1, +1, +1), Vector3(0,  1, 0), Vector2(2/5.0, 1)),
+            new Vertex(Vector3(-1, +1, +1), Vector3(0,  1, 0), Vector2(2/5.0, 0)),
+            new Vertex(Vector3(-1, +1, -1), Vector3(0,  1, 0), Vector2(1/5.0, 0)));
     // back
     data.addQuad(
-            new Vertex(Vector3(+1, +1, +1), Vector3(0, 0,  1), Vector2(2/5.0, 0)),
-            new Vertex(Vector3(+1, -1, +1), Vector3(0, 0,  1), Vector2(3/5.0, 0)),
-            new Vertex(Vector3(-1, -1, +1), Vector3(0, 0,  1), Vector2(3/5.0, 1)),
-            new Vertex(Vector3(-1, +1, +1), Vector3(0, 0,  1), Vector2(2/5.0, 1)));
+            new Vertex(Vector3(+1, +1, +1), Vector3(0, 0,  1), Vector2(2/5.0, 1)),
+            new Vertex(Vector3(+1, -1, +1), Vector3(0, 0,  1), Vector2(3/5.0, 1)),
+            new Vertex(Vector3(-1, -1, +1), Vector3(0, 0,  1), Vector2(3/5.0, 0)),
+            new Vertex(Vector3(-1, +1, +1), Vector3(0, 0,  1), Vector2(2/5.0, 0)));
     // left
     data.addQuad(
-            new Vertex(Vector3(-1, -1, -1), Vector3(0, -1, 0), Vector2(3/5.0, 0)),
-            new Vertex(Vector3(-1, -1, +1), Vector3(0, -1, 0), Vector2(4/5.0, 0)),
-            new Vertex(Vector3(+1, -1, +1), Vector3(0, -1, 0), Vector2(4/5.0, 1)),
-            new Vertex(Vector3(+1, -1, -1), Vector3(0, -1, 0), Vector2(3/5.0, 1)));
+            new Vertex(Vector3(-1, -1, -1), Vector3(0, -1, 0), Vector2(3/5.0, 1)),
+            new Vertex(Vector3(-1, -1, +1), Vector3(0, -1, 0), Vector2(4/5.0, 1)),
+            new Vertex(Vector3(+1, -1, +1), Vector3(0, -1, 0), Vector2(4/5.0, 0)),
+            new Vertex(Vector3(+1, -1, -1), Vector3(0, -1, 0), Vector2(3/5.0, 0)));
     // bottom
     data.addQuad(
             new Vertex(Vector3(-1, +1, -1), Vector3(-1, 0, 0), Vector2(4/5.0, 0)),
@@ -129,7 +129,10 @@ int main(string[] args) {
         // fontNode.rotation = degrees(sin(i * 0.05) * 10);
 
         meshNode.orientation = Quaternion.identity;
-        meshNode.rotate(degrees(i), Vector3(0, 1, 0), TransformSpace.Parent);
+        meshNode.rotate(degrees(i * 0.5), Vector3(1, 1, 1), TransformSpace.Parent);
+        meshNode.rotate(degrees(i * 0.3), Vector3(0, 1, 0), TransformSpace.Parent);
+        meshNode.rotate(degrees(i * 0.2), Vector3(0, 1, 1), TransformSpace.Parent);
+        meshNode.position = Vector3(0, 0, sin(i * 0.01) * 0.5 - 1);
         // camNode.rotate(degrees(i * 0.01), Vector3(0,1,0), TransformSpace.Parent);
         //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
 
