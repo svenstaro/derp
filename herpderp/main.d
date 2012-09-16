@@ -38,7 +38,7 @@ int main(string[] args) {
     spriteNode.position = Vector3(400, 300, 0);
 
     // Setup view
-    CameraComponent cam = new CameraComponent("camera1", degrees(60), 1);
+    CameraComponent cam = new CameraComponent("camera1", degrees(60), 3.0/4.0);
     cam.nearClipDistance = 1;
     cam.farClipDistance = 20;
     // cam.projectionMode = CameraComponent.ProjectionMode.Perspective;
