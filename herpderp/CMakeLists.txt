@@ -14,6 +14,7 @@ TARGET_LINK_LIBRARIES(herpderp
     luad
     orange
     DerelictAL
+    DerelictASSIMP
     DerelictFT
     DerelictGL3
     DerelictGLFW3

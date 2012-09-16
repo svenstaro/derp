@@ -6,16 +6,21 @@ import std.format;
 import std.string;
 
 import derelict.opengl3.gl3;
+import derelict.assimp.assimp;
 
 int main(string[] args) {
     // Create the window
     Window window = new Window("Hello World", 800, 600, Window.Mode.Windowed, true, Window.ViewportType.Viewport);
-    window.backgroundColor = Color.Black;
+    window.backgroundColor = Color.Background;
 
     // Load texture
     ResourceManager resourceManager = new ResourceManager();
     Texture texture = resourceManager.loadT!Texture(new UrlString("data/icon.png"));
-    Texture cube = resourceManager.loadT!Texture(new UrlString("data/cube.png"));
+    Texture cube = resourceManager.loadT!Texture(new UrlString("data/checkerboard.png"));
+
+    Scene scene = resourceManager.loadT!Scene(new UrlString("data/teamonkey.dae"));
+    scene.initialize();
+
 
     // Load font
     Font font = resourceManager.loadT!Font(new UrlString("data/fonts/dejavu/DejaVuSans.ttf"));
@@ -72,47 +77,9 @@ int main(string[] args) {
     polyNode.position = Vector3(700, 500, 0);
     polyNode.scale = Vector3(0.2, 0.2, 0.2);
 
-    MeshData data = new MeshData();
-    // front
-    data.addQuad(
-            new Vertex(Vector3(+1, -1, -1), Vector3(0, 0, -1), Vector2(0/5.0, 1)),
-            new Vertex(Vector3(+1, +1, -1), Vector3(0, 0, -1), Vector2(1/5.0, 1)),
-            new Vertex(Vector3(-1, +1, -1), Vector3(0, 0, -1), Vector2(1/5.0, 0)),
-            new Vertex(Vector3(-1, -1, -1), Vector3(0, 0, -1), Vector2(0/5.0, 0)));
-    // right
-    data.addQuad(
-            new Vertex(Vector3(+1, +1, -1), Vector3(0,  1, 0), Vector2(1/5.0, 1)),
-            new Vertex(Vector3(+1, +1, +1), Vector3(0,  1, 0), Vector2(2/5.0, 1)),
-            new Vertex(Vector3(-1, +1, +1), Vector3(0,  1, 0), Vector2(2/5.0, 0)),
-            new Vertex(Vector3(-1, +1, -1), Vector3(0,  1, 0), Vector2(1/5.0, 0)));
-    // back
-    data.addQuad(
-            new Vertex(Vector3(+1, +1, +1), Vector3(0, 0,  1), Vector2(2/5.0, 1)),
-            new Vertex(Vector3(+1, -1, +1), Vector3(0, 0,  1), Vector2(3/5.0, 1)),
-            new Vertex(Vector3(-1, -1, +1), Vector3(0, 0,  1), Vector2(3/5.0, 0)),
-            new Vertex(Vector3(-1, +1, +1), Vector3(0, 0,  1), Vector2(2/5.0, 0)));
-    // left
-    data.addQuad(
-            new Vertex(Vector3(-1, -1, -1), Vector3(0, -1, 0), Vector2(3/5.0, 1)),
-            new Vertex(Vector3(-1, -1, +1), Vector3(0, -1, 0), Vector2(4/5.0, 1)),
-            new Vertex(Vector3(+1, -1, +1), Vector3(0, -1, 0), Vector2(4/5.0, 0)),
-            new Vertex(Vector3(+1, -1, -1), Vector3(0, -1, 0), Vector2(3/5.0, 0)));
-    // bottom
-    data.addQuad(
-            new Vertex(Vector3(-1, +1, -1), Vector3(-1, 0, 0), Vector2(4/5.0, 0)),
-            new Vertex(Vector3(-1, +1, +1), Vector3(-1, 0, 0), Vector2(5/5.0, 0)),
-            new Vertex(Vector3(-1, -1, +1), Vector3(-1, 0, 0), Vector2(5/5.0, 1)),
-            new Vertex(Vector3(-1, -1, -1), Vector3(-1, 0, 0), Vector2(4/5.0, 1)));
-    // top
-    data.addQuad(
-            new Vertex(Vector3(+1, -1, -1), Vector3( 1, 0, 0), Vector2(4/5.0, 0)),
-            new Vertex(Vector3(+1, -1, +1), Vector3( 1, 0, 0), Vector2(5/5.0, 0)),
-            new Vertex(Vector3(+1, +1, +1), Vector3( 1, 0, 0), Vector2(5/5.0, 1)),
-            new Vertex(Vector3(+1, +1, -1), Vector3( 1, 0, 0), Vector2(4/5.0, 1)));
-
     Material material = new Material();
     material.texture = cube;
-    MeshComponent mesh = new MeshComponent("mesh-1", data, material);
+    MeshComponent mesh = new MeshComponent("mesh-1", scene.getMesh(0), material);
     meshNode.attachComponent(mesh);
 
     // Example main loop
@@ -128,11 +95,12 @@ int main(string[] args) {
         // fontNode.rotation = degrees(i);
         // fontNode.rotation = degrees(sin(i * 0.05) * 10);
 
-        meshNode.orientation = Quaternion.identity;
-        meshNode.rotate(degrees(i * 0.5), Vector3(1, 1, 1), TransformSpace.Parent);
-        meshNode.rotate(degrees(i * 0.3), Vector3(0, 1, 0), TransformSpace.Parent);
-        meshNode.rotate(degrees(i * 0.2), Vector3(0, 1, 1), TransformSpace.Parent);
-        meshNode.position = Vector3(0, 0, sin(i * 0.01) * 0.5 - 1);
+        //meshNode.orientation = Quaternion.identity;
+        meshNode.orientation = Quaternion.yrotation(degrees(i * 0.2).radians);
+        //meshNode.rotate(degrees(i * 0.5), Vector3(1, 1, 1), TransformSpace.Parent);
+        //meshNode.rotate(degrees(i * 0.3), Vector3(0, 1, 0), TransformSpace.Parent);
+        //meshNode.rotate(degrees(i * 0.2), Vector3(0, 1, 1), TransformSpace.Parent);
+        // meshNode.position = Vector3(0, 0, sin(i * 0.01) * 0.5 - 1);
         // camNode.rotate(degrees(i * 0.01), Vector3(0,1,0), TransformSpace.Parent);
         //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
 

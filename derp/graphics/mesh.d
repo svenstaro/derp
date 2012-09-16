@@ -1,11 +1,16 @@
 module derp.graphics.mesh;
 
 import std.stdio;
+import std.string;
+import std.conv;
+import std.path;
 
 import derelict.opengl3.gl3;
+import derelict.assimp.assimp;
 
 import derp.math.all;
 import derp.core.geo;
+import derp.core.resources;
 import derp.core.scene;
 import derp.graphics.vertexbuffer;
 import derp.graphics.draw;
@@ -13,6 +18,97 @@ import derp.graphics.view;
 import derp.graphics.texture;
 import derp.graphics.shader;
 import derp.graphics.render;
+
+static bool _assimpInitialized = false;
+void initializeAssimp() {
+    if(!_assimpInitialized) {
+        DerelictASSIMP.load();
+        _assimpInitialized = true;
+    }
+}
+
+class Scene : Resource {
+private:
+    const(aiScene)* _scene;
+
+public:
+    /// Load the data from the resource loader and interpret it using
+    /// ASSIMP. Save the whole scene into _scene.
+    void initialize(string format = "") {
+        initializeAssimp();
+
+        if(format == "") {
+            try {
+                format = (cast(UrlString)this.source).url.extension();
+            } catch(Exception e) {
+                assert(false, "Cannot extract file type from extension, please provide a file type manually.");
+            }
+        }
+
+        this._scene = aiImportFileFromMemory(
+            cast(const(char)*)this.data.ptr,
+            cast(uint)this.data.length,
+            cast(uint)(
+                aiPostProcessSteps.CalcTangentSpace         | 
+                aiPostProcessSteps.Triangulate              |
+                aiPostProcessSteps.JoinIdenticalVertices    |
+                aiPostProcessSteps.GenNormals               |
+                aiPostProcessSteps.FlipWindingOrder         |
+                aiPostProcessSteps.SortByPType),
+            format.toStringz());
+        writeln("LOADED.");
+
+        if(this._scene is null) {
+            const(char)* e = aiGetErrorString();
+            string s = to!string(e);
+            writeln(s);
+            assert(false, "Scene could not be loaded by ASSIMP.");
+        }
+
+        writefln("Loaded scene %s with %s textures.", this.name, this._scene.mNumTextures);
+        foreach(s; this.meshNames)
+            writeln("Mesh: ", s, ";");
+    }
+
+    @property string[] meshNames() {
+        string[] names;
+        for(uint i = 0; i < this._scene.mNumMeshes; ++i) {
+            names ~= to!string(cast(char[])this._scene.mMeshes[i].mName.data);
+        }
+        return names;
+    }
+
+    MeshData getMesh(uint index) {
+        MeshData data = new MeshData();
+
+        const(aiMesh*) mesh = this._scene.mMeshes[index];
+        for(uint i = 0; i < mesh.mNumFaces; ++i) {
+            const(aiFace) face = mesh.mFaces[i];
+
+            // since we triangulated, we can assume exactly 3 vertices per face
+            // (triangles only)
+            for(uint v = 0; v < 3; ++v) {
+                aiVector3D p, n, uv;
+
+                uint vertex = face.mIndices[v];
+                p = mesh.mVertices[vertex];
+                n = mesh.mNormals[vertex];
+                uv = mesh.mTextureCoords[0][vertex];
+
+                data.addVertex(new Vertex(
+                            Vector3(p.x, -p.z, p.y),
+                            Vector3(n.x, n.z, n.y) * -1,
+                            Vector2(uv.x, uv.y)));
+            }
+        }
+
+        return data;
+    }
+
+    Texture getTexture(uint index) {
+        return null;
+    }
+}
 
 class Material {
 protected:
@@ -60,6 +156,12 @@ public:
             this._needUpdate = false;
             this._previousVertexBufferObject = vbo;
         }
+    }
+
+    void addVertex(Vertex a) {
+        this._vertices ~= a.toVertexData();
+
+        this._needUpdate = true;
     }
 
     void addTriangle(Vertex a, Vertex b, Vertex c) {

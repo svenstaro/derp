@@ -11,6 +11,7 @@ TARGET_LINK_LIBRARIES(derp
     luad
     orange
     DerelictAL
+    DerelictASSIMP
     DerelictFT
     DerelictGL3
     DerelictGLFW3
