@@ -110,6 +110,7 @@ public:
 
         setDepthTestMode(DepthTestMode.LessEqual);
         setBlendMode(BlendMode.Blend);
+        setCullMode(CullMode.Back);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

@@ -291,7 +291,7 @@ void main() {
     vec4 color = texture2D(uTexture0, fTexCoord) * fColor;
 
     vec4 diffuse = dot(fSunLightDirection, fNormal) * 1 * vec4(1, 1, 1, 1);
-    vec4 ambient = vec4(1, 1, 1, 1) * 0.1;
+    vec4 ambient = vec4(1, 1, 1, 1) * 0.5;
 
     gl_FragColor = vec4(clamp(color + diffuse + ambient, 0, 1).xyz, color.a);
 }
@@ -318,7 +318,7 @@ void main() {
     gl_Position = uProjectionMatrix * vPos;
     
     fPosition = vPos.xyz;
-    fNormal = vNormal;
+    fNormal = (uViewMatrix * uModelMatrix * vec4(vNormal, 1.0)).xyz;
     fColor = vColor;
     fTexCoord = vTexCoord;
 }

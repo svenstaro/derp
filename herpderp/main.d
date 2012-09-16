@@ -73,25 +73,36 @@ int main(string[] args) {
 
     MeshData data = new MeshData();
     data.addQuad(
-            new Vertex(Vector3(-1, -1, -1), Vector3(0, 0, -1)),
-            new Vertex(Vector3(-1, +1, -1), Vector3(0, 0, -1)),
+            new Vertex(Vector3(+1, -1, -1), Vector3(0, 0, -1)),
             new Vertex(Vector3(+1, +1, -1), Vector3(0, 0, -1)),
-            new Vertex(Vector3(+1, -1, -1), Vector3(0, 0, -1)));
+            new Vertex(Vector3(-1, +1, -1), Vector3(0, 0, -1)),
+            new Vertex(Vector3(-1, -1, -1), Vector3(0, 0, -1)));
     data.addQuad(
-            new Vertex(Vector3(-1, -1, +1), Vector3(0, 0, 1)),
-            new Vertex(Vector3(-1, +1, +1), Vector3(0, 0, 1)),
             new Vertex(Vector3(+1, +1, +1), Vector3(0, 0, 1)),
-            new Vertex(Vector3(+1, -1, +1), Vector3(0, 0, 1)));
+            new Vertex(Vector3(+1, -1, +1), Vector3(0, 0, 1)),
+            new Vertex(Vector3(-1, -1, +1), Vector3(0, 0, 1)),
+            new Vertex(Vector3(-1, +1, +1), Vector3(0, 0, 1)));
     data.addQuad(
             new Vertex(Vector3(-1, -1, -1), Vector3(0, -1, 0)),
             new Vertex(Vector3(-1, -1, +1), Vector3(0, -1, 0)),
             new Vertex(Vector3(+1, -1, +1), Vector3(0, -1, 0)),
             new Vertex(Vector3(+1, -1, -1), Vector3(0, -1, 0)));
     data.addQuad(
-            new Vertex(Vector3(-1, +1, -1), Vector3(0, 1, 0)),
-            new Vertex(Vector3(-1, +1, +1), Vector3(0, 1, 0)),
+            new Vertex(Vector3(+1, +1, -1), Vector3(0, 1, 0)),
             new Vertex(Vector3(+1, +1, +1), Vector3(0, 1, 0)),
-            new Vertex(Vector3(+1, +1, -1), Vector3(0, 1, 0)));
+            new Vertex(Vector3(-1, +1, +1), Vector3(0, 1, 0)),
+            new Vertex(Vector3(-1, +1, -1), Vector3(0, 1, 0)));
+    data.addQuad(
+            new Vertex(Vector3(-1, +1, -1), Vector3(-1, 0, 0)),
+            new Vertex(Vector3(-1, +1, +1), Vector3(-1, 0, 0)),
+            new Vertex(Vector3(-1, -1, +1), Vector3(-1, 0, 0)),
+            new Vertex(Vector3(-1, -1, -1), Vector3(-1, 0, 0)));
+    data.addQuad(                                          
+            new Vertex(Vector3(+1, -1, -1), Vector3(1, 0, 0)),
+            new Vertex(Vector3(+1, -1, +1), Vector3(1, 0, 0)),
+            new Vertex(Vector3(+1, +1, +1), Vector3(1, 0, 0)),
+            new Vertex(Vector3(+1, +1, -1), Vector3(1, 0, 0)));
+
     MeshComponent mesh = new MeshComponent("mesh-1", data, new Material());
     meshNode.attachComponent(mesh);
 
