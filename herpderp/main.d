@@ -5,6 +5,8 @@ import std.random;
 import std.format;
 import std.string;
 
+import derelict.opengl3.gl3;
+
 int main(string[] args) {
     // Create the window
     Window window = new Window("Hello World", 800, 600, Window.Mode.Windowed, true, Window.ViewportType.Viewport);
@@ -35,13 +37,13 @@ int main(string[] args) {
     spriteNode.position = Vector3(400, 300, 0);
 
     // Setup view
-    CameraComponent cam = new CameraComponent("camera1", degrees(60), 4/3);
+    CameraComponent cam = new CameraComponent("camera1", degrees(60), 1);
     cam.nearClipDistance = 1;
-    cam.farClipDistance = 30;
+    cam.farClipDistance = 20;
     // cam.projectionMode = CameraComponent.ProjectionMode.Perspective;
     window.viewports[0].currentCamera = cam;
     //cam.orthographicBounds = Rect(0, 0, 800, 600);
-    camNode.position = Vector3(5, 0, -10);
+    camNode.position = Vector3(0, 0, -2);
     //camNode.lookAt(Vector3(0, 0, 0));
     camNode.attachComponent(cam);
 

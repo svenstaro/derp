@@ -180,7 +180,7 @@ public:
         glCheck();
 
         // glDisable(GL_LIGHTING);
-        glDisable(GL_DEPTH_TEST);
+        // glDisable(GL_DEPTH_TEST);
         // glDisable(GL_ALPHA_TEST);
         // glEnable(GL_TEXTURE_2D);
         // glEnable(GL_BLEND);

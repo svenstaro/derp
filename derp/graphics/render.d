@@ -112,6 +112,8 @@ void setBlendMode(BlendMode bm) {
 
 ///Set Depth Test
 void setDepthTestMode(DepthTestMode dt) {
+
+    glDepthMask(dt == DepthTestMode.None ? GL_FALSE : GL_TRUE);
     final switch(dt)
     {
     case DepthTestMode.None:

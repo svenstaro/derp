@@ -286,7 +286,7 @@ uniform sampler2D uTexture0;
 
 void main() {
     //fSunLightDirection = normalize(fSunLightDirection);
-    vec3 fSunLightDirection = normalize(vec3(1, 2, 0.2));
+    vec3 fSunLightDirection = normalize(vec3(1, 0.3, 0.2));
 
     vec4 color = texture2D(uTexture0, fTexCoord) * fColor;
 
