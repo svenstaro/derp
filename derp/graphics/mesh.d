@@ -19,10 +19,13 @@ protected:
     ShaderProgram _shader;
 
 public:
+    Texture texture;
+
     // for now, only use a simple shader program instead of a complex shader
     // node structure
     this(ShaderProgram shader = null) {
         this._shader = (shader is null ? ShaderProgram.defaultPipeline : shader);
+        this.texture = Texture.empty;
     }
 
     @property ShaderProgram shader() {
@@ -31,7 +34,7 @@ public:
 
     void activate() {
         this._shader.attach();
-        this._shader.setTexture(Texture.empty, "uTexture0", 0);
+        this._shader.setTexture(this.texture, "uTexture0", 0);
         // ShaderProgram.defaultPipeline.
         // this._vbo.shaderProgram.attach();
         // this._vbo.shaderProgram.setTexture(this._texture, "uTexture0", 0);

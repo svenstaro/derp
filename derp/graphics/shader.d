@@ -290,8 +290,8 @@ void main() {
 
     vec4 color = texture2D(uTexture0, fTexCoord) * fColor;
 
-    vec4 diffuse = dot(fSunLightDirection, fNormal) * 1 * vec4(1, 1, 1, 1);
-    vec4 ambient = vec4(1, 1, 1, 1) * 0.5;
+    vec4 diffuse = dot(fSunLightDirection, fNormal) * 0.2 * vec4(1, 1, 1, 1);
+    vec4 ambient = vec4(1, 1, 1, 1) * 0.1;
 
     gl_FragColor = vec4(clamp(color + diffuse + ambient, 0, 1).xyz, color.a);
 }

@@ -15,6 +15,7 @@ int main(string[] args) {
     // Load texture
     ResourceManager resourceManager = new ResourceManager();
     Texture texture = resourceManager.loadT!Texture(new UrlString("data/icon.png"));
+    Texture cube = resourceManager.loadT!Texture(new UrlString("data/cube.png"));
 
     // Load font
     Font font = resourceManager.loadT!Font(new UrlString("data/fonts/dejavu/DejaVuSans.ttf"));
@@ -72,38 +73,46 @@ int main(string[] args) {
     polyNode.scale = Vector3(0.2, 0.2, 0.2);
 
     MeshData data = new MeshData();
+    // front
     data.addQuad(
-            new Vertex(Vector3(+1, -1, -1), Vector3(0, 0, -1)),
-            new Vertex(Vector3(+1, +1, -1), Vector3(0, 0, -1)),
-            new Vertex(Vector3(-1, +1, -1), Vector3(0, 0, -1)),
-            new Vertex(Vector3(-1, -1, -1), Vector3(0, 0, -1)));
+            new Vertex(Vector3(+1, -1, -1), Vector3(0, 0, -1), Vector2(0/5.0, 0)),
+            new Vertex(Vector3(+1, +1, -1), Vector3(0, 0, -1), Vector2(1/5.0, 0)),
+            new Vertex(Vector3(-1, +1, -1), Vector3(0, 0, -1), Vector2(1/5.0, 1)),
+            new Vertex(Vector3(-1, -1, -1), Vector3(0, 0, -1), Vector2(0/5.0, 1)));
+    // right
     data.addQuad(
-            new Vertex(Vector3(+1, +1, +1), Vector3(0, 0, 1)),
-            new Vertex(Vector3(+1, -1, +1), Vector3(0, 0, 1)),
-            new Vertex(Vector3(-1, -1, +1), Vector3(0, 0, 1)),
-            new Vertex(Vector3(-1, +1, +1), Vector3(0, 0, 1)));
+            new Vertex(Vector3(+1, +1, -1), Vector3(0,  1, 0), Vector2(1/5.0, 0)),
+            new Vertex(Vector3(+1, +1, +1), Vector3(0,  1, 0), Vector2(2/5.0, 0)),
+            new Vertex(Vector3(-1, +1, +1), Vector3(0,  1, 0), Vector2(2/5.0, 1)),
+            new Vertex(Vector3(-1, +1, -1), Vector3(0,  1, 0), Vector2(1/5.0, 1)));
+    // back
     data.addQuad(
-            new Vertex(Vector3(-1, -1, -1), Vector3(0, -1, 0)),
-            new Vertex(Vector3(-1, -1, +1), Vector3(0, -1, 0)),
-            new Vertex(Vector3(+1, -1, +1), Vector3(0, -1, 0)),
-            new Vertex(Vector3(+1, -1, -1), Vector3(0, -1, 0)));
+            new Vertex(Vector3(+1, +1, +1), Vector3(0, 0,  1), Vector2(2/5.0, 0)),
+            new Vertex(Vector3(+1, -1, +1), Vector3(0, 0,  1), Vector2(3/5.0, 0)),
+            new Vertex(Vector3(-1, -1, +1), Vector3(0, 0,  1), Vector2(3/5.0, 1)),
+            new Vertex(Vector3(-1, +1, +1), Vector3(0, 0,  1), Vector2(2/5.0, 1)));
+    // left
     data.addQuad(
-            new Vertex(Vector3(+1, +1, -1), Vector3(0, 1, 0)),
-            new Vertex(Vector3(+1, +1, +1), Vector3(0, 1, 0)),
-            new Vertex(Vector3(-1, +1, +1), Vector3(0, 1, 0)),
-            new Vertex(Vector3(-1, +1, -1), Vector3(0, 1, 0)));
+            new Vertex(Vector3(-1, -1, -1), Vector3(0, -1, 0), Vector2(3/5.0, 0)),
+            new Vertex(Vector3(-1, -1, +1), Vector3(0, -1, 0), Vector2(4/5.0, 0)),
+            new Vertex(Vector3(+1, -1, +1), Vector3(0, -1, 0), Vector2(4/5.0, 1)),
+            new Vertex(Vector3(+1, -1, -1), Vector3(0, -1, 0), Vector2(3/5.0, 1)));
+    // bottom
     data.addQuad(
-            new Vertex(Vector3(-1, +1, -1), Vector3(-1, 0, 0)),
-            new Vertex(Vector3(-1, +1, +1), Vector3(-1, 0, 0)),
-            new Vertex(Vector3(-1, -1, +1), Vector3(-1, 0, 0)),
-            new Vertex(Vector3(-1, -1, -1), Vector3(-1, 0, 0)));
-    data.addQuad(                                          
-            new Vertex(Vector3(+1, -1, -1), Vector3(1, 0, 0)),
-            new Vertex(Vector3(+1, -1, +1), Vector3(1, 0, 0)),
-            new Vertex(Vector3(+1, +1, +1), Vector3(1, 0, 0)),
-            new Vertex(Vector3(+1, +1, -1), Vector3(1, 0, 0)));
+            new Vertex(Vector3(-1, +1, -1), Vector3(-1, 0, 0), Vector2(4/5.0, 0)),
+            new Vertex(Vector3(-1, +1, +1), Vector3(-1, 0, 0), Vector2(5/5.0, 0)),
+            new Vertex(Vector3(-1, -1, +1), Vector3(-1, 0, 0), Vector2(5/5.0, 1)),
+            new Vertex(Vector3(-1, -1, -1), Vector3(-1, 0, 0), Vector2(4/5.0, 1)));
+    // top
+    data.addQuad(
+            new Vertex(Vector3(+1, -1, -1), Vector3( 1, 0, 0), Vector2(4/5.0, 0)),
+            new Vertex(Vector3(+1, -1, +1), Vector3( 1, 0, 0), Vector2(5/5.0, 0)),
+            new Vertex(Vector3(+1, +1, +1), Vector3( 1, 0, 0), Vector2(5/5.0, 1)),
+            new Vertex(Vector3(+1, +1, -1), Vector3( 1, 0, 0), Vector2(4/5.0, 1)));
 
-    MeshComponent mesh = new MeshComponent("mesh-1", data, new Material());
+    Material material = new Material();
+    material.texture = cube;
+    MeshComponent mesh = new MeshComponent("mesh-1", data, material);
     meshNode.attachComponent(mesh);
 
     // Example main loop
