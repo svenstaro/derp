@@ -21,7 +21,6 @@ int main(string[] args) {
     Scene scene = resourceManager.loadT!Scene(new UrlString("data/teamonkey.dae"));
     scene.initialize();
 
-
     // Load font
     Font font = resourceManager.loadT!Font(new UrlString("data/fonts/dejavu/DejaVuSans.ttf"));
     font.pointSize = 30;

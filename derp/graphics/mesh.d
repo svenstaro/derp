@@ -4,6 +4,7 @@ import std.stdio;
 import std.string;
 import std.conv;
 import std.path;
+import std.utf;
 
 import derelict.opengl3.gl3;
 import derelict.assimp.assimp;
@@ -27,6 +28,10 @@ void initializeAssimp() {
     }
 }
 
+string aistr(aiString s) {
+    return toUTF8(s.data[0 .. s.length]);
+}
+
 class Scene : Resource {
 private:
     const(aiScene)* _scene;
@@ -36,49 +41,65 @@ public:
     /// ASSIMP. Save the whole scene into _scene.
     void initialize(string format = "") {
         initializeAssimp();
+        aiString s;
+        aiGetExtensionList(&s);
+        writeln(s.aistr());
 
         if(format == "") {
             try {
-                format = (cast(UrlString)this.source).url.extension();
+                format = (cast(UrlString)this.source).url.extension()[1..$].toLower();
             } catch(Exception e) {
                 assert(false, "Cannot extract file type from extension, please provide a file type manually.");
             }
         }
 
+        writefln("Loading %s file.", format);
         this._scene = aiImportFileFromMemory(
             cast(const(char)*)this.data.ptr,
             cast(uint)this.data.length,
-            cast(uint)(
-                aiPostProcessSteps.CalcTangentSpace         | 
-                aiPostProcessSteps.Triangulate              |
-                aiPostProcessSteps.JoinIdenticalVertices    |
-                aiPostProcessSteps.GenNormals               |
-                aiPostProcessSteps.FlipWindingOrder         |
-                aiPostProcessSteps.SortByPType),
-            format.toStringz());
-        writeln("LOADED.");
+            cast(uint)(aiPostProcessSteps.CalcTangentSpace
+                | aiPostProcessSteps.Triangulate
+                | aiPostProcessSteps.JoinIdenticalVertices
+                | aiPostProcessSteps.GenNormals
+                | aiPostProcessSteps.FlipWindingOrder
+                | aiPostProcessSteps.SortByPType),
+                format.toStringz());
 
         if(this._scene is null) {
-            const(char)* e = aiGetErrorString();
-            string s = to!string(e);
-            writeln(s);
-            assert(false, "Scene could not be loaded by ASSIMP.");
+            assert(false, "Scene could not be loaded by ASSIMP: " ~ to!string(aiGetErrorString()));
         }
 
-        writefln("Loaded scene %s with %s textures.", this.name, this._scene.mNumTextures);
-        foreach(s; this.meshNames)
-            writeln("Mesh: ", s, ";");
+        writefln("Loaded scene %s with\n  %s\tanimations\n  %s\tcameras\n  %s\tlights\n  %s\tmaterials\n  %s\tmeshes\n  %s\ttextures",
+            this.name, this._scene.mNumAnimations, this._scene.mNumCameras,
+            this._scene.mNumLights, this._scene.mNumMaterials,
+            this._scene.mNumMeshes, this._scene.mNumTextures);
+
+        writeln("NODE TREE");
+        writeNode(this._scene.mRootNode);
+    }
+
+    void writeNode(const(aiNode*) n, int i = 1) {
+        for(int x = 0; x < i; ++x) {
+            write("  ");
+        }
+
+        writeln("|-", n.mNumChildren > 0 ? "+" : "- "," ", n.mName.aistr());
+
+        for(int x = 0; x < n.mNumChildren; ++x)
+            writeNode(n.mChildren[x], i + 1);
     }
 
     @property string[] meshNames() {
         string[] names;
         for(uint i = 0; i < this._scene.mNumMeshes; ++i) {
-            names ~= to!string(cast(char[])this._scene.mMeshes[i].mName.data);
+            names ~= this._scene.mMeshes[i].mName.aistr();
         }
         return names;
     }
 
-    MeshData getMesh(uint index) {
+    MeshData getMesh(uint index, uint uvIndex = 0) {
+        assert(index < this._scene.mNumMeshes, "There is no mesh " ~ to!string(index) ~ " in scene " ~ this.name ~ ".");
+
         MeshData data = new MeshData();
 
         const(aiMesh*) mesh = this._scene.mMeshes[index];
@@ -93,7 +114,11 @@ public:
                 uint vertex = face.mIndices[v];
                 p = mesh.mVertices[vertex];
                 n = mesh.mNormals[vertex];
-                uv = mesh.mTextureCoords[0][vertex];
+
+                // check if the mesh has texture coordinates
+                if(mesh.mTextureCoords[uvIndex] !is null) {
+                    uv = mesh.mTextureCoords[uvIndex][vertex];
+                }
 
                 data.addVertex(new Vertex(
                             Vector3(p.x, -p.z, p.y),
@@ -105,8 +130,17 @@ public:
         return data;
     }
 
-    Texture getTexture(uint index) {
-        return null;
+    Texture getTexture(uint index, string name) {
+        assert(index < this._scene.mNumTextures, "There is no texture " ~ to!string(index) ~ " in scene " ~ this.name ~ ".");
+
+        const(aiTexture*) texture = this._scene.mTextures[index];
+
+        ResourceManager mgr = new ResourceManager();
+        ByteArrayResourceGenerator gen = new ByteArrayResourceGenerator(null); // TODO: give texture data here
+        mgr.registerLoader("bytearray-texture", gen);
+        Texture t = mgr.loadT!Texture(new ResourceSettings(), gen, name);
+        t.isRawData = (texture.mHeight != 0);
+        return t;
     }
 }
 
@@ -140,7 +174,7 @@ public:
 class MeshData {
 protected:
     VertexData[] _vertices;
-    
+
     bool _needUpdate;
     VertexBufferObject _previousVertexBufferObject;
 
@@ -203,7 +237,7 @@ public:
     void _updateVertices() {
         this._vbo.setVertices(this._data.vertices);
     }
-    
+
     void prepareRender(RenderQueue queue) {
         queue.push(cast(Renderable) this);
     }
@@ -221,7 +255,7 @@ public:
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        
+
         this._material.activate();
         this._vbo.render(this.node.derivedMatrix, queue.camera.viewMatrix, queue.camera.projectionMatrix);
     }

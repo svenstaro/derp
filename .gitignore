@@ -9,3 +9,5 @@ lib/
 docs/
 build
 compile
+*.blend*
+!*.blend

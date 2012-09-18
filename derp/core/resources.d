@@ -278,6 +278,22 @@ abstract class ResourceGenerator : ResourceLoader {
 }
 
 /**
+ * Returns an already-loaded byte array as resource data. Use the constructor
+ * to supply the data.
+ */
+class ByteArrayResourceGenerator : ResourceGenerator {
+    byte[] data;
+
+    this(byte[] data) {
+        this.data = data;
+    }
+
+    byte[] generate(ResourceSettings settings) {
+        return data;
+    }
+}
+
+/**
  * Loads a resource from a MergedFileSystem.
  */
 class FilesystemResourceLoader : UrlResourceLoader {
