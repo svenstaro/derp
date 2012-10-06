@@ -113,6 +113,13 @@ public:
         return this._localScale;
     }
 
+    /// ditto
+    @property Vector3 scale(in float s) @safe nothrow {
+        this._requestUpdate(Update.Scale);
+        this._localScale = Vector3(s, s, s);
+        return this._localScale;
+    }
+
     /// Position relative to world.
     @property Vector3 derivedPosition() @safe nothrow {
         if(this._needPositionUpdate && this._parent) {

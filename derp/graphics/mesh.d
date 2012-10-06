@@ -43,7 +43,7 @@ public:
         initializeAssimp();
         aiString s;
         aiGetExtensionList(&s);
-        writeln(s.aistr());
+        //writeln(s.aistr());
 
         if(format == "") {
             try {
@@ -53,7 +53,7 @@ public:
             }
         }
 
-        writefln("Loading %s file.", format);
+        //writefln("Loading %s file.", format);
         this._scene = aiImportFileFromMemory(
             cast(const(char)*)this.data.ptr,
             cast(uint)this.data.length,
@@ -69,13 +69,13 @@ public:
             assert(false, "Scene could not be loaded by ASSIMP: " ~ to!string(aiGetErrorString()));
         }
 
-        writefln("Loaded scene %s with\n  %s\tanimations\n  %s\tcameras\n  %s\tlights\n  %s\tmaterials\n  %s\tmeshes\n  %s\ttextures",
-            this.name, this._scene.mNumAnimations, this._scene.mNumCameras,
-            this._scene.mNumLights, this._scene.mNumMaterials,
-            this._scene.mNumMeshes, this._scene.mNumTextures);
+        //writefln("Loaded scene %s with\n  %s\tanimations\n  %s\tcameras\n  %s\tlights\n  %s\tmaterials\n  %s\tmeshes\n  %s\ttextures",
+        //    this.name, this._scene.mNumAnimations, this._scene.mNumCameras,
+        //    this._scene.mNumLights, this._scene.mNumMaterials,
+        //    this._scene.mNumMeshes, this._scene.mNumTextures);
 
-        writeln("NODE TREE");
-        writeNode(this._scene.mRootNode);
+        //writeln("NODE TREE");
+        //writeNode(this._scene.mRootNode);
     }
 
     void writeNode(const(aiNode*) n, int i = 1) {
@@ -249,7 +249,7 @@ public:
 
         setDepthTestMode(DepthTestMode.LessEqual);
         setBlendMode(BlendMode.Blend);
-        setCullMode(CullMode.Back);
+        //setCullMode(CullMode.Back);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

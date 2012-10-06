@@ -28,10 +28,15 @@ int main(string[] args) {
     // Create scene graph
     Node rootNode = new Node("rootNode");
     Node camNode = new Node("camNode", rootNode);
-    Node spriteNode = new Node("spriteNode", rootNode);
-    Node fontNode = new Node("fontNode", rootNode);
-    Node polyNode = new Node("polyNode", rootNode);
     Node meshNode = new Node("meshNode", rootNode);
+    // 2D stuff
+    Node spritePlane = new Node("2DPlane", rootNode);
+    Node spriteNode = new Node("spriteNode", spritePlane);
+    Node fontNode = new Node("fontNode", spritePlane);
+    Node polyNode = new Node("polyNode", spritePlane);
+
+    spritePlane.scale = 1 / 100.0; //pixels per unit
+    spritePlane.position = Vector3(2, 0, 0);
 
     // Create sprite
     SpriteComponent sprite = new SpriteComponent("Sprite", texture);
@@ -39,24 +44,29 @@ int main(string[] args) {
     sprite.smooth = true;
     // sprite.subRect = Rect(0.4, 0.4, 0.2, 0.2);
 
-    spriteNode.position = Vector3(400, 300, 0);
+    // spriteNode.position = Vector3(400, 300, 0);
 
     // Setup view
-    CameraComponent cam = new CameraComponent("camera1", degrees(60), 3.0/4.0);
+    Viewport v = window.viewports[0];
+    writeln(v.aspectRatio);
+    CameraComponent cam = new CameraComponent("camera1", degrees(60), v.aspectRatio);
     cam.nearClipDistance = 1;
     cam.farClipDistance = 20;
     // cam.projectionMode = CameraComponent.ProjectionMode.Perspective;
-    window.viewports[0].currentCamera = cam;
+    v.currentCamera = cam;
     //cam.orthographicBounds = Rect(0, 0, 800, 600);
-    camNode.position = Vector3(0, 0, -2);
+    camNode.position = Vector3(0, 0, -3);
+    //camNode.orientation = Quaternion.xrotation(degrees(30).radians);
     //camNode.lookAt(Vector3(0, 0, 0));
     camNode.attachComponent(cam);
+
+    //setCullMode(CullMode.None);
 
     // Headline
     TextComponent text = new TextComponent("headline", "Derp is awesome!", font);
     text.color = Color.Green;
     fontNode.attachComponent(text);
-    fontNode.position = Vector3(400, 100, 0);
+    //fontNode.position = Vector3(400, 100, 0);
 
     PolygonComponent poly = new PolygonComponent("test-1");
     poly.color = Color(1, 0, 0, 0.8);
@@ -73,8 +83,8 @@ int main(string[] args) {
     poly.addPoint(Vector2(   0, -100));
 
     polyNode.attachComponent(poly);
-    polyNode.position = Vector3(700, 500, 0);
-    polyNode.scale = Vector3(0.2, 0.2, 0.2);
+    polyNode.position = Vector3(0, 0, 1);
+    //polyNode.scale = Vector3(0.2, 0.2, 0.2);
 
     Material material = new Material();
     material.texture = cube;
@@ -82,26 +92,16 @@ int main(string[] args) {
     meshNode.attachComponent(mesh);
 
     // Example main loop
-    float x = 0;
-    int i = 0;
     while(window.isOpen) {
-        i++;
-        x += 0.05;
-        spriteNode.rotation = degrees(- i * 0.5);
-        sprite.scale = 0.1 * sin(i * 0.05) + 1;
+        double dt = window.tick();
 
-        //fontNode.orientation = Quaternion.yrotation(x);
-        // fontNode.rotation = degrees(i);
-        // fontNode.rotation = degrees(sin(i * 0.05) * 10);
+        writefln("%s - %s", window.currentFPS, window.averageFPS);
 
-        //meshNode.orientation = Quaternion.identity;
-        meshNode.orientation = Quaternion.yrotation(degrees(i * 0.2).radians);
-        //meshNode.rotate(degrees(i * 0.5), Vector3(1, 1, 1), TransformSpace.Parent);
-        //meshNode.rotate(degrees(i * 0.3), Vector3(0, 1, 0), TransformSpace.Parent);
-        //meshNode.rotate(degrees(i * 0.2), Vector3(0, 1, 1), TransformSpace.Parent);
-        // meshNode.position = Vector3(0, 0, sin(i * 0.01) * 0.5 - 1);
-        // camNode.rotate(degrees(i * 0.01), Vector3(0,1,0), TransformSpace.Parent);
-        //camNode.position = Vector3(sin(x), cos(x), 0) * -100;
+        sprite.scale = 0.1 * sin(window.lifetime * 2) + 1;
+        meshNode.position = Vector3(sin(window.lifetime), 0, 0);
+        spritePlane.orientation = Quaternion.yrotation(degrees(window.lifetime * 100).radians);
+
+        meshNode.orientation = Quaternion.yrotation(degrees(window.lifetime * 0.2).radians);
 
         window.update();
         window.clear();

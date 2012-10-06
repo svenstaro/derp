@@ -30,6 +30,11 @@ public:
         this.bounds = bounds;
     }
 
+    // width / height
+    @property float aspectRatio() {
+        return this.bounds.size.x / this.bounds.size.y;
+    }
+
     @property void currentCamera(CameraComponent camera) {
         if(!this._allowChangeCamera) {
             throw new Exception("For this viewport the camera may not be changed.");

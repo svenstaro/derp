@@ -6,6 +6,7 @@ module derp.graphics.window;
 
 import std.stdio;
 import std.string;
+import std.datetime;
 
 import derelict.opengl3.gl3;
 import derelict.glfw3.glfw3;
@@ -28,11 +29,17 @@ public:
     }
 
     Color backgroundColor;
+    double currentFrameTime = 0.0;
+    double currentFPS = 0.0;
+    double averageFPS = 0.0;
+    double lifetime = 0.0;
+    int totalFrames = 0;
 
 private:
     GLFWwindow _glfwWindow;
     Viewport[] _viewports;
     bool _isOpen;
+    StopWatch _clock;
 
 public:
     enum ViewportType {
@@ -114,8 +121,28 @@ public:
 
     void activate() {
         reloadGraphics(this);
+        this._clock.start();
+    }
+    
+    /// Updates all the timing information. Call every frame. Returns currentFrameTime.
+    float tick() {
+        TickDuration t = this._clock.peek();
+        this._clock.reset();
+
+        this.currentFrameTime = t.nsecs / 1_000_000_000.0;
+            //1.0 * t.length / t.ticksPerSec;
+        this.currentFPS = 1 / this.currentFrameTime;
+
+        float weight = 0.1;
+        this.averageFPS = (1.0 - weight) * this.averageFPS + weight * this.currentFPS;
+
+        this.lifetime += this.currentFrameTime;
+        this.totalFrames++;
+
+        return this.currentFrameTime;
     }
 
+    /// Reads window state from glfw. Required every frame for input etc...
     void update() {
         int x, y;
         glfwGetCursorPos(this._glfwWindow, &x, &y);
